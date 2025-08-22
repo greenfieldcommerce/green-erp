@@ -1,0 +1,20 @@
+type Query {
+    contractorById(id: Int): ContractorRecord!
+}
+
+type ContractorRecord {
+    id: Int!
+    name: String!
+}
+
+type Rate {
+    id: Int!
+    rate: Float!
+    currency: Currency!
+    startDateTime: String!
+    endDateTime: String!
+}
+
+type Currency {
+    currencyCode: String!
+}
