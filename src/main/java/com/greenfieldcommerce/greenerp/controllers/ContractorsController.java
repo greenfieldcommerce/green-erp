@@ -35,7 +35,7 @@ public class ContractorsController
 	@GetMapping
 	public List<ContractorRecord> getAllContractors()
 	{
-		return contractorRepository.findAll().stream().map(c -> contractorToRecordMapper.map(c)).toList();
+		return contractorRepository.findAll().stream().map(contractorToRecordMapper::map).toList();
 	}
 
 	@PostMapping
