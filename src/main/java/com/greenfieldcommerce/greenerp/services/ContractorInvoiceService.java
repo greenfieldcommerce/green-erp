@@ -2,8 +2,6 @@ package com.greenfieldcommerce.greenerp.services;
 
 import java.math.BigDecimal;
 
-import com.greenfieldcommerce.greenerp.entities.Contractor;
-import com.greenfieldcommerce.greenerp.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 
 public interface ContractorInvoiceService

@@ -56,6 +56,12 @@ public class ContractorServiceImpl implements ContractorService
 		return contractorToRecordMapper.map(contractorRepository.save(contractor));
 	}
 
+	@Override
+	public Contractor findEntityById(final Long id)
+	{
+		return internalFindById(id);
+	}
+
 	private Contractor internalFindById(final Long id)
 	{
 		return contractorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("CONTRACTOR_NOT_FOUND", String.format("Contractor with id '%s' not found", id)));

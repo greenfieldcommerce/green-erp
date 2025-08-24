@@ -3,30 +3,29 @@ package com.greenfieldcommerce.greenerp.services.impl;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.greenfieldcommerce.greenerp.entities.Contractor;
 import com.greenfieldcommerce.greenerp.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
+import com.greenfieldcommerce.greenerp.exceptions.NoActiveContractorRateException;
 import com.greenfieldcommerce.greenerp.mappers.Mapper;
 import com.greenfieldcommerce.greenerp.records.contractorrate.ContractorRateRecord;
 import com.greenfieldcommerce.greenerp.records.contractorrate.CreateContractorRateRecord;
 import com.greenfieldcommerce.greenerp.repositories.ContractorRateRepository;
-import com.greenfieldcommerce.greenerp.repositories.ContractorRepository;
 import com.greenfieldcommerce.greenerp.services.ContractorRateService;
+import com.greenfieldcommerce.greenerp.services.ContractorService;
 
 @Service
 public class ContractorRateServiceImpl implements ContractorRateService
 {
-	private final ContractorRepository contractorRepository;
+	private final ContractorService contractorService;
 	private final ContractorRateRepository contractorRateRepository;
 	private final Mapper<ContractorRate, ContractorRateRecord> contractorRateToRecordMapper;
 
-	public ContractorRateServiceImpl(final ContractorRepository contractorRepository, final ContractorRateRepository contractorRateRepository, final Mapper<ContractorRate, ContractorRateRecord> contractorRateToRecordMapper)
+	public ContractorRateServiceImpl(final ContractorService contractorService, final ContractorRateRepository contractorRateRepository, final Mapper<ContractorRate, ContractorRateRecord> contractorRateToRecordMapper)
 	{
-		this.contractorRepository = contractorRepository;
+		this.contractorService = contractorService;
 		this.contractorRateRepository = contractorRateRepository;
 		this.contractorRateToRecordMapper = contractorRateToRecordMapper;
 	}
@@ -47,7 +46,7 @@ public class ContractorRateServiceImpl implements ContractorRateService
 	@Override
 	public ContractorRateRecord create(final Long contractorId, final CreateContractorRateRecord record)
 	{
-		final Contractor contractor = contractorRepository.findById(contractorId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Contractor with id %s not found", contractorId)));
+		final Contractor contractor = contractorService.findEntityById(contractorId);
 		final ContractorRate rate = ContractorRate.create(contractor, record.rate(), record.currency(), record.startDateTime(), record.endDateTime());
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(rate));
 	}
@@ -59,6 +58,12 @@ public class ContractorRateServiceImpl implements ContractorRateService
 		contractorRate.setEndDateTime(newEndDateTimeRecord);
 
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(contractorRate));
+	}
+
+	@Override
+	public ContractorRate findCurrentRateForContractor(final Contractor contractor)
+	{
+		return contractor.getCurrentRate().orElseThrow(() -> new NoActiveContractorRateException("NO_ACTIVE_RATE", String.format("No active rate for %s", contractor.getName())));
 	}
 
 	private ContractorRate internalFindByIdAndContractorId(final Long rateId, final Long contractorId)
