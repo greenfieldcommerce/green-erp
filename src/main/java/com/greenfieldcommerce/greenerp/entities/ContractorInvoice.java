@@ -62,7 +62,7 @@ public class ContractorInvoice
 		this.currency = rate.getCurrency();
 
 		this.startDate = ZonedDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).with(LocalTime.MIDNIGHT);
-		this.endDate = startDate.plusMonths(1).minusNanos(1);
+		this.endDate = startDate.plusMonths(1).minusSeconds(1);
 
 		this.numberOfWorkedDays = numberOfWorkedDays;
 		this.extraAmount = extraAmount;

@@ -12,9 +12,6 @@ public class CreateContractorMapper implements Mapper<CreateContractorRecord, Co
 	@Override
 	public Contractor map(final CreateContractorRecord createContractorRecord)
 	{
-		final Contractor contractor = new Contractor();
-		contractor.setEmail(createContractorRecord.email());
-		contractor.setName(createContractorRecord.name());
-		return contractor;
+		return Contractor.create(createContractorRecord.email(), createContractorRecord.name());
 	}
 }

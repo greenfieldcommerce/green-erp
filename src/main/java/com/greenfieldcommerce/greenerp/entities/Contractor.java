@@ -32,23 +32,30 @@ public class Contractor
 	private String name;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "contractor")
-	private List<ContractorRate> rates = new ArrayList<>();
+	private final List<ContractorRate> rates = new ArrayList<>();
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "contractor")
-	private List<ContractorInvoice> invoices = new ArrayList<>();
+	private final List<ContractorInvoice> invoices = new ArrayList<>();
 
 	@Version
 	private Long version;
 
-	public Optional<ContractorRate> getCurrentRate()
+	protected Contractor() {}
+
+	private Contractor(final String name, final String email)
 	{
-		ZonedDateTime now = ZonedDateTime.now();
-		return CollectionUtils.emptyIfNull(rates).stream().filter(rate -> isActiveRate(rate, now)).findFirst();
+		this.name = name;
+		this.email = email;
 	}
 
-	private boolean isActiveRate(ContractorRate rate, ZonedDateTime now)
+	public static Contractor create(String name, String email)
 	{
-		return rate.getStartDateTime().isBefore(now) && rate.getEndDateTime().isAfter(now);
+		return new Contractor(name, email);
+	}
+
+	public Optional<ContractorRate> getCurrentRate()
+	{
+		return CollectionUtils.emptyIfNull(rates).stream().filter(ContractorRate::isActive).findFirst();
 	}
 
 	public Long getId()

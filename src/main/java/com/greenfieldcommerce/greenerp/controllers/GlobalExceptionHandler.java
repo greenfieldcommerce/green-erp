@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.greenfieldcommerce.greenerp.exceptions.BusinessException;
+import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.records.ApiError;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,17 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler
 {
+
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<ApiError> handleBusinessException(EntityNotFoundException ex, HttpServletRequest request) {
+		final ApiError error = new ApiError(
+			HttpStatus.NOT_FOUND.value(),
+			HttpStatus.NOT_FOUND.getReasonPhrase(),
+			ex.getCode(),
+			ex.getMessage(),
+			request.getRequestURI(), new HashMap<>());
+		return ResponseEntity.unprocessableEntity().body(error);
+	}
 
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<ApiError> handleBusinessException(BusinessException ex, HttpServletRequest request) {

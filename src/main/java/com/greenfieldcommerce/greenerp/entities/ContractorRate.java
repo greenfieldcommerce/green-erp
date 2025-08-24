@@ -39,59 +39,31 @@ public class ContractorRate
 	@Version
 	private Long version;
 
-	public Long getId()
-	{
-		return id;
-	}
+	protected ContractorRate(){}
 
-	public void setId(final Long id)
-	{
-		this.id = id;
-	}
-
-	public Contractor getContractor()
-	{
-		return contractor;
-	}
-
-	public void setContractor(final Contractor contractor)
+	private ContractorRate(final Contractor contractor, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
 	{
 		this.contractor = contractor;
-	}
-
-	public BigDecimal getRate()
-	{
-		return rate;
-	}
-
-	public void setRate(final BigDecimal rate)
-	{
 		this.rate = rate;
-	}
-
-	public Currency getCurrency()
-	{
-		return currency;
-	}
-
-	public void setCurrency(final Currency currency)
-	{
 		this.currency = currency;
-	}
-
-	public ZonedDateTime getStartDateTime()
-	{
-		return startDateTime;
-	}
-
-	public void setStartDateTime(final ZonedDateTime startDateTime)
-	{
 		this.startDateTime = startDateTime;
+		this.endDateTime = endDateTime;
 	}
 
-	public ZonedDateTime getEndDateTime()
+	public static ContractorRate create(final Contractor contractor, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
 	{
-		return endDateTime;
+		return new ContractorRate(contractor, rate, currency, startDateTime, endDateTime);
+	}
+
+	public boolean isActive()
+	{
+		final ZonedDateTime now = ZonedDateTime.now();
+		return startDateTime.isBefore(now) && endDateTime.isAfter(now);
+	}
+
+	public void inactivate()
+	{
+		this.endDateTime = ZonedDateTime.now();
 	}
 
 	public void setEndDateTime(final ZonedDateTime endDateTime)
@@ -99,13 +71,34 @@ public class ContractorRate
 		this.endDateTime = endDateTime;
 	}
 
-	public Long getVersion()
+	public Long getId()
 	{
-		return version;
+		return id;
 	}
 
-	public void setVersion(final Long version)
+	public Contractor getContractor()
 	{
-		this.version = version;
+		return contractor;
 	}
+
+	public BigDecimal getRate()
+	{
+		return rate;
+	}
+
+	public Currency getCurrency()
+	{
+		return currency;
+	}
+
+	public ZonedDateTime getStartDateTime()
+	{
+		return startDateTime;
+	}
+
+	public ZonedDateTime getEndDateTime()
+	{
+		return endDateTime;
+	}
+
 }

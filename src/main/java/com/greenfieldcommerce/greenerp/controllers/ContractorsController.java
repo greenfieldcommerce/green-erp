@@ -3,16 +3,17 @@ package com.greenfieldcommerce.greenerp.controllers;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.greenfieldcommerce.greenerp.mappers.Mapper;
-import com.greenfieldcommerce.greenerp.entities.Contractor;
+import com.greenfieldcommerce.greenerp.annotations.ValidatedId;
 import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
 import com.greenfieldcommerce.greenerp.records.contractor.CreateContractorRecord;
-import com.greenfieldcommerce.greenerp.repositories.ContractorRepository;
+import com.greenfieldcommerce.greenerp.services.ContractorService;
 
 import jakarta.validation.Valid;
 
@@ -20,29 +21,28 @@ import jakarta.validation.Valid;
 @RequestMapping(value = "/contractors")
 public class ContractorsController
 {
+	private final ContractorService contractorService;
 
-	private final ContractorRepository contractorRepository;
-	private final Mapper<CreateContractorRecord, Contractor> createContractorMapper;
-	private final Mapper<Contractor, ContractorRecord> contractorToRecordMapper;
-
-	public ContractorsController(final ContractorRepository contractorRepository, final Mapper<CreateContractorRecord, Contractor> createContractorMapper, final Mapper<Contractor, ContractorRecord> contractorToRecordMapper)
+	public ContractorsController(final ContractorService contractorService)
 	{
-		this.contractorRepository = contractorRepository;
-		this.createContractorMapper = createContractorMapper;
-		this.contractorToRecordMapper = contractorToRecordMapper;
+		this.contractorService = contractorService;
 	}
 
 	@GetMapping
 	public List<ContractorRecord> getAllContractors()
 	{
-		return contractorRepository.findAll().stream().map(contractorToRecordMapper::map).toList();
+		return contractorService.findAll();
 	}
 
 	@PostMapping
 	public ContractorRecord createContractor(@Valid @RequestBody CreateContractorRecord record)
 	{
-		final Contractor contractor = createContractorMapper.map(record);
-		final Contractor saved = contractorRepository.save(contractor);
-		return contractorToRecordMapper.map(saved);
+		return contractorService.create(record);
+	}
+
+	@PatchMapping(value = "/{contractorId}")
+	public ContractorRecord updateContractor(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorRecord record)
+	{
+		return contractorService.update(contractorId, record);
 	}
 }
