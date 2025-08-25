@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    generate-unique-name: false
+    url: jdbc:mysql://localhost:3306/GreenERP
+    username: ${mysql.greenerp.username}
+    password: ${mysql.greenerp.password}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
