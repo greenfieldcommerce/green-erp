@@ -21,5 +21,7 @@ public interface ContractorRateRepository extends ListCrudRepository<ContractorR
 
 	@Query("SELECT r FROM #{#entityName} r WHERE r.contractor = :contractor AND (:excludeId IS NULL OR r.id <> :excludeId) AND r.startDateTime <= :endDateTime AND :startDateTime <= r.endDateTime")
 	List<ContractorRate> findRatesForContractorIdOverlappingWithPeriod(Contractor contractor, ZonedDateTime startDateTime, ZonedDateTime endDateTime, @Nullable Long excludeId);
+
+	void deleteByContractorIdAndId(Long contractorId, Long id);
 }
 

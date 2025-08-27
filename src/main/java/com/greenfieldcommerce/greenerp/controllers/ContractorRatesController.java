@@ -2,11 +2,14 @@ package com.greenfieldcommerce.greenerp.controllers;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.greenfieldcommerce.greenerp.annotations.ValidatedId;
@@ -30,22 +33,30 @@ public class ContractorRatesController
 		this.contractorRateService = contractorRateService;
 	}
 
-	@GetMapping
+	@GetMapping(produces = "application/json")
 	public List<ContractorRateRecord> findRatesForContractor(@ValidatedId(value = "contractorId") Long contractorId)
 	{
 		return contractorRateService.findRatesForContractor(contractorId);
 	}
 
-	@PostMapping
+	@PostMapping(consumes = "application/json")
+	@ResponseStatus(HttpStatus.CREATED)
 	public ContractorRateRecord createContractorRate(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
 	{
 		return contractorRateService.create(contractorId, record);
 	}
 
-	@PatchMapping(value = "/{rateId}")
+	@PatchMapping(value = "/{rateId}", consumes = "application/json")
 	public ContractorRateRecord updateRateEndDate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId, @NotNull @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
 	{
 		return contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
+	}
+
+	@DeleteMapping(value = "/{rateId}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteRate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId)
+	{
+		contractorRateService.delete(contractorId, rateId);
 	}
 
 }

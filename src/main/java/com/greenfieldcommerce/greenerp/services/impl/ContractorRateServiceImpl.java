@@ -19,6 +19,7 @@ import com.greenfieldcommerce.greenerp.services.ContractorRateService;
 import com.greenfieldcommerce.greenerp.services.ContractorService;
 
 import jakarta.annotation.Nullable;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ContractorRateServiceImpl implements ContractorRateService
@@ -71,6 +72,13 @@ public class ContractorRateServiceImpl implements ContractorRateService
 	public ContractorRate findCurrentRateForContractor(final Contractor contractor)
 	{
 		return contractor.getCurrentRate().orElseThrow(() -> new NoActiveContractorRateException("NO_ACTIVE_RATE", String.format("No active rate for %s", contractor.getName())));
+	}
+
+	@Override
+	@Transactional
+	public void delete(final Long contractorId, final Long rateId)
+	{
+		contractorRateRepository.deleteByContractorIdAndId(contractorId, rateId);
 	}
 
 	private ContractorRate internalFindByIdAndContractorId(final Long rateId, final Long contractorId)

@@ -16,4 +16,6 @@ public interface ContractorRateService
 	ContractorRateRecord changeEndDateTime(Long contractorId, Long rateId, ZonedDateTime newEndDateTime);
 
 	ContractorRate findCurrentRateForContractor(Contractor contractor);
+
+	void delete(Long contractorId, Long rateId);
 }
