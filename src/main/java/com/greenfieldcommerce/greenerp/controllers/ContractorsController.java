@@ -3,6 +3,7 @@ package com.greenfieldcommerce.greenerp.controllers;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,7 @@ public class ContractorsController
 	}
 
 	@GetMapping(produces = "application/json")
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<ContractorRecord> getAllContractors()
 	{
 		return contractorService.findAll();
@@ -37,12 +39,14 @@ public class ContractorsController
 
 	@PostMapping(consumes = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ContractorRecord createContractor(@Valid @RequestBody CreateContractorRecord record)
 	{
 		return contractorService.create(record);
 	}
 
 	@PatchMapping(value = "/{contractorId}", consumes = "application/json")
+	@PreAuthorize("hasAnyRole('ADMIN', 'CONSULTANT')")
 	public ContractorRecord updateContractor(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorRecord record)
 	{
 		return contractorService.update(contractorId, record);
