@@ -52,13 +52,22 @@ public class ContractorInvoiceServiceImpl implements ContractorInvoiceService
 	@Override
 	public ContractorInvoiceRecord findCurrentInvoiceForContractor(final Long contractorId)
 	{
-		final Contractor contractor = contractorService.findEntityById(contractorId);
-		final ContractorInvoice currentInvoice = internalFindCurrentInvoiceForContractor(contractorId, contractor);
+		final ContractorInvoice currentInvoice = internalFindCurrentInvoiceForContractor(contractorId);
 		return contractorInvoiceToRecordMapper.map(currentInvoice);
 	}
 
-	private ContractorInvoice internalFindCurrentInvoiceForContractor(final Long contractorId, final Contractor contractor)
+	@Override
+	public ContractorInvoiceRecord 	patchInvoice(final Long contractorId, final BigDecimal numberOfWorkedDays, final BigDecimal extraAmount)
 	{
+		final ContractorInvoice currentInvoice = internalFindCurrentInvoiceForContractor(contractorId);
+		currentInvoice.setNumberOfWorkedDays(numberOfWorkedDays);
+		currentInvoice.setExtraAmount(extraAmount);
+		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(currentInvoice));
+	}
+
+	private ContractorInvoice internalFindCurrentInvoiceForContractor(final Long contractorId)
+	{
+		final Contractor contractor = contractorService.findEntityById(contractorId);
 		return contractorInvoiceRepository.findCurrentContractorInvoice(contractor, TimeService.now())
 			.orElseThrow(() -> new EntityNotFoundException("CURRENT_INVOICE_NOT_FOUND", String.format("No current invoice for contractor %s found", contractorId)));
 	}

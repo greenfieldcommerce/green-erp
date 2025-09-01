@@ -7,6 +7,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Currency;
 
+import com.greenfieldcommerce.greenerp.exceptions.IllegalInvoiceModificationException;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -51,6 +53,9 @@ public class ContractorInvoice
 	@Column(nullable = false)
 	private BigDecimal total;
 
+	@Column(nullable = false)
+	private InvoiceStatus status;
+
 	protected ContractorInvoice()
 	{
 	}
@@ -61,18 +66,25 @@ public class ContractorInvoice
 		this.contractor = rate.getContractor();
 		this.currency = rate.getCurrency();
 
+		this.status = InvoiceStatus.OPEN;
+
 		this.startDate = ZonedDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).with(LocalTime.MIDNIGHT);
 		this.endDate = startDate.plusMonths(1).minusSeconds(1);
 
 		this.numberOfWorkedDays = numberOfWorkedDays;
 		this.extraAmount = extraAmount;
 
-		this.total = numberOfWorkedDays.multiply(rate.getRate()).add(extraAmount).setScale(2, RoundingMode.HALF_UP);
+		this.total = calculateTotalInvoiceAmount();
 	}
 
 	public static ContractorInvoice create(@NotNull ContractorRate rate, @NotNull BigDecimal numberOfWorkedDays, @NotNull BigDecimal extraAmount)
 	{
 		return new ContractorInvoice(rate, numberOfWorkedDays, extraAmount);
+	}
+
+	private BigDecimal calculateTotalInvoiceAmount()
+	{
+		return this.numberOfWorkedDays.multiply(this.rate.getRate()).add(this.extraAmount).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	public ZonedDateTime getStartDate()
@@ -103,5 +115,41 @@ public class ContractorInvoice
 	public Currency getCurrency()
 	{
 		return currency;
+	}
+
+	public void setNumberOfWorkedDays(final BigDecimal numberOfWorkedDays)
+	{
+		if (!isOpen()) throw new IllegalInvoiceModificationException("NOT_OPEN_INVOICE_MODIFICATION", "Cannot change number of worked days after invoice has been billed");
+
+		this.numberOfWorkedDays = numberOfWorkedDays;
+		this.total = calculateTotalInvoiceAmount();
+	}
+
+	public void setExtraAmount(final BigDecimal extraAmount)
+	{
+		if (!isOpen()) throw new IllegalInvoiceModificationException("NOT_OPEN_INVOICE_MODIFICATION", "Cannot change number of worked days after invoice has been billed");
+
+		this.extraAmount = extraAmount;
+		this.total = calculateTotalInvoiceAmount();
+	}
+
+	public boolean isOpen()
+	{
+		return InvoiceStatus.OPEN.equals(this.status);
+	}
+
+	public void bill()
+	{
+		this.status = InvoiceStatus.BILLED;
+	}
+
+	public void close()
+	{
+		this.status = InvoiceStatus.CLOSED;
+	}
+
+	private enum InvoiceStatus
+	{
+		OPEN, BILLED, CLOSED
 	}
 }
