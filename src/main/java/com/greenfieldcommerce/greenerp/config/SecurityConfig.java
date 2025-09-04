@@ -2,6 +2,8 @@ package com.greenfieldcommerce.greenerp.config;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,16 +26,21 @@ public class SecurityConfig
 
 	@Bean
 	public JwtAuthenticationConverter jwtAuthenticationConverter() {
-		var converter = new JwtAuthenticationConverter();
+		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
 		converter.setJwtGrantedAuthoritiesConverter(jwt -> {
 			Collection<GrantedAuthority> authorities = new ArrayList<>();
 
-			var scopes = jwt.getClaimAsStringList("scope");
+			List<String> scopes = jwt.getClaimAsStringList("scope");
 			if (scopes != null) {
 				scopes.forEach(s -> authorities.add(new SimpleGrantedAuthority("SCOPE_" + s)));
 			}
 
-			var roles = jwt.getClaimAsStringList("roles");
+			Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+			if (realmAccess == null || realmAccess.isEmpty()) {
+				return authorities;
+			}
+
+			List<String> roles = (List<String>) realmAccess.get("roles");
 			if (roles != null) {
 				roles.forEach(r -> authorities.add(new SimpleGrantedAuthority(r)));
 			}
