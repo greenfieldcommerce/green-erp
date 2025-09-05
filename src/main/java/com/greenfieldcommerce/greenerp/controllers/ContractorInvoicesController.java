@@ -1,6 +1,7 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ public class ContractorInvoicesController
 	}
 
 	@GetMapping(value = "/current", produces = "application/json")
+	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
 	public ContractorInvoiceRecord findCurrentInvoice(@ValidatedId(value = "contractorId") Long contractorId)
 	{
 		return contractorInvoiceService.findCurrentInvoiceForContractor(contractorId);
@@ -35,12 +37,14 @@ public class ContractorInvoicesController
 
 	@PostMapping(consumes = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
 	public ContractorInvoiceRecord createInvoice(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
 		return contractorInvoiceService.create(contractorId, record.numberOfWorkedDays(), record.extraAmount());
 	}
 
 	@PatchMapping(value = "/{invoiceId}", consumes = "application/json")
+	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
 	public ContractorInvoiceRecord patchInvoice(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
 		return contractorInvoiceService.patchInvoice(contractorId, record.numberOfWorkedDays(), record.extraAmount());

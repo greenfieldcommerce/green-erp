@@ -38,15 +38,15 @@ public class ContractorsController
 	}
 
 	@PostMapping(consumes = "application/json")
-	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("hasRole('ADMIN')")
+	@ResponseStatus(HttpStatus.CREATED)
 	public ContractorRecord createContractor(@Valid @RequestBody CreateContractorRecord record)
 	{
 		return contractorService.create(record);
 	}
 
 	@PatchMapping(value = "/{contractorId}", consumes = "application/json")
-	@PreAuthorize("hasAnyRole('ADMIN', 'CONSULTANT')")
+	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
 	public ContractorRecord updateContractor(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorRecord record)
 	{
 		return contractorService.update(contractorId, record);

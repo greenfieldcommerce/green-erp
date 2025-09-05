@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import com.greenfieldcommerce.greenerp.entities.Contractor;
 import com.greenfieldcommerce.greenerp.entities.ContractorRate;
 
-import jakarta.annotation.Nullable;
+import org.springframework.lang.Nullable;
 
 @Repository
 public interface ContractorRateRepository extends ListCrudRepository<ContractorRate, Long>

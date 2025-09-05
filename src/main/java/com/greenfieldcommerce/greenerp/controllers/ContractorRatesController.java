@@ -3,6 +3,7 @@ package com.greenfieldcommerce.greenerp.controllers;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,6 +35,7 @@ public class ContractorRatesController
 	}
 
 	@GetMapping(produces = "application/json")
+	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
 	public List<ContractorRateRecord> findRatesForContractor(@ValidatedId(value = "contractorId") Long contractorId)
 	{
 		return contractorRateService.findRatesForContractor(contractorId);
@@ -41,12 +43,14 @@ public class ContractorRatesController
 
 	@PostMapping(consumes = "application/json")
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("hasRole('ADMIN')")
 	public ContractorRateRecord createContractorRate(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
 	{
 		return contractorRateService.create(contractorId, record);
 	}
 
 	@PatchMapping(value = "/{rateId}", consumes = "application/json")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ContractorRateRecord updateRateEndDate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId, @NotNull @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
 	{
 		return contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
@@ -54,6 +58,7 @@ public class ContractorRatesController
 
 	@DeleteMapping(value = "/{rateId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasRole('ADMIN')")
 	public void deleteRate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId)
 	{
 		contractorRateService.delete(contractorId, rateId);
