@@ -22,7 +22,9 @@ public class ContractorToRecordMapper implements Mapper<Contractor, ContractorRe
 	@Override
 	public ContractorRecord map(final Contractor contractor)
 	{
-		final ContractorRateRecord current = contractor.getCurrentRate().isPresent() ? contractorRateToRecordMapper.map(contractor.getCurrentRate().get()) : null;
+		final ContractorRateRecord current = contractor.getCurrentRate()
+		    .map(contractorRateToRecordMapper::map)
+		    .orElse(null);
 		return new ContractorRecord(contractor.getId(), contractor.getEmail(), contractor.getName(), current);
 	}
 }

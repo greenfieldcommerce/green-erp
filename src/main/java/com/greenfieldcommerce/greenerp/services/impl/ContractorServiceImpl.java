@@ -2,9 +2,11 @@ package com.greenfieldcommerce.greenerp.services.impl;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.greenfieldcommerce.greenerp.entities.Contractor;
+import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorException;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.mappers.Mapper;
 import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
@@ -41,9 +43,15 @@ public class ContractorServiceImpl implements ContractorService
 	@Override
 	public ContractorRecord create(final CreateContractorRecord record)
 	{
-		final Contractor contractor = createContractorMapper.map(record);
-		final Contractor saved = contractorRepository.save(contractor);
-		return contractorToRecordMapper.map(saved);
+		try
+		{
+			final Contractor contractor = createContractorMapper.map(record);
+			final Contractor saved = contractorRepository.save(contractor);
+			return contractorToRecordMapper.map(saved);
+		} catch (DataIntegrityViolationException e)
+		{
+			throw new DuplicateContractorException("DUPLICATE_CONTRACTOR", String.format("Contractor with email '%s' already exists", record.email()));
+		}
 	}
 
 	@Override

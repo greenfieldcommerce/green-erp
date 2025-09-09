@@ -42,15 +42,15 @@ public class Contractor
 
 	protected Contractor() {}
 
-	private Contractor(final String name, final String email)
+	private Contractor(final String email, final String name)
 	{
-		this.name = name;
 		this.email = email;
+		this.name = name;
 	}
 
-	public static Contractor create(String name, String email)
+	public static Contractor create(String email, String name)
 	{
-		return new Contractor(name, email);
+		return new Contractor(email, name);
 	}
 
 	public Optional<ContractorRate> getCurrentRate()
