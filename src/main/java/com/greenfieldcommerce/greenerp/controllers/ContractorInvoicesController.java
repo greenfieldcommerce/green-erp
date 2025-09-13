@@ -43,9 +43,9 @@ public class ContractorInvoicesController
 		return contractorInvoiceService.create(contractorId, record.numberOfWorkedDays(), record.extraAmount());
 	}
 
-	@PatchMapping(value = "/{invoiceId}", consumes = "application/json")
+	@PatchMapping(consumes = "application/json")
 	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
-	public ContractorInvoiceRecord patchInvoice(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
+	public ContractorInvoiceRecord patchCurrentInvoice(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
 		return contractorInvoiceService.patchInvoice(contractorId, record.numberOfWorkedDays(), record.extraAmount());
 	}

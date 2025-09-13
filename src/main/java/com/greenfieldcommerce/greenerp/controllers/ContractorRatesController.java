@@ -51,7 +51,7 @@ public class ContractorRatesController
 
 	@PatchMapping(value = "/{rateId}", consumes = "application/json")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ContractorRateRecord updateRateEndDate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId, @NotNull @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
+	public ContractorRateRecord updateRateEndDate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId, @Valid @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
 	{
 		return contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
 	}

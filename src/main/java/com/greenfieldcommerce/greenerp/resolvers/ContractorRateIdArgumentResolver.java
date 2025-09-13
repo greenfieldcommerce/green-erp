@@ -11,7 +11,7 @@ import com.greenfieldcommerce.greenerp.repositories.ContractorRateRepository;
 public class ContractorRateIdArgumentResolver extends BaseArgumentResolver<ContractorRate, Long>
 {
 
-	protected ContractorRateIdArgumentResolver(final ContractorRateRepository repository)
+	public ContractorRateIdArgumentResolver(final ContractorRateRepository repository)
 	{
 		super(Long.class, repository);
 	}

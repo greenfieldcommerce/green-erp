@@ -20,21 +20,15 @@ public class GlobalExceptionHandler
 {
 
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ApiError> handleBusinessException(EntityNotFoundException ex, HttpServletRequest request) {
-		final ApiError error = new ApiError(
-			HttpStatus.NOT_FOUND.value(),
-			HttpStatus.NOT_FOUND.getReasonPhrase(),
-			ex.getCode(),
-			ex.getMessage(),
-			request.getRequestURI(), new HashMap<>());
-		return ResponseEntity.unprocessableEntity().body(error);
+	public ResponseEntity<ApiError> handleBusinessException() {
+		return ResponseEntity.notFound().build();
 	}
 
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<ApiError> handleBusinessException(BusinessException ex, HttpServletRequest request) {
 		final ApiError error = new ApiError(
-			HttpStatus.UNPROCESSABLE_ENTITY.value(),
-			HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
+			HttpStatus.BAD_REQUEST.value(),
+			HttpStatus.BAD_REQUEST.getReasonPhrase(),
 			ex.getCode(),
 			ex.getMessage(),
 			request.getRequestURI(), new HashMap<>());
@@ -48,13 +42,13 @@ public class GlobalExceptionHandler
 		ex.getBindingResult().getFieldErrors().forEach(err -> details.put(err.getField(), err.getDefaultMessage()));
 
 		final ApiError error = new ApiError(
-			HttpStatus.BAD_REQUEST.value(),
-			HttpStatus.BAD_REQUEST.getReasonPhrase(),
+			HttpStatus.UNPROCESSABLE_ENTITY.value(),
+			HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase(),
 			"VALIDATION_ERROR",
 			"One or more fields are invalid.",
 			request.getRequestURI(),
 			details
 		);
-		return ResponseEntity.badRequest().body(error);
+		return ResponseEntity.unprocessableEntity().body(error);
 	}
 }
