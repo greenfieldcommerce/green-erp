@@ -1,5 +1,6 @@
 package com.greenfieldcommerce.greenerp.services.impl;
 
+import static config.ResolverTestConfig.INVALID_RESOURCE_ID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -25,7 +26,6 @@ import com.greenfieldcommerce.greenerp.repositories.ContractorRepository;
 @ExtendWith(MockitoExtension.class)
 class ContractorServiceImplTest
 {
-	private static final Long INEXISTENT_CONTRACTOR_ID = 9999999999L;
 	private static final String EMAIL = "email";
 	private static final String NAME = "name";
 
@@ -105,11 +105,11 @@ class ContractorServiceImplTest
 	@DisplayName("Should throw EntityNotFoundException when cannot find a contractor by id")
 	void shouldThrowEntityNotFoundExceptionWhenCannotFindAContractorById()
 	{
-		when(contractorRepository.findById(INEXISTENT_CONTRACTOR_ID)).thenReturn(Optional.empty());
+		when(contractorRepository.findById(INVALID_RESOURCE_ID)).thenReturn(Optional.empty());
 		try
 		{
-			service.findEntityById(INEXISTENT_CONTRACTOR_ID);
-			fail("Should have thrown EntityNotFoundException, as there is no contractor with id " + INEXISTENT_CONTRACTOR_ID);
+			service.findEntityById(INVALID_RESOURCE_ID);
+			fail("Should have thrown EntityNotFoundException, as there is no contractor with id " + INVALID_RESOURCE_ID);
 		}
 		catch (EntityNotFoundException e)
 		{

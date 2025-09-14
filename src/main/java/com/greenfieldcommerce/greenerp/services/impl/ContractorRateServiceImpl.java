@@ -62,7 +62,7 @@ public class ContractorRateServiceImpl implements ContractorRateService
 	public ContractorRateRecord changeEndDateTime(final Long contractorId, final Long rateId, final ZonedDateTime newEndDateTimeRecord)
 	{
 		final ContractorRate contractorRate = internalFindByIdAndContractorId(rateId, contractorId);
-		validateIfNotOverlapping(contractorRate.getContractor(), contractorRate.getStartDateTime(), newEndDateTimeRecord, rateId);
+		validateIfNotOverlapping(contractorRate.getContractor(), contractorRate.getStartDateTime(), newEndDateTimeRecord, contractorRate.getId());
 
 		contractorRate.setEndDateTime(newEndDateTimeRecord);
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(contractorRate));

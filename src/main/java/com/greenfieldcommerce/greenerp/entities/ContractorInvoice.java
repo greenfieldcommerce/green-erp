@@ -117,6 +117,11 @@ public class ContractorInvoice
 		return currency;
 	}
 
+	public ContractorRate getRate()
+	{
+		return rate;
+	}
+
 	public void setNumberOfWorkedDays(final BigDecimal numberOfWorkedDays)
 	{
 		if (!isOpen()) throw new IllegalInvoiceModificationException("NOT_OPEN_INVOICE_MODIFICATION", "Cannot change number of worked days after invoice has been billed");
