@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greenfieldcommerce.greenerp.security.AuthenticationConstraint;
 
 import config.ResolverTestConfig;
 import config.TestSecurityConfig;
@@ -69,17 +70,17 @@ abstract class BaseRestControllerTest
 
 	protected static SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor admin()
 	{
-		return SecurityMockMvcRequestPostProcessors.user("admin-user").roles("ADMIN");
+		return SecurityMockMvcRequestPostProcessors.user("admin-user").roles(AuthenticationConstraint.ROLE_ADMIN);
 	}
 
 	protected static SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor regularContractor()
 	{
-		return SecurityMockMvcRequestPostProcessors.user("contractor-user").roles("CONTRACTOR");
+		return SecurityMockMvcRequestPostProcessors.user("contractor-user").roles(AuthenticationConstraint.ROLE_CONTRACTOR);
 	}
 
 	protected static SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor ownContractor()
 	{
-		return SecurityMockMvcRequestPostProcessors.user(String.valueOf(VALID_RESOURCE_ID)).roles("CONTRACTOR");
+		return SecurityMockMvcRequestPostProcessors.user(String.valueOf(VALID_RESOURCE_ID)).roles(AuthenticationConstraint.ROLE_CONTRACTOR);
 	}
 
 	protected static Stream<SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor> withAdminUserAndOwnerContractor() {

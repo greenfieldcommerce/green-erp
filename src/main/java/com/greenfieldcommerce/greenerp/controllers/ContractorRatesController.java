@@ -3,6 +3,7 @@ package com.greenfieldcommerce.greenerp.controllers;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +18,10 @@ import com.greenfieldcommerce.greenerp.annotations.ValidatedId;
 import com.greenfieldcommerce.greenerp.records.ZonedDateTimeRecord;
 import com.greenfieldcommerce.greenerp.records.contractorrate.ContractorRateRecord;
 import com.greenfieldcommerce.greenerp.records.contractorrate.CreateContractorRateRecord;
+import com.greenfieldcommerce.greenerp.security.AuthenticationConstraint;
 import com.greenfieldcommerce.greenerp.services.ContractorRateService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping(value = "/contractors/{contractorId}/rates")
@@ -34,23 +35,23 @@ public class ContractorRatesController
 		this.contractorRateService = contractorRateService;
 	}
 
-	@GetMapping(produces = "application/json")
-	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
 	public List<ContractorRateRecord> findRatesForContractor(@ValidatedId(value = "contractorId") Long contractorId)
 	{
 		return contractorRateService.findRatesForContractor(contractorId);
 	}
 
-	@PostMapping(consumes = "application/json")
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
 	public ContractorRateRecord createContractorRate(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
 	{
 		return contractorRateService.create(contractorId, record);
 	}
 
-	@PatchMapping(value = "/{rateId}", consumes = "application/json")
-	@PreAuthorize("hasRole('ADMIN')")
+	@PatchMapping(value = "/{rateId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
 	public ContractorRateRecord updateRateEndDate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId, @Valid @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
 	{
 		return contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
@@ -58,7 +59,7 @@ public class ContractorRatesController
 
 	@DeleteMapping(value = "/{rateId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
 	public void deleteRate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId)
 	{
 		contractorRateService.delete(contractorId, rateId);

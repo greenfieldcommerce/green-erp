@@ -1,6 +1,7 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.greenfieldcommerce.greenerp.annotations.ValidatedId;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.CreateContractorInvoiceRecord;
+import com.greenfieldcommerce.greenerp.security.AuthenticationConstraint;
 import com.greenfieldcommerce.greenerp.services.ContractorInvoiceService;
 
 import jakarta.validation.Valid;
@@ -28,23 +30,25 @@ public class ContractorInvoicesController
 		this.contractorInvoiceService = contractorInvoiceService;
 	}
 
-	@GetMapping(value = "/current", produces = "application/json")
-	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
-	public ContractorInvoiceRecord findCurrentInvoice(@ValidatedId(value = "contractorId") Long contractorId)
+	@GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
+	public ContractorInvoiceRecord findCurrentInvoice(
+		@ValidatedId(value = "contractorId")
+		Long contractorId)
 	{
 		return contractorInvoiceService.findCurrentInvoiceForContractor(contractorId);
 	}
 
-	@PostMapping(consumes = "application/json")
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
 	public ContractorInvoiceRecord createInvoice(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
 		return contractorInvoiceService.create(contractorId, record.numberOfWorkedDays(), record.extraAmount());
 	}
 
-	@PatchMapping(consumes = "application/json")
-	@PreAuthorize("hasRole('ADMIN') or (hasRole('CONTRACTOR') and #contractorId.toString().equals(authentication.name))")
+	@PatchMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
 	public ContractorInvoiceRecord patchCurrentInvoice(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
 		return contractorInvoiceService.patchInvoice(contractorId, record.numberOfWorkedDays(), record.extraAmount());
