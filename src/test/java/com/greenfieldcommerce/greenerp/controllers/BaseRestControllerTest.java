@@ -1,17 +1,22 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
 import static config.ResolverTestConfig.VALID_RESOURCE_ID;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -27,6 +32,7 @@ import config.TestSecurityConfig;
 @AutoConfigureMockMvc
 @Import({ ResolverTestConfig.class, TestSecurityConfig.class })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@AutoConfigureRestDocs
 abstract class BaseRestControllerTest
 {
 
@@ -37,6 +43,9 @@ abstract class BaseRestControllerTest
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private JwtAuthenticationConverter jwtAuthenticationConverter;
 
 	@ParameterizedTest
 	@MethodSource("protectedRequests")
@@ -49,7 +58,8 @@ abstract class BaseRestControllerTest
 	@MethodSource("adminOnlyRequests")
 	void shouldReturnForbiddenWhenRequestingProtectedResources_forUnauthorizedUsers(final MockHttpServletRequestBuilder request) throws Exception
 	{
-		getMvc().perform(request.with(regularContractor())).andExpect(status().isForbidden());
+		getMvc().perform(request.with(regularContractor()))
+			.andExpect(status().isForbidden());
 	}
 
 	@ParameterizedTest
@@ -68,22 +78,42 @@ abstract class BaseRestControllerTest
 		return Stream.concat(protectedRequests(), Stream.of());
 	}
 
-	protected static SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor admin()
+	protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor admin()
 	{
-		return SecurityMockMvcRequestPostProcessors.user("admin-user").roles(AuthenticationConstraint.ROLE_ADMIN);
+		return jwt().jwt(jwt -> jwt
+				.claim("sub", "admin-user")
+				.claim("realm_access", Map.of("roles", List.of(AuthenticationConstraint.ROLE_ADMIN))))
+			.authorities(jwt -> {
+				AbstractAuthenticationToken token = jwtAuthenticationConverter.convert(jwt);
+				return token.getAuthorities();
+			});
 	}
 
-	protected static SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor regularContractor()
+	protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor regularContractor()
 	{
-		return SecurityMockMvcRequestPostProcessors.user("contractor-user").roles(AuthenticationConstraint.ROLE_CONTRACTOR);
+		return jwt().jwt(jwt -> jwt
+			.claim("sub", "contractor-user")
+			.claim("contractorId", "contractor-user")
+			.claim("realm_access", Map.of("roles", List.of(AuthenticationConstraint.ROLE_CONTRACTOR))))
+			.authorities(jwt -> {
+				AbstractAuthenticationToken token = jwtAuthenticationConverter.convert(jwt);
+				return token.getAuthorities();
+			});
 	}
 
-	protected static SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor ownContractor()
+	protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor ownContractor()
 	{
-		return SecurityMockMvcRequestPostProcessors.user(String.valueOf(VALID_RESOURCE_ID)).roles(AuthenticationConstraint.ROLE_CONTRACTOR);
+		return jwt().jwt(jwt -> jwt
+				.claim("sub", "contractor-owner")
+				.claim("contractorId", String.valueOf(VALID_RESOURCE_ID))
+				.claim("realm_access", Map.of("roles", List.of(AuthenticationConstraint.ROLE_CONTRACTOR))))
+			.authorities(jwt -> {
+				AbstractAuthenticationToken token = jwtAuthenticationConverter.convert(jwt);
+				return token.getAuthorities();
+			});
 	}
 
-	protected static Stream<SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor> withAdminUserAndOwnerContractor() {
+	protected Stream<SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor> withAdminUserAndOwnerContractor() {
 		return Stream.of(admin(), ownContractor());
 	}
 

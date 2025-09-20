@@ -7,12 +7,14 @@ import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -30,31 +32,23 @@ public class SecurityConfig
 	}
 
 	@Bean
-	public JwtAuthenticationConverter jwtAuthenticationConverter() {
-		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-		converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+	public Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter()
+	{
+		return jwt -> {
 			Collection<GrantedAuthority> authorities = new ArrayList<>();
-
-			List<String> scopes = jwt.getClaimAsStringList("scope");
-			if (scopes != null) {
-				scopes.forEach(s -> authorities.add(new SimpleGrantedAuthority("SCOPE_" + s)));
-			}
-
 			Map<String, Object> realmAccess = jwt.getClaim("realm_access");
-			if (realmAccess == null || realmAccess.isEmpty()) {
-				return authorities;
+			if (realmAccess != null && realmAccess.get("roles") instanceof List<?> roles)
+			{
+				roles.forEach(r -> authorities.add(new SimpleGrantedAuthority(r.toString())));
 			}
-
-			List<String> roles = (List<String>) realmAccess.get("roles");
-			if (roles != null) {
-				roles.forEach(r -> authorities.add(new SimpleGrantedAuthority(r)));
-			}
-
 			return authorities;
-		});
+		};
+	}
 
-		converter.setPrincipalClaimName("contractorId");
-
+	@Bean
+	public JwtAuthenticationConverter jwtAuthenticationConverter(Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter) {
+		JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+		converter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 		return converter;
 	}
 

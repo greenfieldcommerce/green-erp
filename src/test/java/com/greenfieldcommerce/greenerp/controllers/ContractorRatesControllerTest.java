@@ -45,7 +45,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 	@ParameterizedTest
 	@MethodSource("withAdminUserAndOwnerContractor")
-	public void shouldReturnContractorRates_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user) throws Exception
+	public void shouldReturnContractorRates_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final ContractorRateRecord a = new ContractorRateRecord(1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 		final ContractorRateRecord b = new ContractorRateRecord(2L, BigDecimal.valueOf(100.50), Currency.getInstance("USD"), ZonedDateTime.now().plusMonths(1), ZonedDateTime.now().plusMonths(3));

@@ -20,6 +20,7 @@ import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,14 +43,15 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		when(contractorInvoiceService.findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID))).thenThrow(new EntityNotFoundException("ERROR", "No current invoice"));
 
 		getMvc().perform(getCurrentInvoiceRequest(VALID_RESOURCE_ID).with(admin()))
-			.andExpect(status().isNotFound());
+			.andExpect(status().isNotFound())
+			.andDo(document("contractor-not-found"));
 
 		verify(contractorInvoiceService).findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID));
 	}
 
 	@ParameterizedTest
 	@MethodSource("withAdminUserAndOwnerContractor")
-	public void shouldReturnCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user) throws Exception
+	public void shouldReturnCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
@@ -73,7 +75,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 	@ParameterizedTest
 	@MethodSource("withAdminUserAndOwnerContractor")
-	public void shouldCreateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user) throws Exception
+	public void shouldCreateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
 		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
@@ -97,7 +99,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 	@ParameterizedTest
 	@MethodSource("withAdminUserAndOwnerContractor")
-	public void shouldUpdateCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user) throws Exception
+	public void shouldUpdateCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
 		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));

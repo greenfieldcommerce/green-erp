@@ -1,0 +1,24 @@
+= GreenERP API Documentation
+
+== Resources
+
+[[resources_contractors]]
+== Contractors
+
+The Contractors resources is used to create and list contractors
+
+=== Listing contractors
+
+A `GET` request will list all of the contractors.
+
+operation::listing-contractors[snippets='response-fields,curl-request,http-response']
+
+== Contractor
+The Contractor resource is used to retrieve, update, and delete a specific contractor.
+
+=== Retrieving a contractor
+A `GET` request will retrieve a specific contractor.
+
+operation::retrieving-a-contractor[snippets='response-fields,curl-request,http-response']
+
+

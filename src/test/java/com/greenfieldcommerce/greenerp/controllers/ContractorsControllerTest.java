@@ -11,6 +11,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -27,6 +33,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.snippet.Snippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -48,16 +56,42 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	void shouldReturnAllContractors_forAdmin() throws Exception
 	{
 		final ContractorRateRecord rate = new ContractorRateRecord(1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
-		final ContractorRecord diego = new ContractorRecord(1L, "diego@oneemail.com", "Diego", rate);
-		final ContractorRecord jorge = new ContractorRecord(2L, "jorge@twoemail.com", "Jorge", null);
+		final ContractorRecord diego = new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
+		final ContractorRecord jorge = new ContractorRecord(2L, "diego@greenfieldcommerce.com", "Jorge Viegas", null);
 		when(contractorService.findAll()).thenReturn(List.of(diego, jorge));
 
-		getMvc().perform(get("/contractors").with(admin())).andExpect(status().isOk())
+		getMvc().perform(get("/contractors")
+				.with(admin())
+			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(2))
 			.andExpect(validContractor("$[0]", diego))
 			.andExpect(validContractorRate("$[0].currentRate", rate, getObjectMapper()))
 			.andExpect(validContractor("$[1]", jorge))
-			.andExpect(emptyContractorRate("$[1].currentRate"));
+			.andExpect(emptyContractorRate("$[1].currentRate"))
+			.andDo(
+				document("listing-contractors",
+					requestHeaders(
+						headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'admin' role.").optional()
+					),
+					responseFields(
+						fieldWithPath("[]").description("An array of items"), // Optional: documents the array itself
+						fieldWithPath("[].id").description("The unique identifier of the item"),
+						fieldWithPath("[].email").description("The name of the item"),
+						fieldWithPath("[].name").description("The name of the item"),
+						subsectionWithPath("[].currentRate").description("A description of the item").optional())
+//					.("[].currentRate.", ContractorRateDocumentation.RATE_FIELDS)
+				)
+			);
+	}
+
+	public interface ContractorRateDocumentation {
+		FieldDescriptor[] RATE_FIELDS = new FieldDescriptor[] {
+			fieldWithPath("id").description("The customer ID"),
+			fieldWithPath("rate").description("The customer's first name"),
+			fieldWithPath("currency").description("The customer's first name"),
+			fieldWithPath("startDateTime").description("The customer's first name"),
+			fieldWithPath("endDateTime").description("The customer's last name")
+		};
 	}
 
 	@ParameterizedTest
@@ -86,13 +120,13 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 
 	@ParameterizedTest
 	@MethodSource("withAdminUserAndOwnerContractor")
-	void shouldReturnUpdatedContractorWhenUpdatingWithValidData_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor user) throws Exception
+	void shouldReturnUpdatedContractorWhenUpdatingWithValidData_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwt) throws Exception
 	{
 		final CreateContractorRecord createContractorRecord = buildValidContractor();
 		final ContractorRecord result = new ContractorRecord(VALID_RESOURCE_ID, createContractorRecord.email(), createContractorRecord.name(), null);
 		when(contractorService.update(eq(VALID_RESOURCE_ID), argThat(matchesContractor(createContractorRecord)))).thenReturn(result);
 
-		getMvc().perform(patch("/contractors/{id}", VALID_RESOURCE_ID).with(user)
+		getMvc().perform(patch("/contractors/{id}", VALID_RESOURCE_ID).with(jwt)
 				.contentType(MediaType.APPLICATION_JSON).content(asJson(createContractorRecord))).andExpect(status().isOk()).andExpect(validContractor("$", result))
 			.andExpect(emptyContractorRate("$[0].currentRate"));
 
