@@ -60,3 +60,9 @@ operation::listing-contractor-rates[snippets='http-request,request-headers,path-
 A `POST` request is used to create a contractor rate.
 
 operation::creating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+[[resources_rate]]
+== Rate
+A `GET` request will retrieve a specific contractor's rate.
+
+operation::detailing-a-rate[snippets='http-request,request-headers,path-parameters,http-response']

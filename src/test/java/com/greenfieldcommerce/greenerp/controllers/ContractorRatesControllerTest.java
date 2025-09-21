@@ -6,7 +6,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -56,14 +56,14 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 	@ParameterizedTest
 	@MethodSource("withAdminUserAndOwnerContractor")
-	public void shouldReturnContractorRates_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
+	public void shouldReturnAllContractorRates_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final ContractorRateRecord a = new ContractorRateRecord(1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 		final ContractorRateRecord b = new ContractorRateRecord(2L, BigDecimal.valueOf(100.50), Currency.getInstance("USD"), ZonedDateTime.now().plusMonths(1), ZonedDateTime.now().plusMonths(3));
 
 		when(contractorRateService.findRatesForContractor(eq(VALID_RESOURCE_ID))).thenReturn(List.of(a, b));
 
-		getMvc().perform(getContractorRateRequest(VALID_RESOURCE_ID).with(user))
+		getMvc().perform(getAllContractorRatesRequest(VALID_RESOURCE_ID).with(user))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(2))
 			.andExpect(validContractorRate("$[0]", a, getObjectMapper()))
@@ -87,7 +87,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	{
 		when(contractorRateService.findRatesForContractor(eq(VALID_RESOURCE_ID))).thenReturn(new ArrayList<>());
 
-		getMvc().perform(getContractorRateRequest(VALID_RESOURCE_ID).with(admin()))
+		getMvc().perform(getAllContractorRatesRequest(VALID_RESOURCE_ID).with(admin()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(0));
 
@@ -132,6 +132,29 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		verify(contractorRateService).create(eq(VALID_RESOURCE_ID), argThat(matchesRate(createContractorRateRecord)));
 	}
 
+	@ParameterizedTest
+	@MethodSource("withAdminUserAndOwnerContractor")
+	public void shouldReturnContractorRateById_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwt) throws Exception
+	{
+		final ContractorRateRecord rate = new ContractorRateRecord(1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+
+		when(contractorRateService.findByIdAndContractorId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID))).thenReturn(rate);
+
+		getMvc().perform(getContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID).with(jwt))
+			.andExpect(status().isOk())
+			.andExpect(validContractorRate("$", rate, getObjectMapper()))
+			.andDo(
+				document("detailing-a-rate",
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription()),
+					describeContractorRateResponse()
+				)
+			);
+
+		verify(contractorRateService).findByIdAndContractorId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID)  );
+	}
+
 	@Test
 	public void shouldReturnUnprocessableEntityWhenUpdatingContractorRateWithInvalidDate() throws Exception
 	{
@@ -167,7 +190,11 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@Override
 	protected Stream<MockHttpServletRequestBuilder> protectedRequests() throws JsonProcessingException
 	{
-		return Stream.of(getContractorRateRequest(VALID_RESOURCE_ID), postContractorRateRequest(VALID_RESOURCE_ID, buildValidContractorRate()), patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, buildValidEndDateTimeRecord()),
+		return Stream.of(
+			getAllContractorRatesRequest(VALID_RESOURCE_ID),
+			postContractorRateRequest(VALID_RESOURCE_ID, buildValidContractorRate()),
+			getContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID),
+			patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, buildValidEndDateTimeRecord()),
 			deleteContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID));
 	}
 
@@ -175,8 +202,10 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			getContractorRateRequest(INVALID_RESOURCE_ID).with(admin()),
+			getAllContractorRatesRequest(INVALID_RESOURCE_ID).with(admin()),
 			postContractorRateRequest(INVALID_RESOURCE_ID, buildValidContractorRate()).with(admin()),
+			getContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID).with(admin()),
+			getContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(admin()),
 			patchContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(admin()),
 			patchContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(admin()),
 			deleteContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(admin()),
@@ -194,7 +223,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 			new CreateContractorRateRecord(BigDecimal.valueOf(-100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)));
 	}
 
-	private MockHttpServletRequestBuilder getContractorRateRequest(Long contractorId)
+	private MockHttpServletRequestBuilder getAllContractorRatesRequest(Long contractorId)
 	{
 		return get("/contractors/{contractorId}/rates", contractorId);
 	}
@@ -202,6 +231,11 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	private MockHttpServletRequestBuilder postContractorRateRequest(Long contractorId, CreateContractorRateRecord record) throws JsonProcessingException
 	{
 		return post("/contractors/{contractorId}/rates", contractorId).contentType(MediaType.APPLICATION_JSON).content(asJson(record));
+	}
+
+	private MockHttpServletRequestBuilder getContractorRateRequest(Long contractorId, Long rateId) throws JsonProcessingException
+	{
+		return get("/contractors/{contractorId}/rates/{rateId}", contractorId, rateId);
 	}
 
 	private MockHttpServletRequestBuilder patchContractorRateRequest(Long contractorId, Long rateId, ZonedDateTimeRecord record) throws JsonProcessingException
@@ -241,13 +275,14 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		};
 	}
 
-	public interface ContractorRateDocumentation {
-		FieldDescriptor[] RATE_FIELDS = new FieldDescriptor[] {
-			fieldWithPath("id").description("The customer ID"),
-			fieldWithPath("rate").description("The customer's first name"),
-			fieldWithPath("currency").description("The customer's first name"),
-			fieldWithPath("startDateTime").description("The customer's first name"),
-			fieldWithPath("endDateTime").description("The customer's last name")
-		};
+	private static ResponseFieldsSnippet describeContractorRateResponse()
+	{
+		return responseFields(
+			fieldWithPath("id").description("The rate ID"),
+			fieldWithPath("rate").description("The contractor's daily rate"),
+			fieldWithPath("currency").description("The currency of the rate"),
+			fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
+			fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')")
+		);
 	}
 }

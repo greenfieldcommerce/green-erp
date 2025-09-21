@@ -24,7 +24,7 @@ import com.greenfieldcommerce.greenerp.services.ContractorRateService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/contractors/{contractorId}/rates")
+@RequestMapping(value = "/contractors/{contractorId}/rates", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ContractorRatesController
 {
 
@@ -35,7 +35,7 @@ public class ContractorRatesController
 		this.contractorRateService = contractorRateService;
 	}
 
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
 	public List<ContractorRateRecord> findRatesForContractor(@ValidatedId(value = "contractorId") Long contractorId)
 	{
@@ -48,6 +48,13 @@ public class ContractorRatesController
 	public ContractorRateRecord createContractorRate(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
 	{
 		return contractorRateService.create(contractorId, record);
+	}
+
+	@GetMapping(value = "/{rateId}")
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
+	public ContractorRateRecord getContractorRate(@ValidatedId(value = "contractorId") Long contractorId, @ValidatedId(value = "rateId") Long rateId)
+	{
+		return contractorRateService.findByIdAndContractorId(rateId, contractorId);
 	}
 
 	@PatchMapping(value = "/{rateId}", consumes = MediaType.APPLICATION_JSON_VALUE)

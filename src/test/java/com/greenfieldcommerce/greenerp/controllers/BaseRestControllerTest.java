@@ -150,4 +150,9 @@ abstract class BaseRestControllerTest
 		return parameterWithName("contractorId").description("Contractor id");
 	}
 
+	protected static ParameterDescriptor contractorRateIdParameterDescription()
+	{
+		return parameterWithName("rateId").description("Rate id");
+	}
+
 }
