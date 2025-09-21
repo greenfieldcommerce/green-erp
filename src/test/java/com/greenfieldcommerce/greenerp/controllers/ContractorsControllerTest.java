@@ -17,11 +17,9 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -39,7 +37,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -95,10 +92,9 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 			.andExpect(validContractorRate("$.currentRate", expected.currentRate(), getObjectMapper()))
 			.andDo(
 				document("detailing-contractor",
-					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(describeAdminOrContractorHeader()),
-					pathParameters(parameterWithName("contractorId").description("Contractor id")),
+					pathParameters(contractorIdParameterDescription()),
 					describeContractorResponse()
 				)
 			);
@@ -126,6 +122,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 			.andExpect(validContractor("$", result))
 			.andExpect(emptyContractorRate("$.currentRate"))
 			.andDo(document("creating-a-contractor",
+					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(describeAdminHeader()),
 					requestFields(
@@ -149,9 +146,10 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 			.andExpect(status().isOk()).andExpect(validContractor("$", result))
 			.andExpect(emptyContractorRate("$.currentRate"))
 			.andDo(document("updating-a-contractor",
+					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
 					requestHeaders(describeAdminOrContractorHeader()),
-					pathParameters(parameterWithName("contractorId").description("Contractor id")),
+					pathParameters(contractorIdParameterDescription()),
 					requestFields(
 						fieldWithPath("email").description("The updated contractor's email"),
 						fieldWithPath("name").description("The updated contractor's name"))
@@ -235,23 +233,11 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	private static ContractorRecord buildFullContractorExample()
 	{
 		final ContractorRateRecord rate = new ContractorRateRecord(1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
-		final ContractorRecord contractor = new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
-
-		return contractor;
+		return new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
 	}
 
 	private static CreateContractorRecord buildValidContractor()
 	{
 		return new CreateContractorRecord("gabriel@greenfieldcommerce.com", "Gabriel");
-	}
-
-	public interface ContractorRateDocumentation {
-		FieldDescriptor[] RATE_FIELDS = new FieldDescriptor[] {
-			fieldWithPath("id").description("The customer ID"),
-			fieldWithPath("rate").description("The customer's first name"),
-			fieldWithPath("currency").description("The customer's first name"),
-			fieldWithPath("startDateTime").description("The customer's first name"),
-			fieldWithPath("endDateTime").description("The customer's last name")
-		};
 	}
 }

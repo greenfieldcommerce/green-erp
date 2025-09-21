@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -19,6 +20,16 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,7 +67,17 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(2))
 			.andExpect(validContractorRate("$[0]", a, getObjectMapper()))
-			.andExpect(validContractorRate("$[1]", b, getObjectMapper()));
+			.andExpect(validContractorRate("$[1]", b, getObjectMapper()))
+			.andDo(
+				document("listing-contractor-rates",
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(contractorIdParameterDescription()),
+					responseFields(
+						subsectionWithPath("[]").description("An array with the contractor's <<resources_rate, Rate resources>>")
+					)
+				)
+			);
 
 		verify(contractorRateService).findRatesForContractor(eq(VALID_RESOURCE_ID));
 	}
@@ -93,7 +114,20 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(postContractorRateRequest(VALID_RESOURCE_ID, createContractorRateRecord).with(admin()))
 			.andExpect(status().isCreated())
-			.andExpect(validContractorRate("$", result, getObjectMapper()));
+			.andExpect(validContractorRate("$", result, getObjectMapper()))
+			.andDo(document("creating-a-rate",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminHeader()),
+					pathParameters(contractorIdParameterDescription()),
+					requestFields(
+						fieldWithPath("rate").description("The contractor's rate"),
+						fieldWithPath("currency").description("The rate currency"),
+						fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
+						fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')")
+					)
+				)
+			);
 
 		verify(contractorRateService).create(eq(VALID_RESOURCE_ID), argThat(matchesRate(createContractorRateRecord)));
 	}
@@ -204,6 +238,16 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 			boolean endDateTimeMatches = record.endDateTime().toInstant().equals(createContractorRateRecord.endDateTime().toInstant());
 
 			return rateMatches && currencyMatches && startDateTimeMatches && endDateTimeMatches;
+		};
+	}
+
+	public interface ContractorRateDocumentation {
+		FieldDescriptor[] RATE_FIELDS = new FieldDescriptor[] {
+			fieldWithPath("id").description("The customer ID"),
+			fieldWithPath("rate").description("The customer's first name"),
+			fieldWithPath("currency").description("The customer's first name"),
+			fieldWithPath("startDateTime").description("The customer's first name"),
+			fieldWithPath("endDateTime").description("The customer's last name")
 		};
 	}
 }

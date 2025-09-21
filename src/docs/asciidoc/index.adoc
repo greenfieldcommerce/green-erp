@@ -16,7 +16,7 @@ Diego Reidel
 [[resources_contractors]]
 == Contractors
 
-The Contractors resource is used to create and list contractors
+The Contractors resource is used to list and create contractors
 
 === Listing contractors
 
@@ -44,3 +44,19 @@ A `PATCH` request will update the data for a specific contractor.
 operation::updating-a-contractor[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
 
 
+
+[[resources_rates]]
+== Rates
+
+The Rates resource is used to list and create contractor rates
+
+=== Listing contractor rates
+
+A `GET` request will list all the rates associated with a contractor.
+
+operation::listing-contractor-rates[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
+
+=== Creating a contractor rate
+A `POST` request is used to create a contractor rate.
+
+operation::creating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,http-response']

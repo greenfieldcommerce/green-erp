@@ -2,6 +2,7 @@ package com.greenfieldcommerce.greenerp.controllers;
 
 import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -17,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.headers.HeaderDescriptor;
+import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -141,6 +143,11 @@ abstract class BaseRestControllerTest
 	protected static HeaderDescriptor describeAdminOrContractorHeader()
 	{
 		return headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'ADMIN' role or be owned by the associated 'CONTRACTOR'").optional();
+	}
+
+	protected static ParameterDescriptor contractorIdParameterDescription()
+	{
+		return parameterWithName("contractorId").description("Contractor id");
 	}
 
 }
