@@ -22,7 +22,7 @@ import com.greenfieldcommerce.greenerp.services.ContractorService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/contractors")
+@RequestMapping(value = "/contractors", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ContractorsController
 {
 	private final ContractorService contractorService;
@@ -32,11 +32,18 @@ public class ContractorsController
 		this.contractorService = contractorService;
 	}
 
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
 	public List<ContractorRecord> getAllContractors()
 	{
 		return contractorService.findAll();
+	}
+
+	@GetMapping(value = "/{contractorId}")
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
+	public ContractorRecord getContractorDetails(@ValidatedId(value = "contractorId") Long contractorId)
+	{
+		return contractorService.findById(contractorId);
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

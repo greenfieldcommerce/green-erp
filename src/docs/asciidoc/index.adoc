@@ -1,24 +1,46 @@
 = GreenERP API Documentation
+Diego Reidel
+:operation-curl-request-title: Example request
+:operation-httpie-request-title: Example request
+:operation-http-response-title: Example response
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
 
-== Resources
+[[resources]]
+= Resources
 
 [[resources_contractors]]
 == Contractors
 
-The Contractors resources is used to create and list contractors
+The Contractors resource is used to create and list contractors
 
 === Listing contractors
 
-A `GET` request will list all of the contractors.
+A `GET` request will list all the contractors.
 
-operation::listing-contractors[snippets='response-fields,curl-request,http-response']
+operation::listing-contractors[snippets='http-request,request-headers,response-fields,http-response']
 
+=== Creating a contractor
+A `POST` request is used to create a contractor.
+
+operation::creating-a-contractor[snippets='http-request,request-headers,request-fields,http-response']
+
+[[resources_contractor]]
 == Contractor
-The Contractor resource is used to retrieve, update, and delete a specific contractor.
+The Contractor resource is used to retrieve and update a specific contractor.
 
 === Retrieving a contractor
 A `GET` request will retrieve a specific contractor.
 
-operation::retrieving-a-contractor[snippets='response-fields,curl-request,http-response']
+operation::detailing-contractor[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
+
+=== Updating a contractor
+A `PATCH` request will update the data for a specific contractor.
+
+operation::updating-a-contractor[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
 
 

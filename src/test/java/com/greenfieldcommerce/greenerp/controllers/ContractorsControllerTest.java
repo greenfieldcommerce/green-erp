@@ -11,12 +11,18 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedRequestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,7 +40,7 @@ import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.FieldDescriptor;
-import org.springframework.restdocs.snippet.Snippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -55,51 +61,54 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	@Test
 	void shouldReturnAllContractors_forAdmin() throws Exception
 	{
-		final ContractorRateRecord rate = new ContractorRateRecord(1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
-		final ContractorRecord diego = new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
-		final ContractorRecord jorge = new ContractorRecord(2L, "diego@greenfieldcommerce.com", "Jorge Viegas", null);
+		final ContractorRecord diego = buildFullContractorExample();
+		final ContractorRecord jorge = new ContractorRecord(2L, "jorge@greenfieldcommerce.com", "Jorge Viegas", null);
 		when(contractorService.findAll()).thenReturn(List.of(diego, jorge));
 
-		getMvc().perform(get("/contractors")
-				.with(admin())
+		getMvc().perform(getContractorsRequest().with(admin())
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(2))
 			.andExpect(validContractor("$[0]", diego))
-			.andExpect(validContractorRate("$[0].currentRate", rate, getObjectMapper()))
+			.andExpect(validContractorRate("$[0].currentRate", diego.currentRate(), getObjectMapper()))
 			.andExpect(validContractor("$[1]", jorge))
 			.andExpect(emptyContractorRate("$[1].currentRate"))
 			.andDo(
 				document("listing-contractors",
-					requestHeaders(
-						headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'admin' role.").optional()
-					),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminHeader()),
 					responseFields(
-						fieldWithPath("[]").description("An array of items"), // Optional: documents the array itself
-						fieldWithPath("[].id").description("The unique identifier of the item"),
-						fieldWithPath("[].email").description("The name of the item"),
-						fieldWithPath("[].name").description("The name of the item"),
-						subsectionWithPath("[].currentRate").description("A description of the item").optional())
-//					.("[].currentRate.", ContractorRateDocumentation.RATE_FIELDS)
+						subsectionWithPath("[]").description("An array of <<resources_contractor, Contractor resources>>")
+					)
 				)
 			);
 	}
 
-	public interface ContractorRateDocumentation {
-		FieldDescriptor[] RATE_FIELDS = new FieldDescriptor[] {
-			fieldWithPath("id").description("The customer ID"),
-			fieldWithPath("rate").description("The customer's first name"),
-			fieldWithPath("currency").description("The customer's first name"),
-			fieldWithPath("startDateTime").description("The customer's first name"),
-			fieldWithPath("endDateTime").description("The customer's last name")
-		};
+	@ParameterizedTest
+	@MethodSource("withAdminUserAndOwnerContractor")
+	void shouldReturnContractorDetails_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwt) throws Exception
+	{
+		final ContractorRecord expected = buildFullContractorExample();
+		when(contractorService.findById(eq(VALID_RESOURCE_ID))).thenReturn(expected);
+
+		getMvc().perform(getContractorDetailsRequest(VALID_RESOURCE_ID).with(jwt)).andExpect(status().isOk())
+			.andExpect(validContractor("$", expected))
+			.andExpect(validContractorRate("$.currentRate", expected.currentRate(), getObjectMapper()))
+			.andDo(
+				document("detailing-contractor",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(parameterWithName("contractorId").description("Contractor id")),
+					describeContractorResponse()
+				)
+			);
 	}
 
 	@ParameterizedTest
 	@MethodSource("invalidCreateContractorRecordOptions")
 	void shouldReturnUnprocessableEntityWhenCreatingContractorWithInvalidData(CreateContractorRecord invalidRecord) throws Exception
 	{
-		getMvc().perform(post("/contractors").with(admin())
-			.contentType(MediaType.APPLICATION_JSON).content(asJson(invalidRecord)))
+		getMvc().perform(createContractorRequest(invalidRecord).with(admin()))
 			.andExpect(status().isUnprocessableEntity());
 
 		verify(contractorService, never()).create(any(CreateContractorRecord.class));
@@ -109,11 +118,21 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	void shouldCreateContractor_forAdmin() throws Exception
 	{
 		final CreateContractorRecord createContractorRecord = buildValidContractor();
-		final String body = asJson(createContractorRecord);
 		final ContractorRecord result = new ContractorRecord(1L, createContractorRecord.email(), createContractorRecord.name(), null);
 		when(contractorService.create(argThat(matchesContractor(createContractorRecord)))).thenReturn(result);
 
-		getMvc().perform(post("/contractors").with(admin()).contentType(MediaType.APPLICATION_JSON).content(body)).andExpect(status().isCreated()).andExpect(validContractor("$", result)).andExpect(emptyContractorRate("$[0].currentRate"));
+		getMvc().perform(createContractorRequest(createContractorRecord).with(admin()))
+			.andExpect(status().isCreated())
+			.andExpect(validContractor("$", result))
+			.andExpect(emptyContractorRate("$.currentRate"))
+			.andDo(document("creating-a-contractor",
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminHeader()),
+					requestFields(
+						fieldWithPath("email").description("The contractor's email"),
+						fieldWithPath("name").description("The contractor's name"))
+				)
+			);
 
 		verify(contractorService).create(any(CreateContractorRecord.class));
 	}
@@ -126,28 +145,51 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		final ContractorRecord result = new ContractorRecord(VALID_RESOURCE_ID, createContractorRecord.email(), createContractorRecord.name(), null);
 		when(contractorService.update(eq(VALID_RESOURCE_ID), argThat(matchesContractor(createContractorRecord)))).thenReturn(result);
 
-		getMvc().perform(patch("/contractors/{id}", VALID_RESOURCE_ID).with(jwt)
-				.contentType(MediaType.APPLICATION_JSON).content(asJson(createContractorRecord))).andExpect(status().isOk()).andExpect(validContractor("$", result))
-			.andExpect(emptyContractorRate("$[0].currentRate"));
+		getMvc().perform(updateContractorRequest(VALID_RESOURCE_ID, createContractorRecord).with(jwt))
+			.andExpect(status().isOk()).andExpect(validContractor("$", result))
+			.andExpect(emptyContractorRate("$.currentRate"))
+			.andDo(document("updating-a-contractor",
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(parameterWithName("contractorId").description("Contractor id")),
+					requestFields(
+						fieldWithPath("email").description("The updated contractor's email"),
+						fieldWithPath("name").description("The updated contractor's name"))
+				)
+			);
 
 		verify(contractorService).update(eq(VALID_RESOURCE_ID), argThat(matchesContractor(createContractorRecord)));
 	}
 
+	//@formatter:off
 	@Override
 	protected Stream<MockHttpServletRequestBuilder> protectedRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			get("/contractors"),
-			post("/contractors").contentType(MediaType.APPLICATION_JSON).content(asJson(buildValidContractor())),
-			patch("/contractors/{id}", VALID_RESOURCE_ID).contentType(MediaType.APPLICATION_JSON).content(asJson(buildValidContractor())));
+			getContractorsRequest(),
+			getContractorDetailsRequest(VALID_RESOURCE_ID),
+			createContractorRequest(buildValidContractor()),
+			updateContractorRequest(VALID_RESOURCE_ID, buildValidContractor())
+		);
 	}
+	//@formatter:on
 
 	@Override
 	protected Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			patch("/contractors/{id}", INVALID_RESOURCE_ID).with(admin()).contentType(MediaType.APPLICATION_JSON).content(asJson(buildValidContractor()))
+			updateContractorRequest(INVALID_RESOURCE_ID, buildValidContractor()).with(admin()),
+			getContractorDetailsRequest(INVALID_RESOURCE_ID).with(admin())
 		);
+	}
+
+	private static ResponseFieldsSnippet describeContractorResponse()
+	{
+		return responseFields(
+			fieldWithPath("id").description("The unique identifier of the contractor"),
+			fieldWithPath("email").description("The contractor's email"),
+			fieldWithPath("name").description("The contractor's name"),
+			subsectionWithPath("currentRate").description("The contractor's currently active <<resources_rate, rate>>, if any").optional());
 	}
 
 	private Stream<CreateContractorRecord> invalidCreateContractorRecordOptions()
@@ -170,9 +212,46 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		};
 	}
 
-	private static CreateContractorRecord buildValidContractor()
+	private static MockHttpServletRequestBuilder getContractorsRequest()
 	{
-		return new CreateContractorRecord("email", "name");
+		return get("/contractors");
 	}
 
+	private static MockHttpServletRequestBuilder getContractorDetailsRequest(Long contractorId)
+	{
+		return get("/contractors/{contractorId}", contractorId);
+	}
+
+	private MockHttpServletRequestBuilder createContractorRequest(CreateContractorRecord record) throws JsonProcessingException
+	{
+		return post("/contractors").contentType(MediaType.APPLICATION_JSON).content(asJson(record));
+	}
+
+	private MockHttpServletRequestBuilder updateContractorRequest(Long contractorId, CreateContractorRecord record) throws JsonProcessingException
+	{
+		return patch("/contractors/{contractorId}", contractorId).contentType(MediaType.APPLICATION_JSON).content(asJson(record));
+	}
+
+	private static ContractorRecord buildFullContractorExample()
+	{
+		final ContractorRateRecord rate = new ContractorRateRecord(1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ContractorRecord contractor = new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
+
+		return contractor;
+	}
+
+	private static CreateContractorRecord buildValidContractor()
+	{
+		return new CreateContractorRecord("gabriel@greenfieldcommerce.com", "Gabriel");
+	}
+
+	public interface ContractorRateDocumentation {
+		FieldDescriptor[] RATE_FIELDS = new FieldDescriptor[] {
+			fieldWithPath("id").description("The customer ID"),
+			fieldWithPath("rate").description("The customer's first name"),
+			fieldWithPath("currency").description("The customer's first name"),
+			fieldWithPath("startDateTime").description("The customer's first name"),
+			fieldWithPath("endDateTime").description("The customer's last name")
+		};
+	}
 }
