@@ -63,6 +63,20 @@ operation::creating-a-rate[snippets='http-request,request-headers,path-parameter
 
 [[resources_rate]]
 == Rate
+The Rate resource is used to retrieve, update, and delete a specific contractor's rate.
+
+=== Retrieving a contractor rate
 A `GET` request will retrieve a specific contractor's rate.
 
 operation::detailing-a-rate[snippets='http-request,request-headers,path-parameters,http-response']
+
+
+=== Updating a contractor rate
+A `PATCH` request will update the data for a specific contractor's rate.
+
+operation::updating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+=== Deleting a contractor rate
+A `DELETE` request will delete a specific contractor's rate.
+
+operation::deleting-a-rate[snippets='http-request,request-headers,path-parameters,http-response']

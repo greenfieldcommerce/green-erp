@@ -175,7 +175,18 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, zonedDateTimeRecord).with(admin()))
 			.andExpect(status().isOk())
-			.andExpect(validContractorRate("$", result, getObjectMapper()));
+			.andExpect(validContractorRate("$", result, getObjectMapper()))
+			.andDo(
+				document("updating-a-rate",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminHeader()),
+					pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription()),
+					requestFields(
+						fieldWithPath("newEndDateTime").description("The updated rate's end date and time")
+					)
+				)
+			);
 
 		verify(contractorRateService).changeEndDateTime(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID), argThat(r -> r.toInstant().equals(zonedDateTimeRecord.newEndDateTime().toInstant())));
 	}
@@ -183,7 +194,13 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@Test
 	public void shouldDeleteContractorRate_forAdmin() throws Exception
 	{
-		getMvc().perform(deleteContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID).with(admin())).andExpect(status().isNoContent());
+		getMvc().perform(deleteContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID)
+			.with(admin())).andExpect(status().isNoContent())
+			.andDo(document("deleting-a-rate",
+				requestHeaders(describeAdminHeader()),
+				pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription())
+			)
+		);
 		verify(contractorRateService).delete(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID));
 	}
 
