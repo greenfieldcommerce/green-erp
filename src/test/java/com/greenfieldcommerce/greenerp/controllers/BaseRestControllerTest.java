@@ -1,13 +1,10 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
-import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.TestInstance;
@@ -19,8 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.headers.HeaderDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -28,13 +23,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greenfieldcommerce.greenerp.security.AuthenticationConstraint;
+import com.greenfieldcommerce.greenerp.helpers.JwtRequestPostProcessors;
 
+import config.GreenERPTestConfiguration;
 import config.ResolverTestConfig;
 import config.TestSecurityConfig;
 
 @AutoConfigureMockMvc
-@Import({ ResolverTestConfig.class, TestSecurityConfig.class })
+@Import({ ResolverTestConfig.class, TestSecurityConfig.class, GreenERPTestConfiguration.class })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureRestDocs
 abstract class BaseRestControllerTest
@@ -49,7 +45,7 @@ abstract class BaseRestControllerTest
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	private JwtAuthenticationConverter jwtAuthenticationConverter;
+	private JwtRequestPostProcessors jwtRequestPostProcessors;
 
 	@ParameterizedTest
 	@MethodSource("protectedRequests")
@@ -62,8 +58,7 @@ abstract class BaseRestControllerTest
 	@MethodSource("adminOnlyRequests")
 	void shouldReturnForbiddenWhenRequestingProtectedResources_forUnauthorizedUsers(final MockHttpServletRequestBuilder request) throws Exception
 	{
-		getMvc().perform(request.with(regularContractor()))
-			.andExpect(status().isForbidden());
+		getMvc().perform(request.with(jwtRequestPostProcessors.regularContractor())).andExpect(status().isForbidden());
 	}
 
 	@ParameterizedTest
@@ -82,43 +77,9 @@ abstract class BaseRestControllerTest
 		return Stream.concat(protectedRequests(), Stream.of());
 	}
 
-	protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor admin()
+	protected Stream<SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor> withAdminUserAndOwnerContractor()
 	{
-		return jwt().jwt(jwt -> jwt
-				.claim("sub", "admin-user")
-				.claim("realm_access", Map.of("roles", List.of(AuthenticationConstraint.ROLE_ADMIN))))
-			.authorities(jwt -> {
-				AbstractAuthenticationToken token = jwtAuthenticationConverter.convert(jwt);
-				return token.getAuthorities();
-			});
-	}
-
-	protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor regularContractor()
-	{
-		return jwt().jwt(jwt -> jwt
-			.claim("sub", "contractor-user")
-			.claim("contractorId", "contractor-user")
-			.claim("realm_access", Map.of("roles", List.of(AuthenticationConstraint.ROLE_CONTRACTOR))))
-			.authorities(jwt -> {
-				AbstractAuthenticationToken token = jwtAuthenticationConverter.convert(jwt);
-				return token.getAuthorities();
-			});
-	}
-
-	protected SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor ownContractor()
-	{
-		return jwt().jwt(jwt -> jwt
-				.claim("sub", "contractor-owner")
-				.claim("contractorId", String.valueOf(VALID_RESOURCE_ID))
-				.claim("realm_access", Map.of("roles", List.of(AuthenticationConstraint.ROLE_CONTRACTOR))))
-			.authorities(jwt -> {
-				AbstractAuthenticationToken token = jwtAuthenticationConverter.convert(jwt);
-				return token.getAuthorities();
-			});
-	}
-
-	protected Stream<SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor> withAdminUserAndOwnerContractor() {
-		return Stream.of(admin(), ownContractor());
+		return Stream.of(jwtRequestPostProcessors.admin(), jwtRequestPostProcessors.ownContractor());
 	}
 
 	protected String asJson(Object object) throws JsonProcessingException
@@ -126,13 +87,19 @@ abstract class BaseRestControllerTest
 		return objectMapper.writeValueAsString(object);
 	}
 
-	protected MockMvc getMvc() {
+	protected MockMvc getMvc()
+	{
 		return mvc;
 	}
 
 	protected ObjectMapper getObjectMapper()
 	{
 		return objectMapper;
+	}
+
+	protected JwtRequestPostProcessors getJwtRequestPostProcessors()
+	{
+		return jwtRequestPostProcessors;
 	}
 
 	protected static HeaderDescriptor describeAdminHeader()

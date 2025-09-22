@@ -87,7 +87,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	{
 		when(contractorRateService.findRatesForContractor(eq(VALID_RESOURCE_ID))).thenReturn(new ArrayList<>());
 
-		getMvc().perform(getAllContractorRatesRequest(VALID_RESOURCE_ID).with(admin()))
+		getMvc().perform(getAllContractorRatesRequest(VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(0));
 
@@ -98,7 +98,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@MethodSource("invalidCreateContractorRateRecordOptions")
 	public void shouldReturnUnprocessableEntityWhenCreatingContractorRateWithInvalidData(CreateContractorRateRecord record) throws Exception
 	{
-		getMvc().perform(postContractorRateRequest(VALID_RESOURCE_ID, record).with(admin()))
+		getMvc().perform(postContractorRateRequest(VALID_RESOURCE_ID, record).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isUnprocessableEntity());
 
 		verify(contractorRateService, never()).create(any(Long.class), any(CreateContractorRateRecord.class));
@@ -112,7 +112,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 		when(contractorRateService.create(eq(VALID_RESOURCE_ID), argThat(matchesRate(createContractorRateRecord)))).thenReturn(result);
 
-		getMvc().perform(postContractorRateRequest(VALID_RESOURCE_ID, createContractorRateRecord).with(admin()))
+		getMvc().perform(postContractorRateRequest(VALID_RESOURCE_ID, createContractorRateRecord).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isCreated())
 			.andExpect(validContractorRate("$", result, getObjectMapper()))
 			.andDo(document("creating-a-rate",
@@ -159,7 +159,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	public void shouldReturnUnprocessableEntityWhenUpdatingContractorRateWithInvalidDate() throws Exception
 	{
 		final ZonedDateTimeRecord record = new ZonedDateTimeRecord(null);
-		getMvc().perform(patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, record).with(admin()))
+		getMvc().perform(patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, record).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isUnprocessableEntity());
 
 		verify(contractorRateService, never()).changeEndDateTime(any(Long.class), any(Long.class), any(ZonedDateTime.class));
@@ -173,7 +173,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 		when(contractorRateService.changeEndDateTime(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID), argThat(r -> r.toInstant().equals(zonedDateTimeRecord.newEndDateTime().toInstant())))).thenReturn(result);
 
-		getMvc().perform(patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, zonedDateTimeRecord).with(admin()))
+		getMvc().perform(patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, zonedDateTimeRecord).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isOk())
 			.andExpect(validContractorRate("$", result, getObjectMapper()))
 			.andDo(
@@ -195,7 +195,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	public void shouldDeleteContractorRate_forAdmin() throws Exception
 	{
 		getMvc().perform(deleteContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID)
-			.with(admin())).andExpect(status().isNoContent())
+			.with(getJwtRequestPostProcessors().admin())).andExpect(status().isNoContent())
 			.andDo(document("deleting-a-rate",
 				requestHeaders(describeAdminHeader()),
 				pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription())
@@ -219,14 +219,14 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			getAllContractorRatesRequest(INVALID_RESOURCE_ID).with(admin()),
-			postContractorRateRequest(INVALID_RESOURCE_ID, buildValidContractorRate()).with(admin()),
-			getContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID).with(admin()),
-			getContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(admin()),
-			patchContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(admin()),
-			patchContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(admin()),
-			deleteContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(admin()),
-			deleteContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID).with(admin())
+			getAllContractorRatesRequest(INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
+			postContractorRateRequest(INVALID_RESOURCE_ID, buildValidContractorRate()).with(getJwtRequestPostProcessors().admin()),
+			getContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
+			getContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
+			patchContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(getJwtRequestPostProcessors().admin()),
+			patchContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(getJwtRequestPostProcessors().admin()),
+			deleteContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
+			deleteContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin())
 		);
 	}
 

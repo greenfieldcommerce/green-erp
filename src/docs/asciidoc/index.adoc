@@ -10,6 +10,70 @@ Diego Reidel
 :toclevels: 4
 :sectlinks:
 
+[[overview]]
+= Overview
+
+[[overview_http_verbs]]
+== HTTP verbs
+
+The GreenERP API tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP verbs.
+
+|===
+| Verb | Usage
+
+| `GET`
+| Used to retrieve a resource
+
+| `POST`
+| Used to create a new resource
+
+| `PATCH`
+| Used to update an existing resource, including partial updates
+
+| `DELETE`
+| Used to delete an existing resource
+|===
+
+[[overview_http_status_codes]]
+== HTTP status codes
+
+The GreenERP API tries to adhere as closely as possible to standard HTTP and REST conventions in its use of HTTP status codes.
+
+|===
+| Status code | Usage
+
+| `200 OK`
+| The request completed successfully
+
+| `201 Created`
+| A new resource has been created successfully. The resource's URI is available from the response's
+`Location` header
+
+| `204 No Content`
+| An update to an existing resource has been applied successfully
+
+| `400 Bad Request`
+| The request was malformed. The response body will include an error description providing further information
+
+| `404 Not Found`
+| The requested resource did not exist
+
+| `422 Unprocessable Entity`
+| The application understood the content of the request content, and the syntax of the request content was correct, but it was unable to process the contained instructions. The response body will include an error description providing further information
+|===
+
+[[overview_errors]]
+== Errors
+
+Whenever an error response (status code >= 400) is returned, the body will contain a JSON object
+that describes the problem. The error object has the following structure:
+
+include::{snippets}/error-example/response-fields.adoc[]
+
+For example, a request that attempts to retrieve data on a non-existent contractor will produce a `404 Not Found` response:
+
+include::{snippets}/error-example/http-response.adoc[]
+
 [[resources]]
 = Resources
 
@@ -80,3 +144,28 @@ operation::updating-a-rate[snippets='http-request,request-headers,path-parameter
 A `DELETE` request will delete a specific contractor's rate.
 
 operation::deleting-a-rate[snippets='http-request,request-headers,path-parameters,http-response']
+
+[[resources_invoices]]
+== Invoices
+
+The Invoices resource is used to create an invoice
+
+=== Creating an invoice
+A `POST` request is used to create an invoice.
+
+operation::creating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+
+[[resources_invoice]]
+== Current Invoice
+The Current Invoice resource is used to retrieve and update the current invoice for a contractor.
+
+=== Detailing the current invoice
+A `GET` request will retrieve the current invoice for a contractor.
+
+operation::detailing-current-invoice[snippets='http-request,request-headers,path-parameters,http-response']
+
+=== Updating the current invoice
+A `PATCH` request will update the current invoice for a contractor.
+
+operation::updating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+

@@ -20,7 +20,7 @@ import com.greenfieldcommerce.greenerp.services.ContractorInvoiceService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/contractors/{contractorId}/invoices")
+@RequestMapping(value = "/contractors/{contractorId}/invoices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ContractorInvoicesController
 {
 	private final ContractorInvoiceService contractorInvoiceService;
@@ -28,15 +28,6 @@ public class ContractorInvoicesController
 	public ContractorInvoicesController(final ContractorInvoiceService contractorInvoiceService)
 	{
 		this.contractorInvoiceService = contractorInvoiceService;
-	}
-
-	@GetMapping(value = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
-	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public ContractorInvoiceRecord findCurrentInvoice(
-		@ValidatedId(value = "contractorId")
-		Long contractorId)
-	{
-		return contractorInvoiceService.findCurrentInvoiceForContractor(contractorId);
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -47,7 +38,14 @@ public class ContractorInvoicesController
 		return contractorInvoiceService.create(contractorId, record.numberOfWorkedDays(), record.extraAmount());
 	}
 
-	@PatchMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/current")
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
+	public ContractorInvoiceRecord findCurrentInvoice(@ValidatedId(value = "contractorId") Long contractorId)
+	{
+		return contractorInvoiceService.findCurrentInvoiceForContractor(contractorId);
+	}
+
+	@PatchMapping(value = "/current", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
 	public ContractorInvoiceRecord patchCurrentInvoice(@ValidatedId(value = "contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{

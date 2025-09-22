@@ -20,8 +20,16 @@ public class GlobalExceptionHandler
 {
 
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ApiError> handleBusinessException() {
-		return ResponseEntity.notFound().build();
+	public ResponseEntity<ApiError> handleBusinessException(EntityNotFoundException ex, HttpServletRequest request)
+	{
+		final ApiError error = new ApiError(
+			HttpStatus.NOT_FOUND.value(),
+			HttpStatus.NOT_FOUND.getReasonPhrase(),
+			ex.getCode(),
+			ex.getMessage(),
+			request.getRequestURI(),
+			new HashMap<>());
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
 	}
 
 	@ExceptionHandler(BusinessException.class)
@@ -32,7 +40,7 @@ public class GlobalExceptionHandler
 			ex.getCode(),
 			ex.getMessage(),
 			request.getRequestURI(), new HashMap<>());
-		return ResponseEntity.unprocessableEntity().body(error);
+		return ResponseEntity.badRequest().body(error);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

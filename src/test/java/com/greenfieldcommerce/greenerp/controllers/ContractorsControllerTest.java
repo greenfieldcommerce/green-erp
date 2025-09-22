@@ -62,7 +62,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		final ContractorRecord jorge = new ContractorRecord(2L, "jorge@greenfieldcommerce.com", "Jorge Viegas", null);
 		when(contractorService.findAll()).thenReturn(List.of(diego, jorge));
 
-		getMvc().perform(getContractorsRequest().with(admin())
+		getMvc().perform(getContractorsRequest().with(getJwtRequestPostProcessors().admin())
 			).andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(2))
 			.andExpect(validContractor("$[0]", diego))
@@ -104,7 +104,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	@MethodSource("invalidCreateContractorRecordOptions")
 	void shouldReturnUnprocessableEntityWhenCreatingContractorWithInvalidData(CreateContractorRecord invalidRecord) throws Exception
 	{
-		getMvc().perform(createContractorRequest(invalidRecord).with(admin()))
+		getMvc().perform(createContractorRequest(invalidRecord).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isUnprocessableEntity());
 
 		verify(contractorService, never()).create(any(CreateContractorRecord.class));
@@ -117,7 +117,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		final ContractorRecord result = new ContractorRecord(1L, createContractorRecord.email(), createContractorRecord.name(), null);
 		when(contractorService.create(argThat(matchesContractor(createContractorRecord)))).thenReturn(result);
 
-		getMvc().perform(createContractorRequest(createContractorRecord).with(admin()))
+		getMvc().perform(createContractorRequest(createContractorRecord).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isCreated())
 			.andExpect(validContractor("$", result))
 			.andExpect(emptyContractorRate("$.currentRate"))
@@ -176,8 +176,8 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			updateContractorRequest(INVALID_RESOURCE_ID, buildValidContractor()).with(admin()),
-			getContractorDetailsRequest(INVALID_RESOURCE_ID).with(admin())
+			updateContractorRequest(INVALID_RESOURCE_ID, buildValidContractor()).with(getJwtRequestPostProcessors().admin()),
+			getContractorDetailsRequest(INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin())
 		);
 	}
 

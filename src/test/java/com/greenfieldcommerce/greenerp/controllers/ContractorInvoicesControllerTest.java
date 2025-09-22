@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -20,7 +21,15 @@ import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,9 +51,8 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	{
 		when(contractorInvoiceService.findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID))).thenThrow(new EntityNotFoundException("ERROR", "No current invoice"));
 
-		getMvc().perform(getCurrentInvoiceRequest(VALID_RESOURCE_ID).with(admin()))
-			.andExpect(status().isNotFound())
-			.andDo(document("contractor-not-found"));
+		getMvc().perform(getCurrentInvoiceRequest(VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()))
+			.andExpect(status().isNotFound());
 
 		verify(contractorInvoiceService).findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID));
 	}
@@ -59,7 +67,20 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(getCurrentInvoiceRequest(VALID_RESOURCE_ID).with(user))
 			.andExpect(status().isOk())
-			.andExpect(validateContractorInvoice("$", record, getObjectMapper()));
+			.andExpect(validateContractorInvoice("$", record, getObjectMapper()))
+			.andDo(document("detailing-current-invoice",
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(contractorIdParameterDescription()),
+					responseFields(
+						fieldWithPath("startDate").description("The start of the period for which the invoice is valid"),
+						fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
+						fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"),
+						fieldWithPath("total").description("The invoice total"),
+						fieldWithPath("extraAmount").description("Any extra amount included in the invoice"),
+						fieldWithPath("currency").description("The invoice currency"))
+				)
+			);
 
 		verify(contractorInvoiceService).findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID));
 	}
@@ -69,7 +90,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	@MethodSource("invalidCreateContractorInvoiceRecordOptions")
 	public void shouldReturnUnprocessableEntityWhenCreatingContractorInvoiceWithInvalidData(CreateContractorInvoiceRecord record) throws Exception
 	{
-		getMvc().perform(postContractorInvoiceRequest(VALID_RESOURCE_ID, record).with(admin()))
+		getMvc().perform(postContractorInvoiceRequest(VALID_RESOURCE_ID, record).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isUnprocessableEntity());
 	}
 
@@ -84,16 +105,29 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(postContractorInvoiceRequest(VALID_RESOURCE_ID, createContractorInvoiceRecord).with(user))
 			.andExpect(status().isCreated())
-			.andExpect(validateContractorInvoice("$", result, getObjectMapper()));
+			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
+			.andDo(document("creating-an-invoice",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(contractorIdParameterDescription()),
+					describeCreateOrUpdateContractorInvoiceBody()
+				)
+			);
 
 		verify(contractorInvoiceService).create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()));
+	}
+
+	private static RequestFieldsSnippet describeCreateOrUpdateContractorInvoiceBody()
+	{
+		return requestFields(fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"), fieldWithPath("extraAmount").description("Any extra amount to be included in the invoice"));
 	}
 
 	@ParameterizedTest
 	@MethodSource("invalidCreateContractorInvoiceRecordOptions")
 	public void shouldReturnUnprocessableEntityWhenUpdatingContractorInvoiceWithInvalidData(CreateContractorInvoiceRecord record) throws Exception
 	{
-		getMvc().perform(patchCurrentInvoiceRequest(VALID_RESOURCE_ID, record).with(admin()))
+		getMvc().perform(patchCurrentInvoiceRequest(VALID_RESOURCE_ID, record).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isUnprocessableEntity());
 	}
 
@@ -108,7 +142,14 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(patchCurrentInvoiceRequest(VALID_RESOURCE_ID, createContractorInvoiceRecord).with(user))
 			.andExpect(status().isOk())
-			.andExpect(validateContractorInvoice("$", result, getObjectMapper()));
+			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
+			.andDo(document("updating-an-invoice",
+					preprocessRequest(prettyPrint()),
+					preprocessResponse(prettyPrint()),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(contractorIdParameterDescription()), describeCreateOrUpdateContractorInvoiceBody()
+				)
+			);
 
 		verify(contractorInvoiceService).patchInvoice(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()));
 	}
@@ -127,9 +168,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			getCurrentInvoiceRequest(INVALID_RESOURCE_ID).with(admin()),
-			postContractorInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(admin()),
-			patchCurrentInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(admin())
+			getCurrentInvoiceRequest(INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
+			postContractorInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(getJwtRequestPostProcessors().admin()),
+			patchCurrentInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(getJwtRequestPostProcessors().admin())
 		);
 	}
 
@@ -156,7 +197,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 	private MockHttpServletRequestBuilder patchCurrentInvoiceRequest(Long contractorId, CreateContractorInvoiceRecord record) throws JsonProcessingException
 	{
-		return patch("/contractors/{contractorId}/invoices", contractorId).contentType(MediaType.APPLICATION_JSON).content(asJson(record));
+		return patch("/contractors/{contractorId}/invoices/current", contractorId).contentType(MediaType.APPLICATION_JSON).content(asJson(record));
 	}
 
 	private CreateContractorInvoiceRecord buildValidContractorInvoiceRecord()
