@@ -6,12 +6,11 @@ import com.greenfieldcommerce.greenerp.entities.Contractor;
 import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
 import com.greenfieldcommerce.greenerp.records.contractor.CreateContractorRecord;
 
-public interface ContractorService
+public interface ContractorService extends EntityService<Contractor, Long>
 {
 	List<ContractorRecord> findAll();
 	ContractorRecord findById(Long id);
 	ContractorRecord create(CreateContractorRecord record);
 	ContractorRecord update(Long id, CreateContractorRecord record);
-
 	Contractor findEntityById(Long id);
 }

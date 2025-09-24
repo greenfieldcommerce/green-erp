@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static config.ResolverTestConfig.INVALID_RESOURCE_ID;
-import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -29,12 +27,11 @@ import com.greenfieldcommerce.greenerp.records.contractor.CreateContractorRecord
 import com.greenfieldcommerce.greenerp.services.ContractorService;
 
 import config.GreenERPTestConfiguration;
-import config.ResolverTestConfig;
 import config.TestSecurityConfig;
 
 @WebMvcTest(controllers = ContractorsController.class)
 @AutoConfigureMockMvc
-@Import({ ResolverTestConfig.class, TestSecurityConfig.class, GreenERPTestConfiguration.class })
+@Import({ TestSecurityConfig.class, GreenERPTestConfiguration.class })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureRestDocs
 public class ErrorResponseExampleTest
@@ -55,7 +52,7 @@ public class ErrorResponseExampleTest
 	@Test
 	public void errorExample() throws Exception
 	{
-		final String path = "/contractors/" + VALID_RESOURCE_ID;
+		final String path = "/contractors/1";
 		this.mvc.perform(patch(path).with(jwtRequestPostProcessors.admin())
 			.contentType("application/json").content(objectMapper.writeValueAsString(new CreateContractorRecord("", ""))))
 			.andExpect(status().isUnprocessableEntity())

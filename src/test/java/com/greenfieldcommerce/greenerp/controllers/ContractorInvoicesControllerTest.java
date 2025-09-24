@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.Currency;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,8 +17,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static com.greenfieldcommerce.greenerp.helpers.ContractorInvoiceTestValidations.validateContractorInvoice;
-import static config.ResolverTestConfig.INVALID_RESOURCE_ID;
-import static config.ResolverTestConfig.VALID_RESOURCE_ID;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,6 +45,14 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 	@MockitoBean
 	private ContractorInvoiceService contractorInvoiceService;
+
+	@BeforeEach
+	public void setup()
+	{
+		when(contractorInvoiceService.findCurrentInvoiceForContractor(INVALID_RESOURCE_ID)).thenThrow(entityNotFoundException());
+		when(contractorInvoiceService.create(eq(INVALID_RESOURCE_ID), any(BigDecimal.class), any(BigDecimal.class))).thenThrow(entityNotFoundException());
+		when(contractorInvoiceService.patchInvoice(eq(INVALID_RESOURCE_ID), any(BigDecimal.class), any(BigDecimal.class))).thenThrow(entityNotFoundException());
+	}
 
 	@Test
 	public void shouldReturnNotFoundWhenContractorHasNoCurrentInvoice() throws Exception

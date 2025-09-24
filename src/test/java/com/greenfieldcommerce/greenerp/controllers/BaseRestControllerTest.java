@@ -23,20 +23,22 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.helpers.JwtRequestPostProcessors;
 
 import config.GreenERPTestConfiguration;
-import config.ResolverTestConfig;
 import config.TestSecurityConfig;
 
 @AutoConfigureMockMvc
-@Import({ ResolverTestConfig.class, TestSecurityConfig.class, GreenERPTestConfiguration.class })
+@Import({ TestSecurityConfig.class, GreenERPTestConfiguration.class })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureRestDocs
 abstract class BaseRestControllerTest
 {
 
 	protected static final List<String> INVALID_STRINGS = List.of("", " ", "\t", "\n");
+	protected static final Long VALID_RESOURCE_ID = 1L;
+	protected static final Long INVALID_RESOURCE_ID = -1L;
 
 	@Autowired
 	private MockMvc mvc;
@@ -120,6 +122,11 @@ abstract class BaseRestControllerTest
 	protected static ParameterDescriptor contractorRateIdParameterDescription()
 	{
 		return parameterWithName("rateId").description("Rate id");
+	}
+
+	protected EntityNotFoundException entityNotFoundException()
+	{
+		return new EntityNotFoundException("ERROR", "Entity not found");
 	}
 
 }

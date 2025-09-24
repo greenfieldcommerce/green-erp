@@ -3,6 +3,7 @@ package com.greenfieldcommerce.greenerp.services.impl;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import com.greenfieldcommerce.greenerp.entities.Contractor;
@@ -19,7 +20,7 @@ import com.greenfieldcommerce.greenerp.services.ContractorService;
 import com.greenfieldcommerce.greenerp.services.TimeService;
 
 @Service
-public class ContractorInvoiceServiceImpl implements ContractorInvoiceService
+public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorInvoice, Long> implements ContractorInvoiceService
 {
 
 	private final ContractorInvoiceRepository contractorInvoiceRepository;
@@ -29,6 +30,7 @@ public class ContractorInvoiceServiceImpl implements ContractorInvoiceService
 
 	public ContractorInvoiceServiceImpl(final ContractorInvoiceRepository contractorInvoiceRepository, final ContractorRateService contractorRateService, final Mapper<ContractorInvoice, ContractorInvoiceRecord> contractorInvoiceToRecordMapper, final ContractorService contractorService)
 	{
+		super(contractorInvoiceRepository, ContractorInvoice.class);
 		this.contractorInvoiceRepository = contractorInvoiceRepository;
 		this.contractorRateService = contractorRateService;
 		this.contractorInvoiceToRecordMapper = contractorInvoiceToRecordMapper;
@@ -71,4 +73,5 @@ public class ContractorInvoiceServiceImpl implements ContractorInvoiceService
 		return contractorInvoiceRepository.findCurrentContractorInvoice(contractor, TimeService.now())
 			.orElseThrow(() -> new EntityNotFoundException("CURRENT_INVOICE_NOT_FOUND", String.format("No current invoice for contractor %s found", contractorId)));
 	}
+
 }

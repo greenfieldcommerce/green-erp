@@ -2,13 +2,12 @@ package com.greenfieldcommerce.greenerp.services;
 
 import java.math.BigDecimal;
 
+import com.greenfieldcommerce.greenerp.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 
-import jakarta.validation.constraints.NotNull;
-
-public interface ContractorInvoiceService
+public interface ContractorInvoiceService extends EntityService<ContractorInvoice, Long>
 {
-	ContractorInvoiceRecord create(Long contractorId, @NotNull BigDecimal numberOfWorkedDays, @NotNull BigDecimal extraAmount);
+	ContractorInvoiceRecord create(Long contractorId, BigDecimal numberOfWorkedDays, BigDecimal extraAmount);
 	ContractorInvoiceRecord findCurrentInvoiceForContractor(Long contractorId);
-	ContractorInvoiceRecord patchInvoice(Long contractorId, @NotNull BigDecimal bigDecimal, @NotNull BigDecimal bigDecimal1);
+	ContractorInvoiceRecord patchInvoice(Long contractorId, BigDecimal bigDecimal, BigDecimal bigDecimal1);
 }

@@ -1,6 +1,5 @@
 package com.greenfieldcommerce.greenerp.helpers;
 
-import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import java.util.List;
@@ -46,7 +45,7 @@ public class JwtRequestPostProcessors
 	{
 		return jwt().jwt(jwt -> jwt
 				.claim("sub", "contractor-owner")
-				.claim("contractorId", String.valueOf(VALID_RESOURCE_ID))
+				.claim("contractorId", String.valueOf(1L))
 				.claim("realm_access", Map.of("roles", List.of(AuthenticationConstraint.ROLE_CONTRACTOR))))
 			.authorities(jwt -> {
 				AbstractAuthenticationToken token = jwtAuthenticationConverter.convert(jwt);

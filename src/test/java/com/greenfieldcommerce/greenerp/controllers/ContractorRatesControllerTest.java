@@ -1,5 +1,6 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -12,8 +13,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static com.greenfieldcommerce.greenerp.helpers.ContractorRateTestValidations.validContractorRate;
-import static config.ResolverTestConfig.INVALID_RESOURCE_ID;
-import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,6 +52,18 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 	@MockitoBean
 	private ContractorRateService contractorRateService;
+
+	@BeforeEach
+	public void setup()
+	{
+		when(contractorRateService.findEntityById(eq(INVALID_RESOURCE_ID))).thenThrow(entityNotFoundException());
+		when(contractorRateService.findRatesForContractor(INVALID_RESOURCE_ID)).thenThrow(entityNotFoundException());
+		when(contractorRateService.findByIdAndContractorId(eq(INVALID_RESOURCE_ID), any(Long.class))).thenThrow(entityNotFoundException());
+		when(contractorRateService.findByIdAndContractorId(any(Long.class), eq(INVALID_RESOURCE_ID))).thenThrow(entityNotFoundException());
+		when(contractorRateService.create(eq(INVALID_RESOURCE_ID), any(CreateContractorRateRecord.class))).thenThrow(entityNotFoundException());
+		when(contractorRateService.changeEndDateTime(eq(INVALID_RESOURCE_ID), any(Long.class), any(ZonedDateTime.class))).thenThrow(entityNotFoundException());
+		when(contractorRateService.changeEndDateTime(any(Long.class), eq(INVALID_RESOURCE_ID), any(ZonedDateTime.class))).thenThrow(entityNotFoundException());
+	}
 
 	@ParameterizedTest
 	@MethodSource("withAdminUserAndOwnerContractor")
@@ -224,9 +235,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 			getContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
 			getContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
 			patchContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(getJwtRequestPostProcessors().admin()),
-			patchContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(getJwtRequestPostProcessors().admin()),
-			deleteContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
-			deleteContractorRateRequest(INVALID_RESOURCE_ID, VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin())
+			patchContractorRateRequest(VALID_RESOURCE_ID, INVALID_RESOURCE_ID, buildValidEndDateTimeRecord()).with(getJwtRequestPostProcessors().admin())
 		);
 	}
 

@@ -3,8 +3,6 @@ package com.greenfieldcommerce.greenerp.controllers;
 import static com.greenfieldcommerce.greenerp.helpers.ContractorRateTestValidations.emptyContractorRate;
 import static com.greenfieldcommerce.greenerp.helpers.ContractorRateTestValidations.validContractorRate;
 import static com.greenfieldcommerce.greenerp.helpers.ContractorTestValidations.validContractor;
-import static config.ResolverTestConfig.INVALID_RESOURCE_ID;
-import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,6 +10,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.halLinks;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -31,6 +32,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -43,6 +45,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
 import com.greenfieldcommerce.greenerp.records.contractor.CreateContractorRecord;
 import com.greenfieldcommerce.greenerp.records.contractorrate.ContractorRateRecord;
@@ -54,6 +57,14 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 
 	@MockitoBean
 	public ContractorService contractorService;
+
+	@BeforeEach
+	public void setup()
+	{
+		when(contractorService.existsById(INVALID_RESOURCE_ID)).thenThrow(entityNotFoundException());
+		when(contractorService.findById(INVALID_RESOURCE_ID)).thenThrow(entityNotFoundException());
+		when(contractorService.update(eq(INVALID_RESOURCE_ID), any(CreateContractorRecord.class))).thenThrow(entityNotFoundException());
+	}
 
 	@Test
 	void shouldReturnAllContractors_forAdmin() throws Exception
@@ -90,9 +101,16 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		getMvc().perform(getContractorDetailsRequest(VALID_RESOURCE_ID).with(jwt)).andExpect(status().isOk())
 			.andExpect(validContractor("$", expected))
 			.andExpect(validContractorRate("$.currentRate", expected.currentRate(), getObjectMapper()))
+			.andExpect(jsonPath("$._links").exists())
+			.andExpect(jsonPath("$._links.self").exists())
+			.andExpect(jsonPath("$._links.self.href").value("http://localhost:8080/contractors/" + VALID_RESOURCE_ID))
 			.andDo(
 				document("detailing-contractor",
 					preprocessResponse(prettyPrint()),
+					links(
+						halLinks(),
+						linkWithRel("self").description("Self link to this <<resources_contractor, Contractor resources>>")
+					),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription()),
 					describeContractorResponse()
@@ -187,7 +205,8 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 			fieldWithPath("id").description("The unique identifier of the contractor"),
 			fieldWithPath("email").description("The contractor's email"),
 			fieldWithPath("name").description("The contractor's name"),
-			subsectionWithPath("currentRate").description("The contractor's currently active <<resources_rate, rate>>, if any").optional());
+			subsectionWithPath("currentRate").description("The contractor's currently active <<resources_rate, rate>>, if any").optional(),
+			subsectionWithPath("_links").description("HATEOAS links to related resources"));
 	}
 
 	private Stream<CreateContractorRecord> invalidCreateContractorRecordOptions()

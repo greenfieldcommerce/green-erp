@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.greenfieldcommerce.greenerp.entities.Contractor;
 import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorException;
-import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.mappers.Mapper;
 import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
 import com.greenfieldcommerce.greenerp.records.contractor.CreateContractorRecord;
@@ -15,7 +14,7 @@ import com.greenfieldcommerce.greenerp.repositories.ContractorRepository;
 import com.greenfieldcommerce.greenerp.services.ContractorService;
 
 @Service
-public class ContractorServiceImpl implements ContractorService
+public class ContractorServiceImpl extends BaseEntityService<Contractor, Long> implements ContractorService
 {
 	private final ContractorRepository contractorRepository;
 	private final Mapper<CreateContractorRecord, Contractor> createContractorMapper;
@@ -23,6 +22,7 @@ public class ContractorServiceImpl implements ContractorService
 
 	public ContractorServiceImpl(final ContractorRepository contractorRepository, final Mapper<CreateContractorRecord, Contractor> createContractorMapper, final Mapper<Contractor, ContractorRecord> contractorToRecordMapper)
 	{
+		super(contractorRepository, Contractor.class);
 		this.contractorRepository = contractorRepository;
 		this.createContractorMapper = createContractorMapper;
 		this.contractorToRecordMapper = contractorToRecordMapper;
@@ -37,7 +37,7 @@ public class ContractorServiceImpl implements ContractorService
 	@Override
 	public ContractorRecord findById(final Long id)
 	{
-		return contractorToRecordMapper.map(internalFindById(id));
+		return contractorToRecordMapper.map(findEntityById(id));
 	}
 
 	@Override
@@ -57,21 +57,10 @@ public class ContractorServiceImpl implements ContractorService
 	@Override
 	public ContractorRecord update(final Long id, final CreateContractorRecord record)
 	{
-		final Contractor contractor = internalFindById(id);
+		final Contractor contractor = findEntityById(id);
 		contractor.setEmail(record.email());
 		contractor.setName(record.name());
 
 		return contractorToRecordMapper.map(contractorRepository.save(contractor));
-	}
-
-	@Override
-	public Contractor findEntityById(final Long id)
-	{
-		return internalFindById(id);
-	}
-
-	private Contractor internalFindById(final Long id)
-	{
-		return contractorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("CONTRACTOR_NOT_FOUND", String.format("Contractor with id '%s' not found", id)));
 	}
 }

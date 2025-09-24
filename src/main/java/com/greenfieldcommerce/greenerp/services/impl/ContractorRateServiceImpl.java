@@ -22,7 +22,7 @@ import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 
 @Service
-public class ContractorRateServiceImpl implements ContractorRateService
+public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate, Long> implements ContractorRateService
 {
 	private final ContractorService contractorService;
 	private final ContractorRateRepository contractorRateRepository;
@@ -30,6 +30,7 @@ public class ContractorRateServiceImpl implements ContractorRateService
 
 	public ContractorRateServiceImpl(final ContractorService contractorService, final ContractorRateRepository contractorRateRepository, final Mapper<ContractorRate, ContractorRateRecord> contractorRateToRecordMapper)
 	{
+		super(contractorRateRepository, ContractorRate.class);
 		this.contractorService = contractorService;
 		this.contractorRateRepository = contractorRateRepository;
 		this.contractorRateToRecordMapper = contractorRateToRecordMapper;

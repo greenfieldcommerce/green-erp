@@ -1,6 +1,5 @@
 package com.greenfieldcommerce.greenerp.services.impl;
 
-import static config.ResolverTestConfig.VALID_RESOURCE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -34,6 +33,8 @@ import com.greenfieldcommerce.greenerp.services.ContractorService;
 @ExtendWith(MockitoExtension.class)
 public class ContractorInvoiceServiceImplTest
 {
+	private static final Long VALID_RESOURCE_ID = 1L;
+
 	@Mock
 	private ContractorInvoiceRepository contractorInvoiceRepository;
 	@Mock

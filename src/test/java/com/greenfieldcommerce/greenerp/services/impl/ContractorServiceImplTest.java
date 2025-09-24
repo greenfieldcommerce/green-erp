@@ -1,6 +1,5 @@
 package com.greenfieldcommerce.greenerp.services.impl;
 
-import static config.ResolverTestConfig.INVALID_RESOURCE_ID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -28,6 +27,7 @@ class ContractorServiceImplTest
 {
 	private static final String EMAIL = "email";
 	private static final String NAME = "name";
+	private static final Long INVALID_RESOURCE_ID = -1L;
 
 	@Mock
 	private ContractorRepository contractorRepository;
@@ -113,7 +113,7 @@ class ContractorServiceImplTest
 		}
 		catch (EntityNotFoundException e)
 		{
-			assertEquals("CONTRACTOR_NOT_FOUND", e.getCode());
+			assertEquals("ENTITY_NOT_FOUND", e.getCode());
 		}
 	}
 
