@@ -2,6 +2,7 @@ package com.greenfieldcommerce.greenerp.controllers;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -39,9 +40,9 @@ public class ContractorsController
 
 	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	public List<ContractorRecord> getAllContractors()
+	public CollectionModel<EntityModel<ContractorRecord>> getAllContractors()
 	{
-		return contractorService.findAll();
+		return contractorModelAssembler.toCollectionModel(contractorService.findAll());
 	}
 
 	@GetMapping(value = "/{contractorId}")

@@ -74,6 +74,15 @@ For example, a request that attempts to retrieve data on a non-existent contract
 
 include::{snippets}/error-example/http-response.adoc[]
 
+[[overview_hypermedia]]
+== Hypermedia
+
+The GreenERP API uses hypermedia and resources include links to other resources in their
+responses. Responses are in https://github.com/mikekelly/hal_specification[Hypertext
+Application Language (HAL)] format. Links can be found beneath the `_links` key. Users of
+the API should not create URIs themselves, instead they should use the above-described
+links to navigate from resource to resource.
+
 [[resources]]
 = Resources
 
@@ -81,6 +90,11 @@ include::{snippets}/error-example/http-response.adoc[]
 == Contractors
 
 The Contractors resource is used to list and create contractors
+
+[[resources_contractors_links]]
+=== Links
+
+include::{snippets}/listing-contractors/links.adoc[]
 
 === Listing contractors
 
@@ -96,6 +110,11 @@ operation::creating-a-contractor[snippets='http-request,request-headers,request-
 [[resources_contractor]]
 == Contractor
 The Contractor resource is used to retrieve and update a specific contractor.
+
+[[resources_contractor_links]]
+=== Links
+
+include::{snippets}/detailing-contractor/links.adoc[]
 
 === Retrieving a contractor
 A `GET` request will retrieve a specific contractor.

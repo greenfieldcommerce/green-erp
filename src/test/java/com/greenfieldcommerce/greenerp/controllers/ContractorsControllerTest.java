@@ -10,7 +10,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.halLinks;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -45,7 +44,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
 import com.greenfieldcommerce.greenerp.records.contractor.CreateContractorRecord;
 import com.greenfieldcommerce.greenerp.records.contractorrate.ContractorRateRecord;
@@ -75,17 +73,22 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(getContractorsRequest().with(getJwtRequestPostProcessors().admin())
 			).andExpect(status().isOk())
-			.andExpect(jsonPath("$.length()").value(2))
-			.andExpect(validContractor("$[0]", diego))
-			.andExpect(validContractorRate("$[0].currentRate", diego.currentRate(), getObjectMapper()))
-			.andExpect(validContractor("$[1]", jorge))
-			.andExpect(emptyContractorRate("$[1].currentRate"))
+			.andExpect(jsonPath("_embedded.contractors").isArray())
+			.andExpect(validContractor("_embedded.contractors[0]", diego))
+			.andExpect(validContractorRate("_embedded.contractors[0].currentRate", diego.currentRate(), getObjectMapper()))
+			.andExpect(validContractor("_embedded.contractors[1]", jorge))
+			.andExpect(emptyContractorRate("_embedded.contractors[1].currentRate"))
+			.andExpect(jsonPath("_links").exists())
+			.andExpect(jsonPath("$._links.self").exists())
+			.andExpect(jsonPath("$._links.self.href").value("http://localhost:8080/contractors"))
 			.andDo(
 				document("listing-contractors",
 					preprocessResponse(prettyPrint()),
 					requestHeaders(describeAdminHeader()),
+					links(linkWithRel("self").description("Self link to this <<resources_contractors, resource>>")),
 					responseFields(
-						subsectionWithPath("[]").description("An array of <<resources_contractor, Contractor resources>>")
+						subsectionWithPath("_embedded.contractors").description("An array of <<resources_contractor, Contractor resources>>"),
+						subsectionWithPath("_links").description("<<resources_contractors_links, Links>> to other resources")
 					)
 				)
 			);
@@ -108,8 +111,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 				document("detailing-contractor",
 					preprocessResponse(prettyPrint()),
 					links(
-						halLinks(),
-						linkWithRel("self").description("Self link to this <<resources_contractor, Contractor resources>>")
+						linkWithRel("self").description("Self link to this <<resources_contractor, Contractor>>")
 					),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription()),
