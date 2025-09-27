@@ -22,6 +22,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -29,8 +31,10 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -69,25 +73,33 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
-		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
 		when(contractorInvoiceService.findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID))).thenReturn(record);
 
 		getMvc().perform(getCurrentInvoiceRequest(VALID_RESOURCE_ID).with(user))
 			.andExpect(status().isOk())
 			.andExpect(validateContractorInvoice("$", record, getObjectMapper()))
+			.andExpect(jsonPath("_links").exists())
+			.andExpect(jsonPath("_links.self").exists())
+			.andExpect(jsonPath("_links.self.href").value(String.format("http://localhost:8080/contractors/%s/invoices/current", VALID_RESOURCE_ID)))
 			.andDo(document("detailing-current-invoice",
 					preprocessResponse(prettyPrint()),
+					links(
+						linkWithRel("self").description("Self link to this <<resources_invoice, Invoice>>"),
+						linkWithRel("contractor").description("Link to the <<resources_contractor, Contractor>> for whom this invoice is issued")
+					),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription()),
 					responseFields(
+						fieldWithPath("contractorId").description("ID of the contractor"),
 						fieldWithPath("startDate").description("The start of the period for which the invoice is valid"),
 						fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
 						fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"),
 						fieldWithPath("total").description("The invoice total"),
 						fieldWithPath("extraAmount").description("Any extra amount included in the invoice"),
-						fieldWithPath("currency").description("The invoice currency"))
-				)
+						fieldWithPath("currency").description("The invoice currency"),
+						subsectionWithPath("_links").description("HATEOAS links to related resources")))
 			);
 
 		verify(contractorInvoiceService).findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID));
@@ -107,7 +119,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldCreateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
 		when(contractorInvoiceService.create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()))).thenReturn(result);
 
@@ -144,7 +156,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldUpdateCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
 		when(contractorInvoiceService.patchInvoice(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()))).thenReturn(result);
 

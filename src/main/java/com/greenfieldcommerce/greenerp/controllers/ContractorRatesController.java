@@ -2,6 +2,9 @@ package com.greenfieldcommerce.greenerp.controllers;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.greenfieldcommerce.greenerp.assemblers.ContractorRateModelAssembler;
 import com.greenfieldcommerce.greenerp.records.ZonedDateTimeRecord;
 import com.greenfieldcommerce.greenerp.records.contractorrate.ContractorRateRecord;
 import com.greenfieldcommerce.greenerp.records.contractorrate.CreateContractorRateRecord;
@@ -24,22 +28,25 @@ import com.greenfieldcommerce.greenerp.services.ContractorRateService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/contractors/{contractorId}/rates", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/contractors/{contractorId}/rates", produces = MediaTypes.HAL_JSON_VALUE)
 public class ContractorRatesController
 {
 
 	private final ContractorRateService contractorRateService;
+	private final ContractorRateModelAssembler contractorRateModelAssembler;
 
-	public ContractorRatesController(final ContractorRateService contractorRateService)
+	public ContractorRatesController(final ContractorRateService contractorRateService, final ContractorRateModelAssembler contractorRateModelAssembler)
 	{
 		this.contractorRateService = contractorRateService;
+		this.contractorRateModelAssembler = contractorRateModelAssembler;
 	}
 
 	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public List<ContractorRateRecord> findRatesForContractor(@PathVariable("contractorId") Long contractorId)
+	public CollectionModel<EntityModel<ContractorRateRecord>> findRatesForContractor(@PathVariable("contractorId") Long contractorId)
 	{
-		return contractorRateService.findRatesForContractor(contractorId);
+		final List<ContractorRateRecord> ratesForContractor = contractorRateService.findRatesForContractor(contractorId);
+		return contractorRateModelAssembler.toCollectionModel(contractorId, ratesForContractor);
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -52,9 +59,9 @@ public class ContractorRatesController
 
 	@GetMapping(value = "/{rateId}")
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public ContractorRateRecord getContractorRate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId)
+	public EntityModel<ContractorRateRecord> getContractorRate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId)
 	{
-		return contractorRateService.findByIdAndContractorId(rateId, contractorId);
+		return contractorRateModelAssembler.toModel(contractorRateService.findByIdAndContractorId(rateId, contractorId));
 	}
 
 	@PatchMapping(value = "/{rateId}", consumes = MediaType.APPLICATION_JSON_VALUE)

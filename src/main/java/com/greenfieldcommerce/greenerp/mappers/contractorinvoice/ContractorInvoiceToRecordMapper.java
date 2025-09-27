@@ -12,6 +12,6 @@ public class ContractorInvoiceToRecordMapper implements Mapper<ContractorInvoice
 	@Override
 	public ContractorInvoiceRecord map(final ContractorInvoice contractorInvoice)
 	{
-		return new ContractorInvoiceRecord(contractorInvoice.getStartDate(), contractorInvoice.getEndDate(), contractorInvoice.getNumberOfWorkedDays(), contractorInvoice.getExtraAmount(), contractorInvoice.getTotal(), contractorInvoice.getCurrency());
+		return new ContractorInvoiceRecord(contractorInvoice.getContractor().getId(), contractorInvoice.getStartDate(), contractorInvoice.getEndDate(), contractorInvoice.getNumberOfWorkedDays(), contractorInvoice.getExtraAmount(), contractorInvoice.getTotal(), contractorInvoice.getCurrency());
 	}
 }

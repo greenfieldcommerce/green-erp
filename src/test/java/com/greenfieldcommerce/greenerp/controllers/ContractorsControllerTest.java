@@ -22,6 +22,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -107,11 +108,18 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 			.andExpect(jsonPath("$._links").exists())
 			.andExpect(jsonPath("$._links.self").exists())
 			.andExpect(jsonPath("$._links.self.href").value("http://localhost:8080/contractors/" + VALID_RESOURCE_ID))
+			.andExpect(jsonPath("$._links.rates").exists())
+			.andExpect(jsonPath("$._links.rates.href").value(String.format("http://localhost:8080/contractors/%s/rates", VALID_RESOURCE_ID)))
+			.andExpect(jsonPath("$._links.currentInvoice").exists())
+			.andExpect(jsonPath("$._links.currentInvoice.href").value(String.format("http://localhost:8080/contractors/%s/invoices/current", VALID_RESOURCE_ID)))
+			.andDo(print())
 			.andDo(
 				document("detailing-contractor",
 					preprocessResponse(prettyPrint()),
 					links(
-						linkWithRel("self").description("Self link to this <<resources_contractor, Contractor>>")
+						linkWithRel("self").description("Self link to this <<resources_contractor, Contractor>>"),
+						linkWithRel("rates").description("Link to this contractor's <<resources_rates, Rates>>"),
+						linkWithRel("currentInvoice").description("Link to this contractor's <<resources_invoice, current Invoice>>")
 					),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription()),
@@ -253,7 +261,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 
 	private static ContractorRecord buildFullContractorExample()
 	{
-		final ContractorRateRecord rate = new ContractorRateRecord(1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ContractorRateRecord rate = new ContractorRateRecord(1L, 1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 		return new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
 	}
 

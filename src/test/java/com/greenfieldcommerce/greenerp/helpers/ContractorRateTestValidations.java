@@ -12,6 +12,7 @@ public class ContractorRateTestValidations
 	public static ResultMatcher validContractorRate(String path, ContractorRateRecord rate, ObjectMapper objectMapper)
 	{
 		return result -> {
+			jsonPath(path + ".contractorId").value(rate.contractorId()).match(result);
 			jsonPath(path + ".id").value(rate.id()).match(result);
 			jsonPath(path + ".rate").value(rate.rate()).match(result);
 			jsonPath(path + ".currency").value(rate.currency().toString()).match(result);

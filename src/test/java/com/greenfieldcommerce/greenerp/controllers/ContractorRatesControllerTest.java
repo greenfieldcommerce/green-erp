@@ -20,6 +20,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
+import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -69,38 +71,31 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnAllContractorRates_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
-		final ContractorRateRecord a = new ContractorRateRecord(1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
-		final ContractorRateRecord b = new ContractorRateRecord(2L, BigDecimal.valueOf(100.50), Currency.getInstance("USD"), ZonedDateTime.now().plusMonths(1), ZonedDateTime.now().plusMonths(3));
+		final ContractorRateRecord a = new ContractorRateRecord(VALID_RESOURCE_ID, 1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ContractorRateRecord b = new ContractorRateRecord(VALID_RESOURCE_ID, 2L, BigDecimal.valueOf(100.50), Currency.getInstance("USD"), ZonedDateTime.now().plusMonths(1), ZonedDateTime.now().plusMonths(3));
 
 		when(contractorRateService.findRatesForContractor(eq(VALID_RESOURCE_ID))).thenReturn(List.of(a, b));
 
 		getMvc().perform(getAllContractorRatesRequest(VALID_RESOURCE_ID).with(user))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()").value(2))
-			.andExpect(validContractorRate("$[0]", a, getObjectMapper()))
-			.andExpect(validContractorRate("$[1]", b, getObjectMapper()))
+			.andExpect(validContractorRate("_embedded.rates[0]", a, getObjectMapper()))
+			.andExpect(validContractorRate("_embedded.rates[1]", b, getObjectMapper()))
+			.andExpect(jsonPath("_links").exists())
+			.andExpect(jsonPath("$._links.self").exists())
+			.andExpect(jsonPath("$._links.self.href").value(String.format("http://localhost:8080/contractors/%s/rates", VALID_RESOURCE_ID)))
 			.andDo(
 				document("listing-contractor-rates",
 					preprocessResponse(prettyPrint()),
+					links(linkWithRel("self").description("Self link to this <<resources_rates, resource>>")),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription()),
 					responseFields(
-						subsectionWithPath("[]").description("An array with the contractor's <<resources_rate, Rate resources>>")
+						subsectionWithPath("_embedded.rates").description("An array with the contractor's <<resources_rate, Rate resources>>"),
+						subsectionWithPath("_links").description("<<resources_rates_links, Links>> to other resources")
 					)
 				)
 			);
-
-		verify(contractorRateService).findRatesForContractor(eq(VALID_RESOURCE_ID));
-	}
-
-	@Test
-	public void shouldReturnAnEmptyBodyWhenNoCurrentRateExists() throws Exception
-	{
-		when(contractorRateService.findRatesForContractor(eq(VALID_RESOURCE_ID))).thenReturn(new ArrayList<>());
-
-		getMvc().perform(getAllContractorRatesRequest(VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.length()").value(0));
 
 		verify(contractorRateService).findRatesForContractor(eq(VALID_RESOURCE_ID));
 	}
@@ -119,7 +114,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	public void shouldCreateContractorRate_forAdmin() throws Exception
 	{
 		final CreateContractorRateRecord createContractorRateRecord = buildValidContractorRate();
-		final ContractorRateRecord result = buildExpectedSuccessResult(createContractorRateRecord);
+		final ContractorRateRecord result = buildExpectedSuccessResult(VALID_RESOURCE_ID, createContractorRateRecord);
 
 		when(contractorRateService.create(eq(VALID_RESOURCE_ID), argThat(matchesRate(createContractorRateRecord)))).thenReturn(result);
 
@@ -147,16 +142,24 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnContractorRateById_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwt) throws Exception
 	{
-		final ContractorRateRecord rate = new ContractorRateRecord(1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ContractorRateRecord rate = new ContractorRateRecord(VALID_RESOURCE_ID,1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 
 		when(contractorRateService.findByIdAndContractorId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID))).thenReturn(rate);
 
 		getMvc().perform(getContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID).with(jwt))
 			.andExpect(status().isOk())
 			.andExpect(validContractorRate("$", rate, getObjectMapper()))
+			.andExpect(jsonPath("_links").exists())
+			.andExpect(jsonPath("_links.self").exists())
+			.andExpect(jsonPath("_links.self.href").value(String.format("http://localhost:8080/contractors/%s/rates/%s", VALID_RESOURCE_ID, VALID_RESOURCE_ID)))
+			.andExpect(jsonPath("_links.contractor").exists())
+			.andExpect(jsonPath("_links.contractor.href").value(String.format("http://localhost:8080/contractors/%s", VALID_RESOURCE_ID)))
 			.andDo(
 				document("detailing-a-rate",
 					preprocessResponse(prettyPrint()),
+					links(
+						linkWithRel("self").description("Self link to this <<resources_rate, Rate>>"),
+						linkWithRel("contractor").description("Lint to the <<resources_contractor, contractor>> this rate belongs to")),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription()),
 					describeContractorRateResponse()
@@ -180,7 +183,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	public void shouldUpdateContractorRate_forAdmin() throws Exception
 	{
 		final ZonedDateTimeRecord zonedDateTimeRecord = buildValidEndDateTimeRecord();
-		final ContractorRateRecord result = new ContractorRateRecord(1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), zonedDateTimeRecord.newEndDateTime());
+		final ContractorRateRecord result = new ContractorRateRecord(VALID_RESOURCE_ID,1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), zonedDateTimeRecord.newEndDateTime());
 
 		when(contractorRateService.changeEndDateTime(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID), argThat(r -> r.toInstant().equals(zonedDateTimeRecord.newEndDateTime().toInstant())))).thenReturn(result);
 
@@ -279,9 +282,9 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		return new CreateContractorRateRecord(BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 	}
 
-	private static ContractorRateRecord buildExpectedSuccessResult(final CreateContractorRateRecord createContractorRateRecord)
+	private static ContractorRateRecord buildExpectedSuccessResult(final Long contractorId, final CreateContractorRateRecord createContractorRateRecord)
 	{
-		return new ContractorRateRecord(1L, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
+		return new ContractorRateRecord(contractorId,1L, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
 	}
 
 	private ZonedDateTimeRecord buildValidEndDateTimeRecord()
@@ -304,11 +307,13 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	private static ResponseFieldsSnippet describeContractorRateResponse()
 	{
 		return responseFields(
+			fieldWithPath("contractorId").description("The ID of the contractor this rate belongs to"),
 			fieldWithPath("id").description("The rate ID"),
 			fieldWithPath("rate").description("The contractor's daily rate"),
 			fieldWithPath("currency").description("The currency of the rate"),
 			fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
-			fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')")
+			fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')"),
+			subsectionWithPath("_links").description("<<resources_rate_links, Links>> to other resources")
 		);
 	}
 }

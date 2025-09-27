@@ -87,6 +87,11 @@ public class ContractorInvoice
 		return this.numberOfWorkedDays.multiply(this.rate.getRate()).add(this.extraAmount).setScale(2, RoundingMode.HALF_UP);
 	}
 
+	public Contractor getContractor()
+	{
+		return contractor;
+	}
+
 	public ZonedDateTime getStartDate()
 	{
 		return startDate;

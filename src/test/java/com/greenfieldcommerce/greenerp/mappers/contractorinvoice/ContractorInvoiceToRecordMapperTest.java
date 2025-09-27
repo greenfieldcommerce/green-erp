@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
+import com.greenfieldcommerce.greenerp.entities.Contractor;
 import com.greenfieldcommerce.greenerp.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +23,7 @@ class ContractorInvoiceToRecordMapperTest {
 	private static final BigDecimal WORKED_DAYS = BigDecimal.valueOf(20);
 	private static final BigDecimal EXTRA_AMOUNT = BigDecimal.valueOf(200.0);
 	private static final BigDecimal TOTAL = BigDecimal.valueOf(5000.0);
+	private static final Long CONTRACTOR_ID = 1L;
 
     private final ContractorInvoiceToRecordMapper mapper = new ContractorInvoiceToRecordMapper();
 
@@ -34,6 +36,7 @@ class ContractorInvoiceToRecordMapperTest {
 		ContractorInvoiceRecord result = mapper.map(contractorInvoice);
 
 		assertNotNull(result);
+		assertEquals(CONTRACTOR_ID, result.contractorId());
 		assertEquals(START, result.startDate());
 		assertEquals(END, result.endDate());
 		assertEquals(WORKED_DAYS, result.numberOfWorkedDays());
@@ -44,6 +47,10 @@ class ContractorInvoiceToRecordMapperTest {
 	ContractorInvoice validInvoice()
 	{
 		ContractorInvoice invoice = mock(ContractorInvoice.class);
+		Contractor contractor = mock(Contractor.class);
+		when(contractor.getId()).thenReturn(CONTRACTOR_ID);
+
+		when(invoice.getContractor()).thenReturn(contractor);
 		when(invoice.getStartDate()).thenReturn(START);
 		when(invoice.getEndDate()).thenReturn(END);
 		when(invoice.getNumberOfWorkedDays()).thenReturn(WORKED_DAYS);

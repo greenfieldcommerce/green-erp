@@ -1,5 +1,7 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.greenfieldcommerce.greenerp.assemblers.ContractorInvoiceModelAssembler;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.CreateContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.security.AuthenticationConstraint;
@@ -20,14 +23,16 @@ import com.greenfieldcommerce.greenerp.services.ContractorInvoiceService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/contractors/{contractorId}/invoices", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/contractors/{contractorId}/invoices", produces = MediaTypes.HAL_JSON_VALUE)
 public class ContractorInvoicesController
 {
 	private final ContractorInvoiceService contractorInvoiceService;
+	private final ContractorInvoiceModelAssembler contractorInvoiceModelAssembler;
 
-	public ContractorInvoicesController(final ContractorInvoiceService contractorInvoiceService)
+	public ContractorInvoicesController(final ContractorInvoiceService contractorInvoiceService, final ContractorInvoiceModelAssembler contractorInvoiceModelAssembler)
 	{
 		this.contractorInvoiceService = contractorInvoiceService;
+		this.contractorInvoiceModelAssembler = contractorInvoiceModelAssembler;
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -40,9 +45,10 @@ public class ContractorInvoicesController
 
 	@GetMapping(value = "/current")
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public ContractorInvoiceRecord findCurrentInvoice(@PathVariable("contractorId") Long contractorId)
+	public EntityModel<ContractorInvoiceRecord> findCurrentInvoice(@PathVariable("contractorId") Long contractorId)
 	{
-		return contractorInvoiceService.findCurrentInvoiceForContractor(contractorId);
+		final ContractorInvoiceRecord currentInvoiceForContractor = contractorInvoiceService.findCurrentInvoiceForContractor(contractorId);
+		return contractorInvoiceModelAssembler.toModel(currentInvoiceForContractor);
 	}
 
 	@PatchMapping(value = "/current", consumes = MediaType.APPLICATION_JSON_VALUE)

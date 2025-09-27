@@ -133,6 +133,11 @@ operation::updating-a-contractor[snippets='http-request,request-headers,path-par
 
 The Rates resource is used to list and create contractor rates
 
+[[resources_rates_links]]
+=== Links
+
+include::{snippets}/listing-contractor-rates/links.adoc[]
+
 === Listing contractor rates
 
 A `GET` request will list all the rates associated with a contractor.
@@ -147,6 +152,11 @@ operation::creating-a-rate[snippets='http-request,request-headers,path-parameter
 [[resources_rate]]
 == Rate
 The Rate resource is used to retrieve, update, and delete a specific contractor's rate.
+
+[[resources_rate_links]]
+=== Links
+
+include::{snippets}/detailing-a-rate/links.adoc[]
 
 === Retrieving a contractor rate
 A `GET` request will retrieve a specific contractor's rate.
@@ -177,6 +187,11 @@ operation::creating-an-invoice[snippets='http-request,request-headers,path-param
 [[resources_invoice]]
 == Current Invoice
 The Current Invoice resource is used to retrieve and update the current invoice for a contractor.
+
+[[resources_invoice_links]]
+=== Links
+
+include::{snippets}/detailing-current-invoice/links.adoc[]
 
 === Detailing the current invoice
 A `GET` request will retrieve the current invoice for a contractor.

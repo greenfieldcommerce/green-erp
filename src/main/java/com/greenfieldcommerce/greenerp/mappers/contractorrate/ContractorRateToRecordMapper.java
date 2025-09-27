@@ -13,6 +13,6 @@ public class ContractorRateToRecordMapper implements Mapper<ContractorRate, Cont
 	@Override
 	public ContractorRateRecord map(final ContractorRate contractorRate)
 	{
-		return new ContractorRateRecord(contractorRate.getId(), contractorRate.getRate(), contractorRate.getCurrency(), contractorRate.getStartDateTime(), contractorRate.getEndDateTime());
+		return new ContractorRateRecord(contractorRate.getContractor().getId(), contractorRate.getId(), contractorRate.getRate(), contractorRate.getCurrency(), contractorRate.getStartDateTime(), contractorRate.getEndDateTime());
 	}
 }
