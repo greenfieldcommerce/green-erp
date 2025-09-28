@@ -105,7 +105,7 @@ operation::listing-contractors[snippets='http-request,request-headers,response-f
 === Creating a contractor
 A `POST` request is used to create a contractor.
 
-operation::creating-a-contractor[snippets='http-request,request-headers,request-fields,http-response']
+operation::creating-a-contractor[snippets='http-request,request-headers,request-fields,response-headers,http-response']
 
 [[resources_contractor]]
 == Contractor
@@ -124,7 +124,7 @@ operation::detailing-contractor[snippets='http-request,request-headers,path-para
 === Updating a contractor
 A `PATCH` request will update the data for a specific contractor.
 
-operation::updating-a-contractor[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
+operation::updating-a-contractor[snippets='http-request,request-headers,path-parameters,http-response']
 
 
 
@@ -147,7 +147,7 @@ operation::listing-contractor-rates[snippets='http-request,request-headers,path-
 === Creating a contractor rate
 A `POST` request is used to create a contractor rate.
 
-operation::creating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+operation::creating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,response-headers,http-response']
 
 [[resources_rate]]
 == Rate
@@ -161,7 +161,7 @@ include::{snippets}/detailing-a-rate/links.adoc[]
 === Retrieving a contractor rate
 A `GET` request will retrieve a specific contractor's rate.
 
-operation::detailing-a-rate[snippets='http-request,request-headers,path-parameters,http-response']
+operation::detailing-a-rate[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
 
 
 === Updating a contractor rate
@@ -182,7 +182,7 @@ The Invoices resource is used to create an invoice
 === Creating an invoice
 A `POST` request is used to create an invoice.
 
-operation::creating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+operation::creating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,response-headers,http-response']
 
 [[resources_invoice]]
 == Current Invoice
@@ -196,7 +196,7 @@ include::{snippets}/detailing-current-invoice/links.adoc[]
 === Detailing the current invoice
 A `GET` request will retrieve the current invoice for a contractor.
 
-operation::detailing-current-invoice[snippets='http-request,request-headers,path-parameters,http-response']
+operation::detailing-current-invoice[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
 
 === Updating the current invoice
 A `PATCH` request will update the current invoice for a contractor.

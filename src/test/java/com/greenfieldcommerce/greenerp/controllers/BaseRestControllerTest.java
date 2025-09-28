@@ -114,6 +114,11 @@ abstract class BaseRestControllerTest
 		return headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'ADMIN' role or be owned by the associated 'CONTRACTOR'").optional();
 	}
 
+	protected static HeaderDescriptor describeResourceLocationHeader()
+	{
+		return headerWithName("Location").description("The URL of the newly created resource");
+	}
+
 	protected static ParameterDescriptor contractorIdParameterDescription()
 	{
 		return parameterWithName("contractorId").description("Contractor id");

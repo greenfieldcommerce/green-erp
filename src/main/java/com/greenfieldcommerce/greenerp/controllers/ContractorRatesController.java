@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,11 +52,13 @@ public class ContractorRatesController
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	public ContractorRateRecord createContractorRate(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
+	public ResponseEntity<EntityModel<ContractorRateRecord>> createContractorRate(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
 	{
-		return contractorRateService.create(contractorId, record);
+		final ContractorRateRecord createdRate = contractorRateService.create(contractorId, record);
+		EntityModel<ContractorRateRecord> response = contractorRateModelAssembler.toModel(createdRate);
+
+		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
 	}
 
 	@GetMapping(value = "/{rateId}")
@@ -66,9 +70,10 @@ public class ContractorRatesController
 
 	@PatchMapping(value = "/{rateId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	public ContractorRateRecord updateRateEndDate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId, @Valid @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
+	public EntityModel<ContractorRateRecord> updateRateEndDate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId, @Valid @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
 	{
-		return contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
+		final ContractorRateRecord updated = contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
+		return contractorRateModelAssembler.toModel(updated);
 	}
 
 	@DeleteMapping(value = "/{rateId}")

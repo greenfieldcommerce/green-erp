@@ -10,6 +10,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -23,6 +24,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.subsecti
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,9 +41,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -105,22 +109,12 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		getMvc().perform(getContractorDetailsRequest(VALID_RESOURCE_ID).with(jwt)).andExpect(status().isOk())
 			.andExpect(validContractor("$", expected))
 			.andExpect(validContractorRate("$.currentRate", expected.currentRate(), getObjectMapper()))
-			.andExpect(jsonPath("$._links").exists())
-			.andExpect(jsonPath("$._links.self").exists())
-			.andExpect(jsonPath("$._links.self.href").value("http://localhost:8080/contractors/" + VALID_RESOURCE_ID))
-			.andExpect(jsonPath("$._links.rates").exists())
-			.andExpect(jsonPath("$._links.rates.href").value(String.format("http://localhost:8080/contractors/%s/rates", VALID_RESOURCE_ID)))
-			.andExpect(jsonPath("$._links.currentInvoice").exists())
-			.andExpect(jsonPath("$._links.currentInvoice.href").value(String.format("http://localhost:8080/contractors/%s/invoices/current", VALID_RESOURCE_ID)))
+			.andExpectAll(contractorLinksMatchers(VALID_RESOURCE_ID))
 			.andDo(print())
 			.andDo(
 				document("detailing-contractor",
 					preprocessResponse(prettyPrint()),
-					links(
-						linkWithRel("self").description("Self link to this <<resources_contractor, Contractor>>"),
-						linkWithRel("rates").description("Link to this contractor's <<resources_rates, Rates>>"),
-						linkWithRel("currentInvoice").description("Link to this contractor's <<resources_invoice, current Invoice>>")
-					),
+					describeContractorLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription()),
 					describeContractorResponse()
@@ -142,20 +136,24 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	void shouldCreateContractor_forAdmin() throws Exception
 	{
 		final CreateContractorRecord createContractorRecord = buildValidContractor();
-		final ContractorRecord result = new ContractorRecord(1L, createContractorRecord.email(), createContractorRecord.name(), null);
+		final ContractorRecord result = new ContractorRecord(3L, createContractorRecord.email(), createContractorRecord.name(), null);
 		when(contractorService.create(argThat(matchesContractor(createContractorRecord)))).thenReturn(result);
 
 		getMvc().perform(createContractorRequest(createContractorRecord).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isCreated())
 			.andExpect(validContractor("$", result))
 			.andExpect(emptyContractorRate("$.currentRate"))
+			.andExpect(header().string("Location", String.format("http://localhost:8080/contractors/%s", result.id())))
+			.andExpectAll(contractorLinksMatchers(result.id()))
 			.andDo(document("creating-a-contractor",
-					preprocessRequest(prettyPrint()),
-					preprocessResponse(prettyPrint()),
-					requestHeaders(describeAdminHeader()),
-					requestFields(
-						fieldWithPath("email").description("The contractor's email"),
-						fieldWithPath("name").description("The contractor's name"))
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestHeaders(describeAdminHeader()),
+				responseHeaders(describeResourceLocationHeader()),
+				describeContractorLinks(),
+				requestFields(
+					fieldWithPath("email").description("The contractor's email"),
+					fieldWithPath("name").description("The contractor's name"))
 				)
 			);
 
@@ -173,14 +171,16 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		getMvc().perform(updateContractorRequest(VALID_RESOURCE_ID, createContractorRecord).with(jwt))
 			.andExpect(status().isOk()).andExpect(validContractor("$", result))
 			.andExpect(emptyContractorRate("$.currentRate"))
+			.andExpectAll(contractorLinksMatchers(result.id()))
 			.andDo(document("updating-a-contractor",
-					preprocessRequest(prettyPrint()),
-					preprocessResponse(prettyPrint()),
-					requestHeaders(describeAdminOrContractorHeader()),
-					pathParameters(contractorIdParameterDescription()),
-					requestFields(
-						fieldWithPath("email").description("The updated contractor's email"),
-						fieldWithPath("name").description("The updated contractor's name"))
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				describeContractorLinks(),
+				requestHeaders(describeAdminOrContractorHeader()),
+				pathParameters(contractorIdParameterDescription()),
+				requestFields(
+					fieldWithPath("email").description("The updated contractor's email"),
+					fieldWithPath("name").description("The updated contractor's name"))
 				)
 			);
 
@@ -268,5 +268,26 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	private static CreateContractorRecord buildValidContractor()
 	{
 		return new CreateContractorRecord("gabriel@greenfieldcommerce.com", "Gabriel");
+	}
+
+	private static ResultMatcher[] contractorLinksMatchers(Long contractorId) {
+		return new ResultMatcher[] {
+			jsonPath("$._links").exists(),
+			jsonPath("$._links.self").exists(),
+			jsonPath("$._links.self.href").value("http://localhost:8080/contractors/" + contractorId),
+			jsonPath("$._links.rates").exists(),
+			jsonPath("$._links.rates.href").value(String.format("http://localhost:8080/contractors/%s/rates", contractorId)),
+			jsonPath("$._links.currentInvoice").exists(),
+			jsonPath("$._links.currentInvoice.href").value(String.format("http://localhost:8080/contractors/%s/invoices/current", contractorId))
+		};
+	}
+
+	private LinksSnippet describeContractorLinks()
+	{
+		return links(
+			linkWithRel("self").description("Self link to this <<resources_contractor, Contractor>>"),
+			linkWithRel("rates").description("Link to this contractor's <<resources_rates, Rates>>"),
+			linkWithRel("currentInvoice").description("Link to this contractor's <<resources_invoice, current Invoice>>")
+		);
 	}
 }

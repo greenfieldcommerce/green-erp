@@ -7,9 +7,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatcher;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static com.greenfieldcommerce.greenerp.helpers.ContractorRateTestValidations.validContractorRate;
@@ -20,6 +22,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -32,12 +35,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;
 import java.util.stream.Stream;
@@ -114,26 +117,28 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	public void shouldCreateContractorRate_forAdmin() throws Exception
 	{
 		final CreateContractorRateRecord createContractorRateRecord = buildValidContractorRate();
-		final ContractorRateRecord result = buildExpectedSuccessResult(VALID_RESOURCE_ID, createContractorRateRecord);
+		final ContractorRateRecord result = buildExpectedSuccessResult(VALID_RESOURCE_ID, VALID_RESOURCE_ID, createContractorRateRecord);
 
 		when(contractorRateService.create(eq(VALID_RESOURCE_ID), argThat(matchesRate(createContractorRateRecord)))).thenReturn(result);
 
 		getMvc().perform(postContractorRateRequest(VALID_RESOURCE_ID, createContractorRateRecord).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isCreated())
 			.andExpect(validContractorRate("$", result, getObjectMapper()))
+			.andExpect(header().string("Location", String.format("http://localhost:8080/contractors/%s/rates/%s", result.contractorId(), result.id())))
+			.andExpectAll(rateLinksMatchers())
 			.andDo(document("creating-a-rate",
-					preprocessRequest(prettyPrint()),
-					preprocessResponse(prettyPrint()),
-					requestHeaders(describeAdminHeader()),
-					pathParameters(contractorIdParameterDescription()),
-					requestFields(
-						fieldWithPath("rate").description("The contractor's rate"),
-						fieldWithPath("currency").description("The rate currency"),
-						fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
-						fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')")
-					)
-				)
-			);
+				preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				describeRateLinks(),
+				requestHeaders(describeAdminHeader()),
+				responseHeaders(describeResourceLocationHeader()),
+				pathParameters(contractorIdParameterDescription()),
+				requestFields(
+					fieldWithPath("rate").description("The contractor's rate"),
+					fieldWithPath("currency").description("The rate currency"),
+					fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
+					fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')")
+				)));
 
 		verify(contractorRateService).create(eq(VALID_RESOURCE_ID), argThat(matchesRate(createContractorRateRecord)));
 	}
@@ -149,17 +154,11 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		getMvc().perform(getContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID).with(jwt))
 			.andExpect(status().isOk())
 			.andExpect(validContractorRate("$", rate, getObjectMapper()))
-			.andExpect(jsonPath("_links").exists())
-			.andExpect(jsonPath("_links.self").exists())
-			.andExpect(jsonPath("_links.self.href").value(String.format("http://localhost:8080/contractors/%s/rates/%s", VALID_RESOURCE_ID, VALID_RESOURCE_ID)))
-			.andExpect(jsonPath("_links.contractor").exists())
-			.andExpect(jsonPath("_links.contractor.href").value(String.format("http://localhost:8080/contractors/%s", VALID_RESOURCE_ID)))
+			.andExpectAll(rateLinksMatchers())
 			.andDo(
 				document("detailing-a-rate",
 					preprocessResponse(prettyPrint()),
-					links(
-						linkWithRel("self").description("Self link to this <<resources_rate, Rate>>"),
-						linkWithRel("contractor").description("Lint to the <<resources_contractor, contractor>> this rate belongs to")),
+					describeRateLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription()),
 					describeContractorRateResponse()
@@ -190,10 +189,12 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		getMvc().perform(patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, zonedDateTimeRecord).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isOk())
 			.andExpect(validContractorRate("$", result, getObjectMapper()))
+			.andExpectAll(rateLinksMatchers())
 			.andDo(
 				document("updating-a-rate",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
+					describeRateLinks(),
 					requestHeaders(describeAdminHeader()),
 					pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription()),
 					requestFields(
@@ -262,7 +263,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		return post("/contractors/{contractorId}/rates", contractorId).contentType(MediaType.APPLICATION_JSON).content(asJson(record));
 	}
 
-	private MockHttpServletRequestBuilder getContractorRateRequest(Long contractorId, Long rateId) throws JsonProcessingException
+	private MockHttpServletRequestBuilder getContractorRateRequest(Long contractorId, Long rateId)
 	{
 		return get("/contractors/{contractorId}/rates/{rateId}", contractorId, rateId);
 	}
@@ -282,9 +283,9 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		return new CreateContractorRateRecord(BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 	}
 
-	private static ContractorRateRecord buildExpectedSuccessResult(final Long contractorId, final CreateContractorRateRecord createContractorRateRecord)
+	private static ContractorRateRecord buildExpectedSuccessResult(final Long contractorId, final Long rateId, final CreateContractorRateRecord createContractorRateRecord)
 	{
-		return new ContractorRateRecord(contractorId,1L, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
+		return new ContractorRateRecord(contractorId, rateId, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
 	}
 
 	private ZonedDateTimeRecord buildValidEndDateTimeRecord()
@@ -315,5 +316,23 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 			fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')"),
 			subsectionWithPath("_links").description("<<resources_rate_links, Links>> to other resources")
 		);
+	}
+
+	private static ResultMatcher[] rateLinksMatchers()
+	{
+		return new ResultMatcher[] {
+			jsonPath("$._links").exists(),
+			jsonPath("$._links.self").exists(),
+			jsonPath("$._links.self.href").value(String.format("http://localhost:8080/contractors/%s/rates/%s", VALID_RESOURCE_ID, VALID_RESOURCE_ID)),
+			jsonPath("$._links.contractor").exists(),
+			jsonPath("$._links.contractor.href").value(String.format("http://localhost:8080/contractors/%s", VALID_RESOURCE_ID))
+		};
+	}
+
+	private static LinksSnippet describeRateLinks()
+	{
+		return links(
+			linkWithRel("self").description("Self link to this <<resources_rate, Rate>>"),
+			linkWithRel("contractor").description("Lint to the <<resources_contractor, contractor>> this rate belongs to"));
 	}
 }

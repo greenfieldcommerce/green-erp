@@ -2,9 +2,11 @@ package com.greenfieldcommerce.greenerp.controllers;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -52,16 +54,18 @@ public class ContractorsController
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	@ResponseStatus(HttpStatus.CREATED)
-	public ContractorRecord createContractor(@Valid @RequestBody CreateContractorRecord record)
+	public ResponseEntity<EntityModel<ContractorRecord>> createContractor(@Valid @RequestBody CreateContractorRecord record)
 	{
-		return contractorService.create(record);
+		final ContractorRecord newContractor = contractorService.create(record);
+		final EntityModel<ContractorRecord> response = contractorModelAssembler.toModel(newContractor);
+
+		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
 	}
 
 	@PatchMapping(value = "/{contractorId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public ContractorRecord updateContractor(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRecord record)
+	public EntityModel<ContractorRecord> updateContractor(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRecord record)
 	{
-		return contractorService.update(contractorId, record);
+		return contractorModelAssembler.toModel(contractorService.update(contractorId, record));
 	}
 }

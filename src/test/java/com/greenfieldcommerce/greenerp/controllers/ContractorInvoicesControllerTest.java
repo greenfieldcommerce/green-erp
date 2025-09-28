@@ -11,9 +11,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static com.greenfieldcommerce.greenerp.helpers.ContractorInvoiceTestValidations.validateContractorInvoice;
@@ -22,6 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
 import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -34,6 +37,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,31 +84,25 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		getMvc().perform(getCurrentInvoiceRequest(VALID_RESOURCE_ID).with(user))
 			.andExpect(status().isOk())
 			.andExpect(validateContractorInvoice("$", record, getObjectMapper()))
-			.andExpect(jsonPath("_links").exists())
-			.andExpect(jsonPath("_links.self").exists())
-			.andExpect(jsonPath("_links.self.href").value(String.format("http://localhost:8080/contractors/%s/invoices/current", VALID_RESOURCE_ID)))
+			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("detailing-current-invoice",
-					preprocessResponse(prettyPrint()),
-					links(
-						linkWithRel("self").description("Self link to this <<resources_invoice, Invoice>>"),
-						linkWithRel("contractor").description("Link to the <<resources_contractor, Contractor>> for whom this invoice is issued")
-					),
-					requestHeaders(describeAdminOrContractorHeader()),
-					pathParameters(contractorIdParameterDescription()),
-					responseFields(
-						fieldWithPath("contractorId").description("ID of the contractor"),
-						fieldWithPath("startDate").description("The start of the period for which the invoice is valid"),
-						fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
-						fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"),
-						fieldWithPath("total").description("The invoice total"),
-						fieldWithPath("extraAmount").description("Any extra amount included in the invoice"),
-						fieldWithPath("currency").description("The invoice currency"),
-						subsectionWithPath("_links").description("HATEOAS links to related resources")))
-			);
+				preprocessResponse(prettyPrint()),
+				describeInvoiceLinks(),
+				requestHeaders(describeAdminOrContractorHeader()),
+				pathParameters(contractorIdParameterDescription()),
+				responseFields(
+					fieldWithPath("contractorId").description("ID of the contractor"),
+					fieldWithPath("startDate").description("The start of the period for which the invoice is valid"),
+					fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
+					fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"),
+					fieldWithPath("total").description("The invoice total"),
+					fieldWithPath("extraAmount").description("Any extra amount included in the invoice"),
+					fieldWithPath("currency").description("The invoice currency"),
+					subsectionWithPath("_links").description("HATEOAS links to related resources"))
+			));
 
 		verify(contractorInvoiceService).findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID));
 	}
-
 
 	@ParameterizedTest
 	@MethodSource("invalidCreateContractorInvoiceRecordOptions")
@@ -126,10 +124,14 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		getMvc().perform(postContractorInvoiceRequest(VALID_RESOURCE_ID, createContractorInvoiceRecord).with(user))
 			.andExpect(status().isCreated())
 			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
+			.andExpect(header().string("Location", String.format("http://localhost:8080/contractors/%s/invoices/current", result.contractorId())))
+			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("creating-an-invoice",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
+					describeInvoiceLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
+					responseHeaders(describeResourceLocationHeader()),
 					pathParameters(contractorIdParameterDescription()),
 					describeCreateOrUpdateContractorInvoiceBody()
 				)
@@ -163,9 +165,11 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		getMvc().perform(patchCurrentInvoiceRequest(VALID_RESOURCE_ID, createContractorInvoiceRecord).with(user))
 			.andExpect(status().isOk())
 			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
+			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("updating-an-invoice",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
+					describeInvoiceLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription()), describeCreateOrUpdateContractorInvoiceBody()
 				)
@@ -223,5 +227,21 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	private CreateContractorInvoiceRecord buildValidContractorInvoiceRecord()
 	{
 		return new CreateContractorInvoiceRecord(BigDecimal.valueOf(22), BigDecimal.valueOf(100.50));
+	}
+
+	private static ResultMatcher[] invoiceLinksMatcher()
+	{
+		return new ResultMatcher[] {
+			jsonPath("_links").exists(),
+			jsonPath("_links.self").exists(),
+			jsonPath("_links.self.href").value(String.format("http://localhost:8080/contractors/%s/invoices/current", VALID_RESOURCE_ID)),
+			jsonPath("_links.contractor").exists(),
+			jsonPath("_links.contractor.href").value(String.format("http://localhost:8080/contractors/%s", VALID_RESOURCE_ID))
+		};
+	}
+
+	private static LinksSnippet describeInvoiceLinks()
+	{
+		return links(linkWithRel("self").description("Self link to this <<resources_invoice, Invoice>>"), linkWithRel("contractor").description("Link to the <<resources_contractor, Contractor>> for whom this invoice is issued"));
 	}
 }
