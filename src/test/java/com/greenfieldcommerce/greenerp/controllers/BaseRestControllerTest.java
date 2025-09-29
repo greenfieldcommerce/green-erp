@@ -29,6 +29,19 @@ import com.greenfieldcommerce.greenerp.helpers.JwtRequestPostProcessors;
 import config.GreenERPTestConfiguration;
 import config.TestSecurityConfig;
 
+///
+/// Abstract base class for REST controller integration tests.
+///
+/// This class provides common testing functionality for REST controllers including:
+/// - Security testing (authentication and authorization)
+/// - Spring REST Docs configuration and utilities
+/// - MockMvc setup and configuration
+/// - Common test data and helper methods
+/// - Parameterized tests for protected endpoints
+///
+/// Subclasses should extend this class and implement the abstract methods to provide
+/// controller-specific test cases.
+///
 @AutoConfigureMockMvc
 @Import({ TestSecurityConfig.class, GreenERPTestConfiguration.class })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -49,6 +62,15 @@ abstract class BaseRestControllerTest
 	@Autowired
 	private JwtRequestPostProcessors jwtRequestPostProcessors;
 
+	///
+	/// Tests that protected resources return 401 Unauthorized when accessed without authentication.
+	///
+	/// This parameterized test verifies that all protected endpoints properly enforce authentication
+	/// by rejecting requests that lack valid JWT tokens.
+	///
+	/// @param request the request builder for the endpoint to test
+	/// @throws Exception if the request execution fails
+	///
 	@ParameterizedTest
 	@MethodSource("protectedRequests")
 	void shouldReturnUnauthorizedWhenRequestingProtectedResources_forUnauthenticated(final RequestBuilder request) throws Exception
@@ -56,6 +78,15 @@ abstract class BaseRestControllerTest
 		getMvc().perform(request).andExpect(status().isUnauthorized());
 	}
 
+	///
+	/// Tests that admin-only resources return 403 Forbidden when accessed by non-admin users.
+	///
+	/// This parameterized test verifies that endpoints requiring admin privileges properly enforce
+	/// authorization by rejecting requests from authenticated users without admin role.
+	///
+	/// @param request the request builder for the admin-only endpoint to test
+	/// @throws Exception if the request execution fails
+	///
 	@ParameterizedTest
 	@MethodSource("adminOnlyRequests")
 	void shouldReturnForbiddenWhenRequestingProtectedResources_forUnauthorizedUsers(final MockHttpServletRequestBuilder request) throws Exception
@@ -63,6 +94,15 @@ abstract class BaseRestControllerTest
 		getMvc().perform(request.with(jwtRequestPostProcessors.regularContractor())).andExpect(status().isForbidden());
 	}
 
+	///
+	/// Tests that requests with invalid resource IDs return 404 Not Found.
+	///
+	/// This parameterized test verifies that endpoints properly handle non-existent resources
+	/// by returning appropriate 404 status codes.
+	///
+	/// @param request the request builder for the endpoint to test with invalid resource
+	/// @throws Exception if the request execution fails
+	///
 	@ParameterizedTest
 	@MethodSource("invalidResourceRequests")
 	void shouldReturnNotFoundWhenRequestingWithInvalidResource(final RequestBuilder request) throws Exception
@@ -70,23 +110,125 @@ abstract class BaseRestControllerTest
 		getMvc().perform(request).andExpect(status().isNotFound());
 	}
 
+	///
+	/// Provides a stream of protected request builders for authentication testing.
+	///
+	/// Subclasses must implement this method to return all protected endpoints that should
+	/// be tested for proper authentication enforcement.
+	///
+	/// @return a stream of request builders for protected endpoints
+	/// @throws JsonProcessingException if JSON serialization fails during request building
+	///
 	protected abstract Stream<MockHttpServletRequestBuilder> protectedRequests() throws JsonProcessingException;
 
+	///
+	/// Provides a stream of request builders with invalid resource IDs for error handling testing.
+	///
+	/// Subclasses must implement this method to return endpoints that should be tested with
+	/// invalid resource identifiers.
+	///
+	/// @return a stream of request builders with invalid resource references
+	/// @throws JsonProcessingException if JSON serialization fails during request building
+	///
 	protected abstract Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException;
 
+	///
+	/// Provides a stream of admin-only request builders for authorization testing.
+	///
+	/// The default implementation returns all protected requests. Subclasses can override this
+	/// to specify which endpoints require admin privileges specifically.
+	///
+	/// @return a stream of request builders for admin-only endpoints
+	/// @throws JsonProcessingException if JSON serialization fails during request building
+	///
 	protected Stream<MockHttpServletRequestBuilder> adminOnlyRequests() throws JsonProcessingException
 	{
 		return Stream.concat(protectedRequests(), Stream.of());
 	}
 
+	///
+	/// Provides a stream of JWT request post-processors for users with admin role or the resource owner.
+	///
+	/// Returns post-processors for both admin users and contractor owners, useful for testing
+	/// endpoints that allow access by either role.
+	///
+	/// @return a stream of JWT request post-processors for admin and owner contractor roles
+	///
 	protected Stream<SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor> withAdminUserAndOwnerContractor()
 	{
 		return Stream.of(jwtRequestPostProcessors.admin(), jwtRequestPostProcessors.ownContractor());
 	}
 
+	///
+	/// Converts an object to its JSON string representation.
+	///
+	/// @param object the object to serialize
+	/// @return the JSON string representation of the object
+	/// @throws JsonProcessingException if serialization fails
+	///
 	protected String asJson(Object object) throws JsonProcessingException
 	{
 		return objectMapper.writeValueAsString(object);
+	}
+
+	///
+	/// Creates a REST Docs header descriptor for admin-only endpoints.
+	///
+	/// @return a header descriptor for Authorization header requiring admin role
+	///
+	protected static HeaderDescriptor describeAdminHeader()
+	{
+		return headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'ADMIN' role.").optional();
+	}
+
+	///
+	/// Creates a REST Docs header descriptor for endpoints accessible by admin or resource owner.
+	///
+	/// @return a header descriptor for Authorization header requiring admin role or contractor ownership
+	///
+	protected static HeaderDescriptor describeAdminOrContractorHeader()
+	{
+		return headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'ADMIN' role or be owned by the associated 'CONTRACTOR'").optional();
+	}
+
+	///
+	/// Creates a REST Docs header descriptor for the Location header in creation responses.
+	///
+	/// @return a header descriptor for Location header containing the new resource URL
+	///
+	protected static HeaderDescriptor describeResourceLocationHeader()
+	{
+		return headerWithName("Location").description("The URL of the newly created resource");
+	}
+
+	///
+	/// Creates a REST Docs parameter descriptor for contractor ID path parameters.
+	///
+	/// @return a parameter descriptor for contractorId
+	///
+	protected static ParameterDescriptor contractorIdParameterDescription()
+	{
+		return parameterWithName("contractorId").description("Contractor id");
+	}
+
+	///
+	/// Creates a REST Docs parameter descriptor for contractor rate ID path parameters.
+	///
+	/// @return a parameter descriptor for rateId
+	///
+	protected static ParameterDescriptor contractorRateIdParameterDescription()
+	{
+		return parameterWithName("rateId").description("Rate id");
+	}
+
+	///
+	/// Creates a generic EntityNotFoundException for testing error handling.
+	///
+	/// @return a new EntityNotFoundException instance
+	///
+	protected EntityNotFoundException entityNotFoundException()
+	{
+		return new EntityNotFoundException("ERROR", "Entity not found");
 	}
 
 	protected MockMvc getMvc()
@@ -102,36 +244,6 @@ abstract class BaseRestControllerTest
 	protected JwtRequestPostProcessors getJwtRequestPostProcessors()
 	{
 		return jwtRequestPostProcessors;
-	}
-
-	protected static HeaderDescriptor describeAdminHeader()
-	{
-		return headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'ADMIN' role.").optional();
-	}
-
-	protected static HeaderDescriptor describeAdminOrContractorHeader()
-	{
-		return headerWithName("Authorization").description("Bearer token used to authenticate the request. Must have 'ADMIN' role or be owned by the associated 'CONTRACTOR'").optional();
-	}
-
-	protected static HeaderDescriptor describeResourceLocationHeader()
-	{
-		return headerWithName("Location").description("The URL of the newly created resource");
-	}
-
-	protected static ParameterDescriptor contractorIdParameterDescription()
-	{
-		return parameterWithName("contractorId").description("Contractor id");
-	}
-
-	protected static ParameterDescriptor contractorRateIdParameterDescription()
-	{
-		return parameterWithName("rateId").description("Rate id");
-	}
-
-	protected EntityNotFoundException entityNotFoundException()
-	{
-		return new EntityNotFoundException("ERROR", "Entity not found");
 	}
 
 }

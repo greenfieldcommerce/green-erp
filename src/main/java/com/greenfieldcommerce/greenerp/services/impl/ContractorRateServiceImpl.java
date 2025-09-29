@@ -21,6 +21,16 @@ import com.greenfieldcommerce.greenerp.services.ContractorService;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 
+///
+/// Implementation of [ContractorRateService] for managing contractor rates.
+///
+/// This service handles:
+/// - Creation and modification of contractor rates
+/// - Retrieval of rates for specific contractors
+/// - Validation to prevent overlapping rate periods
+/// - Finding the current active rate for a contractor
+/// - Deletion of contractor rates
+///
 @Service
 public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate, Long> implements ContractorRateService
 {
@@ -36,6 +46,12 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 		this.contractorRateToRecordMapper = contractorRateToRecordMapper;
 	}
 
+	///
+	/// Retrieves all rates for a specific contractor, ordered by end date (descending).
+	///
+	/// @param contractorId the ID of the contractor
+	/// @return a list of `ContractorRateRecord` objects representing the contractor's rates
+	///
 	@Override
 	public List<ContractorRateRecord> findRatesForContractor(final Long contractorId)
 	{
@@ -43,12 +59,32 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 		return rates.stream().map(contractorRateToRecordMapper::map).toList();
 	}
 
+	///
+	/// Finds a specific contractor rate by rate ID and contractor ID.
+	///
+	/// @param rateId the ID of the rate
+	/// @param contractorId the ID of the contractor
+	/// @return a `ContractorRateRecord` representing the found rate
+	/// @throws EntityNotFoundException if the rate is not found for the given contractor
+	///
 	@Override
 	public ContractorRateRecord findByIdAndContractorId(final Long rateId, final Long contractorId)
 	{
 		return contractorRateToRecordMapper.map(internalFindByIdAndContractorId(rateId, contractorId));
 	}
 
+	///
+	/// Creates a new contractor rate for the specified contractor.
+	///
+	/// This method validates that the new rate period does not overlap with any existing
+	/// rate periods for the same contractor before creating the rate.
+	///
+	/// @param contractorId the ID of the contractor
+	/// @param record the record containing rate details (rate amount, currency, start/end dates)
+	/// @return a `ContractorRateRecord` representing the created rate
+	/// @throws EntityNotFoundException if the contractor with the given ID is not found
+	/// @throws OverlappingContractorRateException if the rate period overlaps with existing rates
+	///
 	@Override
 	public ContractorRateRecord create(final Long contractorId, final CreateContractorRateRecord record)
 	{
@@ -59,6 +95,19 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(rate));
 	}
 
+	///
+	/// Changes the end date/time of an existing contractor rate.
+	///
+	/// This method validates that the modified rate period does not overlap with any other
+	/// existing rate periods for the same contractor.
+	///
+	/// @param contractorId the ID of the contractor
+	/// @param rateId the ID of the rate to modify
+	/// @param newEndDateTimeRecord the new end date/time for the rate
+	/// @return a `ContractorRateRecord` representing the updated rate
+	/// @throws EntityNotFoundException if the rate is not found for the given contractor
+	/// @throws OverlappingContractorRateException if the modified period overlaps with other rates
+	///
 	@Override
 	public ContractorRateRecord changeEndDateTime(final Long contractorId, final Long rateId, final ZonedDateTime newEndDateTimeRecord)
 	{
@@ -69,12 +118,25 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(contractorRate));
 	}
 
+	///
+	/// Finds the current active rate for a contractor.
+	///
+	/// @param contractor the contractor entity
+	/// @return the current `ContractorRate` entity
+	/// @throws NoActiveContractorRateException if no active rate exists for the contractor
+	///
 	@Override
 	public ContractorRate findCurrentRateForContractor(final Contractor contractor)
 	{
 		return contractor.getCurrentRate().orElseThrow(() -> new NoActiveContractorRateException("NO_ACTIVE_RATE", String.format("No active rate for %s", contractor.getName())));
 	}
 
+	///
+	/// Deletes a contractor rate by rate ID and contractor ID.
+	///
+	/// @param contractorId the ID of the contractor
+	/// @param rateId the ID of the rate to delete
+	///
 	@Override
 	@Transactional
 	public void delete(final Long contractorId, final Long rateId)
@@ -82,11 +144,28 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 		contractorRateRepository.deleteByContractorIdAndId(contractorId, rateId);
 	}
 
+	///
+	/// Internal helper method to find a contractor rate by rate ID and contractor ID.
+	///
+	/// @param rateId the ID of the rate
+	/// @param contractorId the ID of the contractor
+	/// @return the found `ContractorRate` entity
+	/// @throws EntityNotFoundException if the rate is not found for the given contractor
+	///
 	private ContractorRate internalFindByIdAndContractorId(final Long rateId, final Long contractorId)
 	{
 		return contractorRateRepository.findByIdAndContractorId(rateId, contractorId).orElseThrow(() -> new EntityNotFoundException("CONTRACTOR_RATE_NOT_FOUND", String.format("Contractor rate with id '%s' not found for %s", rateId, contractorId)));
 	}
 
+	///
+	/// Validates that a rate period does not overlap with existing rate periods for the contractor.
+	///
+	/// @param contractor the contractor entity
+	/// @param startDateTime the start date/time of the rate period
+	/// @param endDateTime the end date/time of the rate period
+	/// @param excludeId optional rate ID to exclude from the overlap check (used when updating)
+	/// @throws OverlappingContractorRateException if overlapping rates are found
+	///
 	private void validateIfNotOverlapping(final Contractor contractor, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime, @Nullable final Long excludeId)
 	{
 		final List<ContractorRate> overlapping = contractorRateRepository.findRatesForContractorIdOverlappingWithPeriod(contractor, startDateTime, endDateTime, excludeId);
