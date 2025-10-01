@@ -17,9 +17,6 @@ spring:
 
     show-sql: true
 
-  profiles:
-    default: local
-
   security:
     oauth2:
       resourceserver:
