@@ -1,0 +1,68 @@
+services:
+  # ---------------------
+  # MySQL for both Spring & Keycloak
+  # ---------------------
+  mysql:
+    image: mysql:8.0
+    container_name: greenerp-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_GREENERP_DATABASE}
+      MYSQL_USER: ${MYSQL_GREENERP_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_GREENERP_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - green-erp-net
+
+  # ---------------------
+  # Keycloak
+  # ---------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4.0
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+      KC_DB: mysql
+      KC_DB_URL_HOST: mysql
+      KC_DB_DATABASE: ${MYSQL_KEYCLOAK_DATABASE}
+      KC_DB_USERNAME: ${MYSQL_KEYCLOAK_USERNAME}
+      KC_DB_PASSWORD: ${MYSQL_KEYCLOAK_PASSWORD}
+      KC_DB_PORT: 3306
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - green-erp-net
+
+  # ---------------------
+  # Spring Boot App
+  # ---------------------
+  greenerp:
+    build: .
+    container_name: greenerp
+    environment:
+      MYSQL_GREENERP_HOST: mysql
+      MYSQL_GREENERP_PORT: 3306
+      MYSQL_GREENERP_DATABASE: ${MYSQL_GREENERP_DATABASE}
+      MYSQL_GREENERP_USERNAME: ${MYSQL_GREENERP_USERNAME}
+      MYSQL_GREENERP_PASSWORD: ${MYSQL_GREENERP_PASSWORD}
+      RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/green-erp
+    ports:
+      - "9000:9000"
+    depends_on:
+      - keycloak
+      - mysql
+    networks:
+      - green-erp-net
+
+networks:
+  green-erp-net:
+
+volumes:
+  mysql-data:
