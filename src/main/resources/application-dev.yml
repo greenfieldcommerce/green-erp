@@ -1,0 +1,24 @@
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.server.authorization: DEBUG
+
+spring:
+  datasource:
+    generate-unique-name: false
+    url: jdbc:mysql://${mysql.greenerp.host}:${mysql.greenerp.port}/GreenERP
+    username: ${mysql.greenerp.username}
+    password: ${mysql.greenerp.password}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${resourceserver.jwt.issuer.uri}

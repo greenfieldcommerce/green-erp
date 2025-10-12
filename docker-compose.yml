@@ -33,8 +33,11 @@ services:
       KC_DB_USERNAME: ${MYSQL_KEYCLOAK_USERNAME}
       KC_DB_PASSWORD: ${MYSQL_KEYCLOAK_PASSWORD}
       KC_DB_PORT: 3306
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
     ports:
       - "8080:8080"
+      - "8000:9000"
     depends_on:
       - mysql
     networks:
