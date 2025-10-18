@@ -56,11 +56,27 @@ services:
       MYSQL_GREENERP_USERNAME: ${MYSQL_GREENERP_USERNAME}
       MYSQL_GREENERP_PASSWORD: ${MYSQL_GREENERP_PASSWORD}
       RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/green-erp
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     ports:
       - "9000:9000"
     depends_on:
       - keycloak
       - mysql
+      - rabbitmq
+    networks:
+      - green-erp-net
+
+  # ---------------------
+  # RabbitMQ
+  # ---------------------
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - green-erp-net
 

@@ -14,6 +14,7 @@ import com.greenfieldcommerce.greenerp.exceptions.NoActiveContractorRateExceptio
 import com.greenfieldcommerce.greenerp.mappers.Mapper;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.repositories.ContractorInvoiceRepository;
+import com.greenfieldcommerce.greenerp.services.ContractorInvoiceMessagingService;
 import com.greenfieldcommerce.greenerp.services.ContractorInvoiceService;
 import com.greenfieldcommerce.greenerp.services.ContractorRateService;
 import com.greenfieldcommerce.greenerp.services.ContractorService;
@@ -40,14 +41,17 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	private final ContractorRateService contractorRateService;
 	private final Mapper<ContractorInvoice, ContractorInvoiceRecord> contractorInvoiceToRecordMapper;
 	private final ContractorService contractorService;
+	private final ContractorInvoiceMessagingService contractorInvoiceMessagingService;
 
-	public ContractorInvoiceServiceImpl(final ContractorInvoiceRepository contractorInvoiceRepository, final ContractorRateService contractorRateService, final Mapper<ContractorInvoice, ContractorInvoiceRecord> contractorInvoiceToRecordMapper, final ContractorService contractorService)
+	public ContractorInvoiceServiceImpl(final ContractorInvoiceRepository contractorInvoiceRepository, final ContractorRateService contractorRateService, final Mapper<ContractorInvoice, ContractorInvoiceRecord> contractorInvoiceToRecordMapper, final ContractorService contractorService,
+		final ContractorInvoiceMessagingService contractorInvoiceMessagingService)
 	{
 		super(contractorInvoiceRepository, ContractorInvoice.class);
 		this.contractorInvoiceRepository = contractorInvoiceRepository;
 		this.contractorRateService = contractorRateService;
 		this.contractorInvoiceToRecordMapper = contractorInvoiceToRecordMapper;
 		this.contractorService = contractorService;
+		this.contractorInvoiceMessagingService = contractorInvoiceMessagingService;
 	}
 
 	/**
@@ -76,7 +80,9 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 		final ContractorRate currentRateForContractor = contractorRateService.findCurrentRateForContractor(contractor);
 		final ContractorInvoice invoice = ContractorInvoice.create(currentRateForContractor, numberOfWorkedDays, extraAmount);
 
-		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
+		final ContractorInvoiceRecord createdInvoiceRecord = contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
+		contractorInvoiceMessagingService.sendContractorInvoiceCreatedMessage(createdInvoiceRecord);
+		return createdInvoiceRecord;
 	}
 
 	/**

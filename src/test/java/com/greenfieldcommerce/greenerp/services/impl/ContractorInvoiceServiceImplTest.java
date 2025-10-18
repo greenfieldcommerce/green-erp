@@ -27,6 +27,7 @@ import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.mappers.Mapper;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.repositories.ContractorInvoiceRepository;
+import com.greenfieldcommerce.greenerp.services.ContractorInvoiceMessagingService;
 import com.greenfieldcommerce.greenerp.services.ContractorRateService;
 import com.greenfieldcommerce.greenerp.services.ContractorService;
 
@@ -43,6 +44,8 @@ public class ContractorInvoiceServiceImplTest
 	private Mapper<ContractorInvoice, ContractorInvoiceRecord> contractorInvoiceToRecordMapper;
 	@Mock
 	private ContractorService contractorService;
+	@Mock
+	private ContractorInvoiceMessagingService contractorInvoiceMessagingService;
 
 	@InjectMocks
 	private ContractorInvoiceServiceImpl service;
@@ -90,6 +93,7 @@ public class ContractorInvoiceServiceImplTest
 		final ContractorInvoiceRecord result = service.create(VALID_RESOURCE_ID, workedDays, extra);
 
 		assertEquals(savedRecord, result);
+		verify(contractorInvoiceMessagingService).sendContractorInvoiceCreatedMessage(eq(savedRecord));
 	}
 
 	@Test
