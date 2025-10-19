@@ -74,6 +74,21 @@ For example, a request that attempts to retrieve data on a non-existent contract
 
 include::{snippets}/error-example/http-response.adoc[]
 
+[[overview_health]]
+
+== Health
+The GreenERP API exposes an endpoint (from Spring Actuator) to check the health of the application.
+
+operation::health[snippets='http-request,http-response']
+
+[[overview_metrics]]
+
+== Metrics
+The GreenERP API exposes an endpoint (from Spring Actuator) to check the metrics of the application.
+
+operation::metrics[snippets='http-request,http-response']
+
+
 [[overview_hypermedia]]
 == Hypermedia
 
