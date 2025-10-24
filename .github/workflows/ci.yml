@@ -1,22 +1,5 @@
 name: CI - Build, Test & Docs
 
-env:
-  MYSQL_GREENERP_HOST: localhost
-  MYSQL_GREENERP_PORT: 3306
-  MYSQL_GREENERP_USERNAME: not-a-real-username
-  MYSQL_GREENERP_PASSWORD: not-a-real-password
-  MYSQL_ROOT_PASSWORD: not-a-real-password
-  MYSQL_GREENERP_DATABASE: not-real
-  MYSQL_KEYCLOAK_DATABASE: not-real
-  MYSQL_KEYCLOAK_USERNAME: not-a-real-username
-  MYSQL_KEYCLOAK_PASSWORD: not-a-real-password
-  RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8080/realms/green-erp
-  KEYCLOAK_ADMIN: not-a-real-username
-  KEYCLOAK_PASSWORD: not-a-real-password
-  RABBITMQ_HOST: localhost
-  RABBITMQ_USERNAME: guest
-  RABBITMQ_PASSWORD: guest
-
 on:
   pull_request:
     branches:
@@ -46,6 +29,12 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+      - name: Load .env file
+        run: |
+          set -a
+          source .env
+          set +a
 
       - name: Build, run tests, and generate REST Docs
         run: ./mvnw clean verify

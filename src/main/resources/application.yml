@@ -5,6 +5,28 @@ spring:
   profiles:
     default: local
 
+  datasource:
+    generate-unique-name: false
+    url: jdbc:mysql://${mysql.greenerp.host:localhost}:${mysql.greenerp.port:3306}/GreenERP
+    username: ${mysql.greenerp.username:GreenERP}
+    password: ${mysql.greenerp.password:GreenERP2025Purple}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  rabbitmq:
+    host: ${rabbitmq.host:localhost}
+    port: 5672
+    username: ${rabbitmq.username:guest}
+    password: ${rabbitmq.password:guest}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${resourceserver.jwt.issuer.uri:http://localhost:8080/auth/realms/green-erp}
+
 management:
   endpoints:
     web:
