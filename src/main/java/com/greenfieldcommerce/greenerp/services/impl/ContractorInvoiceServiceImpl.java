@@ -3,6 +3,8 @@ package com.greenfieldcommerce.greenerp.services.impl;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.greenfieldcommerce.greenerp.entities.Contractor;
@@ -116,6 +118,21 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 		currentInvoice.setNumberOfWorkedDays(numberOfWorkedDays);
 		currentInvoice.setExtraAmount(extraAmount);
 		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(currentInvoice));
+	}
+
+	/**
+	 * Retrieves a paginated list of invoices for a specific contractor.
+	 *
+	 * @param contractorId	  the ID of the contractor whose invoices are to be retrieved
+	 * @param pageable        the pagination information (i.e., page number, size, and sorting)
+	 * @return a {@code Page} of {@code ContractorInvoiceRecord} containing the contractor's invoices
+	 * @throws EntityNotFoundException if the contractor with the given ID is not found
+	 */
+	@Override
+	public Page<ContractorInvoiceRecord> findByContractor(final Long contractorId, final Pageable pageable)
+	{
+		final Contractor contractor = contractorService.findEntityById(contractorId);
+		return contractorInvoiceRepository.findByContractor(contractor, pageable).map(contractorInvoiceToRecordMapper::map);
 	}
 
 	/**

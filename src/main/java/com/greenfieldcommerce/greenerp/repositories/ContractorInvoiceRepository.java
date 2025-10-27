@@ -3,6 +3,8 @@ package com.greenfieldcommerce.greenerp.repositories;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 
@@ -13,4 +15,5 @@ public interface ContractorInvoiceRepository extends ListCrudRepository<Contract
 {
 	@Query("SELECT i FROM #{#entityName} i WHERE i.contractor = :contractor and i.startDate <= :now AND i.endDate >= :now")
 	Optional<ContractorInvoice> findCurrentContractorInvoice(Contractor contractor, ZonedDateTime now);
+	Page<ContractorInvoice> findByContractor(Contractor contractor, Pageable pageable);
 }

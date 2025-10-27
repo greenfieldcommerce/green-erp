@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.greenfieldcommerce.greenerp.entities.Contractor;
 import com.greenfieldcommerce.greenerp.entities.ContractorInvoice;
@@ -149,6 +155,35 @@ public class ContractorInvoiceServiceImplTest
 		verify(invoice).setNumberOfWorkedDays(workedDays);
 		verify(invoice).setExtraAmount(extra);
 		verify(contractorInvoiceRepository).save(invoice);
+	}
+
+	@Test
+	@DisplayName("Should find the sorted latest x invoices for contractor")
+	public void shouldFindTheSortedLatestXInvoicesForContractor()
+	{
+		final Contractor contractor = mock(Contractor.class);
+		final Sort sort = Sort.by(Sort.Direction.DESC, "invoiceDate");
+		final Pageable pageable = PageRequest.of(0, 2, sort);
+		final ContractorInvoice invoice1 = mock(ContractorInvoice.class);
+		final ContractorInvoice invoice2 = mock(ContractorInvoice.class);
+
+		final ContractorInvoiceRecord invoice1Record = mock(ContractorInvoiceRecord.class);
+		final ContractorInvoiceRecord invoice2Record = mock(ContractorInvoiceRecord.class);
+
+		final List<ContractorInvoice> invoices = List.of(invoice1, invoice2);
+		final Page<ContractorInvoice> page = new PageImpl<>(invoices, pageable, invoices.size());
+
+		when(contractorInvoiceRepository.findByContractor(eq(contractor), eq(pageable))).thenReturn(page);
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceToRecordMapper.map(eq(invoice1))).thenReturn(invoice1Record);
+		when(contractorInvoiceToRecordMapper.map(eq(invoice2))).thenReturn(invoice2Record);
+
+		final Page<ContractorInvoiceRecord> result = service.findByContractor(VALID_RESOURCE_ID, pageable);
+		assertEquals(2, result.getNumberOfElements());
+		assertEquals(invoice1Record, result.getContent().get(0));
+		assertEquals(invoice2Record, result.getContent().get(1));
+		assertEquals(invoices.size(), result.getTotalElements());
+		assertEquals(pageable, result.getPageable());
 	}
 
 	private static ZonedDateTime dateIsSameDay(final ZonedDateTime now)
