@@ -569,6 +569,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#resources_invoices">Invoices</a>
 <ul class="sectlevel2">
+<li><a href="#_listing_the_latest_invoices">Listing the latest invoices</a>
+<ul class="sectlevel3">
+<li><a href="#_listing_the_latest_invoices_http_request">HTTP request</a></li>
+<li><a href="#_listing_the_latest_invoices_request_headers">Request headers</a></li>
+<li><a href="#_listing_the_latest_invoices_path_parameters">Path parameters</a></li>
+<li><a href="#_listing_the_latest_invoices_request_fields">Request fields</a></li>
+<li><a href="#_listing_the_latest_invoices_http_response">Example response</a></li>
+</ul>
+</li>
 <li><a href="#_creating_an_invoice">Creating an invoice</a>
 <ul class="sectlevel3">
 <li><a href="#_creating_an_invoice_http_request">HTTP request</a></li>
@@ -770,7 +779,7 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "timestamp" : "2025-10-27T22:30:58.412254980Z",
+  "timestamp" : "2025-10-28T22:12:08.672439442Z",
   "status" : 422,
   "error" : "Unprocessable Entity",
   "code" : "VALIDATION_ERROR",
@@ -814,7 +823,7 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 365
 
-{"status":"UP","components":{"db":{"status":"UP","details":{"database":"H2","validationQuery":"isValid()"}},"diskSpace":{"status":"UP","details":{"total":76887154688,"free":23452196864,"threshold":10485760,"path":"/home/runner/work/green-erp/green-erp/.","exists":true}},"ping":{"status":"UP"},"ssl":{"status":"UP","details":{"validChains":[],"invalidChains":[]}}}}</code></pre>
+{"status":"UP","components":{"db":{"status":"UP","details":{"database":"H2","validationQuery":"isValid()"}},"diskSpace":{"status":"UP","details":{"total":76887154688,"free":23452168192,"threshold":10485760,"path":"/home/runner/work/green-erp/green-erp/.","exists":true}},"ping":{"status":"UP"},"ssl":{"status":"UP","details":{"validChains":[],"invalidChains":[]}}}}</code></pre>
 </div>
 </div>
 </div>
@@ -847,9 +856,9 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 2467
+Content-Length: 2452
 
-{"names":["application.ready.time","application.started.time","disk.free","disk.total","executor.active","executor.completed","executor.pool.core","executor.pool.max","executor.pool.size","executor.queue.remaining","executor.queued","http.server.requests","http.server.requests.active","jvm.buffer.count","jvm.buffer.memory.used","jvm.buffer.total.capacity","jvm.classes.loaded","jvm.classes.unloaded","jvm.compilation.time","jvm.gc.live.data.size","jvm.gc.max.data.size","jvm.gc.memory.allocated","jvm.gc.memory.promoted","jvm.gc.overhead","jvm.gc.pause","jvm.info","jvm.memory.committed","jvm.memory.max","jvm.memory.usage.after.gc","jvm.memory.used","jvm.threads.daemon","jvm.threads.live","jvm.threads.peak","jvm.threads.started","jvm.threads.states","logback.events","process.cpu.time","process.cpu.usage","process.files.max","process.files.open","process.start.time","process.uptime","spring.security.authorizations","spring.security.authorizations.active","spring.security.filterchains","spring.security.filterchains.AuthenticationFilter.after","spring.security.filterchains.AuthenticationFilter.before","spring.security.filterchains.access.exceptions.after","spring.security.filterchains.access.exceptions.before","spring.security.filterchains.active","spring.security.filterchains.authentication.anonymous.after","spring.security.filterchains.authentication.anonymous.before","spring.security.filterchains.authentication.bearer.after","spring.security.filterchains.authentication.bearer.before","spring.security.filterchains.authorization.after","spring.security.filterchains.authorization.before","spring.security.filterchains.context.async.after","spring.security.filterchains.context.async.before","spring.security.filterchains.context.holder.after","spring.security.filterchains.context.holder.before","spring.security.filterchains.context.servlet.after","spring.security.filterchains.context.servlet.before","spring.security.filterchains.header.after","spring.security.filterchains.header.before","spring.security.filterchains.logout.after","spring.security.filterchains.logout.before","spring.security.filterchains.requestcache.after","spring.security.filterchains.requestcache.before","spring.security.filterchains.session.urlencoding.after","spring.security.filterchains.session.urlencoding.before","spring.security.http.secured.requests","spring.security.http.secured.requests.active","system.cpu.count","system.cpu.usage","system.load.average.1m"]}</code></pre>
+{"names":["application.ready.time","application.started.time","disk.free","disk.total","executor.active","executor.completed","executor.pool.core","executor.pool.max","executor.pool.size","executor.queue.remaining","executor.queued","http.server.requests","http.server.requests.active","jvm.buffer.count","jvm.buffer.memory.used","jvm.buffer.total.capacity","jvm.classes.loaded","jvm.classes.unloaded","jvm.compilation.time","jvm.gc.live.data.size","jvm.gc.max.data.size","jvm.gc.memory.allocated","jvm.gc.memory.promoted","jvm.gc.overhead","jvm.info","jvm.memory.committed","jvm.memory.max","jvm.memory.usage.after.gc","jvm.memory.used","jvm.threads.daemon","jvm.threads.live","jvm.threads.peak","jvm.threads.started","jvm.threads.states","logback.events","process.cpu.time","process.cpu.usage","process.files.max","process.files.open","process.start.time","process.uptime","spring.security.authorizations","spring.security.authorizations.active","spring.security.filterchains","spring.security.filterchains.AuthenticationFilter.after","spring.security.filterchains.AuthenticationFilter.before","spring.security.filterchains.access.exceptions.after","spring.security.filterchains.access.exceptions.before","spring.security.filterchains.active","spring.security.filterchains.authentication.anonymous.after","spring.security.filterchains.authentication.anonymous.before","spring.security.filterchains.authentication.bearer.after","spring.security.filterchains.authentication.bearer.before","spring.security.filterchains.authorization.after","spring.security.filterchains.authorization.before","spring.security.filterchains.context.async.after","spring.security.filterchains.context.async.before","spring.security.filterchains.context.holder.after","spring.security.filterchains.context.holder.before","spring.security.filterchains.context.servlet.after","spring.security.filterchains.context.servlet.before","spring.security.filterchains.header.after","spring.security.filterchains.header.before","spring.security.filterchains.logout.after","spring.security.filterchains.logout.before","spring.security.filterchains.requestcache.after","spring.security.filterchains.requestcache.before","spring.security.filterchains.session.urlencoding.after","spring.security.filterchains.session.urlencoding.before","spring.security.http.secured.requests","spring.security.http.secured.requests.active","system.cpu.count","system.cpu.usage","system.load.average.1m"]}</code></pre>
 </div>
 </div>
 </div>
@@ -971,7 +980,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 1262
+Content-Length: 1475
 
 {
   "_embedded" : {
@@ -984,8 +993,8 @@ Content-Length: 1262
         "id" : 1,
         "rate" : 10,
         "currency" : "USD",
-        "startDateTime" : "2025-10-27T22:30:59.841933959Z",
-        "endDateTime" : "2025-11-27T22:30:59.84196159Z"
+        "startDateTime" : "2025-10-28T22:12:10.090342186Z",
+        "endDateTime" : "2025-11-28T22:12:10.090350392Z"
       },
       "_links" : {
         "self" : {
@@ -996,6 +1005,9 @@ Content-Length: 1262
         },
         "currentInvoice" : {
           "href" : "http://localhost:8080/contractors/1/invoices/current"
+        },
+        "latestInvoices" : {
+          "href" : "http://localhost:8080/contractors/1/invoices"
         }
       }
     }, {
@@ -1012,6 +1024,9 @@ Content-Length: 1262
         },
         "currentInvoice" : {
           "href" : "http://localhost:8080/contractors/2/invoices/current"
+        },
+        "latestInvoices" : {
+          "href" : "http://localhost:8080/contractors/2/invoices"
         }
       }
     } ]
@@ -1131,7 +1146,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 384
+Content-Length: 478
 
 {
   "id" : 3,
@@ -1147,6 +1162,9 @@ Content-Length: 384
     },
     "currentInvoice" : {
       "href" : "http://localhost:8080/contractors/3/invoices/current"
+    },
+    "latestInvoices" : {
+      "href" : "http://localhost:8080/contractors/3/invoices"
     }
   }
 }</code></pre>
@@ -1187,6 +1205,10 @@ Content-Length: 384
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>currentInvoice</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Link to this contractor&#8217;s <a href="#resources_invoice">current Invoice</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>latestInvoices</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Link to this contractor&#8217;s latest <a href="#resources_invoices">Invoices</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -1304,7 +1326,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 576
+Content-Length: 670
 
 {
   "id" : 1,
@@ -1315,8 +1337,8 @@ Content-Length: 576
     "id" : 1,
     "rate" : 10,
     "currency" : "USD",
-    "startDateTime" : "2025-10-27T22:30:59.822945145Z",
-    "endDateTime" : "2025-11-27T22:30:59.822956175Z"
+    "startDateTime" : "2025-10-28T22:12:10.073813772Z",
+    "endDateTime" : "2025-11-28T22:12:10.073822709Z"
   },
   "_links" : {
     "self" : {
@@ -1327,6 +1349,9 @@ Content-Length: 576
     },
     "currentInvoice" : {
       "href" : "http://localhost:8080/contractors/1/invoices/current"
+    },
+    "latestInvoices" : {
+      "href" : "http://localhost:8080/contractors/1/invoices"
     }
   }
 }</code></pre>
@@ -1410,7 +1435,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 384
+Content-Length: 478
 
 {
   "id" : 1,
@@ -1426,6 +1451,9 @@ Content-Length: 384
     },
     "currentInvoice" : {
       "href" : "http://localhost:8080/contractors/1/invoices/current"
+    },
+    "latestInvoices" : {
+      "href" : "http://localhost:8080/contractors/1/invoices"
     }
   }
 }</code></pre>
@@ -1569,8 +1597,8 @@ Content-Length: 994
       "id" : 1,
       "rate" : 100,
       "currency" : "USD",
-      "startDateTime" : "2025-10-27T22:30:57.790000547Z",
-      "endDateTime" : "2025-11-27T22:30:57.790020604Z",
+      "startDateTime" : "2025-10-28T22:12:08.009595722Z",
+      "endDateTime" : "2025-11-28T22:12:08.009616591Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1584,8 +1612,8 @@ Content-Length: 994
       "id" : 2,
       "rate" : 100.5,
       "currency" : "USD",
-      "startDateTime" : "2025-11-27T22:30:57.790049338Z",
-      "endDateTime" : "2026-01-27T22:30:57.790057423Z",
+      "startDateTime" : "2025-11-28T22:12:08.009653029Z",
+      "endDateTime" : "2026-01-28T22:12:08.009662606Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/2"
@@ -1623,8 +1651,8 @@ Host: localhost:8080
 {
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-10-27T22:30:57.689456293Z",
-  "endDateTime" : "2025-11-27T22:30:57.689472443Z"
+  "startDateTime" : "2025-10-28T22:12:07.896041561Z",
+  "endDateTime" : "2025-11-28T22:12:07.896059805Z"
 }</code></pre>
 </div>
 </div>
@@ -1752,8 +1780,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-10-27T22:30:57.689456293Z",
-  "endDateTime" : "2025-11-27T22:30:57.689472443Z",
+  "startDateTime" : "2025-10-28T22:12:07.896041561Z",
+  "endDateTime" : "2025-11-28T22:12:07.896059805Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1934,8 +1962,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-10-27T22:30:57.569102124Z",
-  "endDateTime" : "2025-11-27T22:30:57.569124556Z",
+  "startDateTime" : "2025-10-28T22:12:07.815940375Z",
+  "endDateTime" : "2025-11-28T22:12:07.815959621Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1964,7 +1992,7 @@ Content-Length: 57
 Host: localhost:8080
 
 {
-  "newEndDateTime" : "2025-11-27T22:30:57.643976595Z"
+  "newEndDateTime" : "2025-11-28T22:12:07.868113089Z"
 }</code></pre>
 </div>
 </div>
@@ -2059,8 +2087,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-10-27T22:30:57.644000489Z",
-  "endDateTime" : "2025-11-27T22:30:57.643976595Z",
+  "startDateTime" : "2025-10-28T22:12:07.868141993Z",
+  "endDateTime" : "2025-11-28T22:12:07.868113089Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2156,7 +2184,136 @@ X-Frame-Options: DENY</code></pre>
 <h2 id="resources_invoices"><a class="link" href="#resources_invoices">Invoices</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The Invoices resource is used to create an invoice</p>
+<p>The Invoices resource is used to list and create invoices</p>
+</div>
+<div class="sect2">
+<h3 id="_listing_the_latest_invoices"><a class="link" href="#_listing_the_latest_invoices">Listing the latest invoices</a></h3>
+<div class="paragraph">
+<p>A <code>GET</code> request is used to list the latest contractor invoices.</p>
+</div>
+<div class="sect3">
+<h4 id="_listing_the_latest_invoices_http_request"><a class="link" href="#_listing_the_latest_invoices_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /contractors/1/invoices?page=0&amp;size=10 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_listing_the_latest_invoices_request_headers"><a class="link" href="#_listing_the_latest_invoices_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer token used to authenticate the request. Must have 'ADMIN' role or be owned by the associated 'CONTRACTOR'</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_listing_the_latest_invoices_path_parameters"><a class="link" href="#_listing_the_latest_invoices_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /contractors/{contractorId}/invoices</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Contractor id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_listing_the_latest_invoices_request_fields"><a class="link" href="#_listing_the_latest_invoices_request_fields">Request fields</a></h4>
+<div class="paragraph">
+<p>Snippet request-fields not found for operation::listing-latest-invoices</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_listing_the_latest_invoices_http_response"><a class="link" href="#_listing_the_latest_invoices_http_response">Example response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/hal+json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Length: 1226
+
+{
+  "_embedded" : {
+    "invoices" : [ {
+      "contractorId" : 1,
+      "startDate" : "2025-10-28T22:12:09.543877796Z",
+      "endDate" : "2025-11-28T22:12:09.543888416Z",
+      "numberOfWorkedDays" : 20,
+      "extraAmount" : 100,
+      "total" : 3600,
+      "currency" : "USD",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/contractors/1/invoices/current"
+        },
+        "contractor" : {
+          "href" : "http://localhost:8080/contractors/1"
+        }
+      }
+    }, {
+      "contractorId" : 1,
+      "startDate" : "2025-09-28T22:12:09.543909856Z",
+      "endDate" : "2025-10-28T22:12:09.543915637Z",
+      "numberOfWorkedDays" : 20,
+      "extraAmount" : 100,
+      "total" : 3600,
+      "currency" : "USD",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/contractors/1/invoices/current"
+        },
+        "contractor" : {
+          "href" : "http://localhost:8080/contractors/1"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/contractors/1/invoices?page=0&amp;size=2&amp;sort=invoiceDate,desc"
+    }
+  },
+  "page" : {
+    "size" : 2,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "number" : 0
+  }
+}</code></pre>
+</div>
+</div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_creating_an_invoice"><a class="link" href="#_creating_an_invoice">Creating an invoice</a></h3>
@@ -2285,12 +2442,12 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 407
+Content-Length: 408
 
 {
   "contractorId" : 1,
-  "startDate" : "2025-10-27T22:30:59.157614873Z",
-  "endDate" : "2025-11-27T22:30:59.15762896Z",
+  "startDate" : "2025-10-28T22:12:09.451129672Z",
+  "endDate" : "2025-11-28T22:12:09.451151582Z",
   "numberOfWorkedDays" : 22,
   "extraAmount" : 100.5,
   "total" : 3600,
@@ -2469,12 +2626,12 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 405
+Content-Length: 406
 
 {
   "contractorId" : 1,
-  "startDate" : "2025-10-27T22:30:59.03230785Z",
-  "endDate" : "2025-11-27T22:30:59.032331084Z",
+  "startDate" : "2025-10-28T22:12:09.308129977Z",
+  "endDate" : "2025-11-28T22:12:09.308148081Z",
   "numberOfWorkedDays" : 20,
   "extraAmount" : 100,
   "total" : 3600,
@@ -2601,8 +2758,8 @@ Content-Length: 408
 
 {
   "contractorId" : 1,
-  "startDate" : "2025-10-27T22:30:59.115424347Z",
-  "endDate" : "2025-11-27T22:30:59.115441048Z",
+  "startDate" : "2025-10-28T22:12:09.406943071Z",
+  "endDate" : "2025-11-28T22:12:09.406960523Z",
   "numberOfWorkedDays" : 22,
   "extraAmount" : 100.5,
   "total" : 3600,
@@ -2625,7 +2782,7 @@ Content-Length: 408
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-10-27 22:30:37 UTC
+Last updated 2025-10-28 22:11:47 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
