@@ -3,6 +3,7 @@ package com.greenfieldcommerce.greenerp.assemblers;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -24,9 +25,11 @@ public class ContractorModelAssembler extends RepresentationModelAssemblerSuppor
 	@Override
 	public EntityModel<ContractorRecord> toModel(final ContractorRecord contractor)
 	{
-		return EntityModel.of(contractor, linkTo(methodOn(ContractorsController.class).getContractorDetails(contractor.id())).withSelfRel(),
-						linkTo(methodOn(ContractorRatesController.class).findRatesForContractor(contractor.id())).withRel("rates"),
-						linkTo(methodOn(ContractorInvoicesController.class).findCurrentInvoice(contractor.id())).withRel("currentInvoice")
+		return EntityModel.of(contractor,
+			linkTo(methodOn(ContractorsController.class).getContractorDetails(contractor.id())).withSelfRel(),
+			linkTo(methodOn(ContractorRatesController.class).findRatesForContractor(contractor.id())).withRel("rates"),
+			linkTo(methodOn(ContractorInvoicesController.class).findCurrentInvoice(contractor.id())).withRel("currentInvoice"),
+			linkTo(methodOn(ContractorInvoicesController.class).findInvoices(contractor.id(), PageRequest.of(0, 12))).withRel("latestInvoices")
 		);
 	}
 

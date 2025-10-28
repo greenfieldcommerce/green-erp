@@ -287,7 +287,8 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		return links(
 			linkWithRel("self").description("Self link to this <<resources_contractor, Contractor>>"),
 			linkWithRel("rates").description("Link to this contractor's <<resources_rates, Rates>>"),
-			linkWithRel("currentInvoice").description("Link to this contractor's <<resources_invoice, current Invoice>>")
+			linkWithRel("currentInvoice").description("Link to this contractor's <<resources_invoice, current Invoice>>"),
+			linkWithRel("latestInvoices").description("Link to this contractor's latest <<resources_invoices, Invoices>>")
 		);
 	}
 }

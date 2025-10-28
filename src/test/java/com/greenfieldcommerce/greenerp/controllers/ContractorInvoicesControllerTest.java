@@ -3,6 +3,7 @@ package com.greenfieldcommerce.greenerp.controllers;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Currency;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
@@ -20,7 +26,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 
 import static com.greenfieldcommerce.greenerp.helpers.ContractorInvoiceTestValidations.validateContractorInvoice;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -42,6 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.greenfieldcommerce.greenerp.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.CreateContractorInvoiceRecord;
@@ -60,6 +69,45 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		when(contractorInvoiceService.findCurrentInvoiceForContractor(INVALID_RESOURCE_ID)).thenThrow(entityNotFoundException());
 		when(contractorInvoiceService.create(eq(INVALID_RESOURCE_ID), any(BigDecimal.class), any(BigDecimal.class))).thenThrow(entityNotFoundException());
 		when(contractorInvoiceService.patchInvoice(eq(INVALID_RESOURCE_ID), any(BigDecimal.class), any(BigDecimal.class))).thenThrow(entityNotFoundException());
+		when(contractorInvoiceService.findByContractor(eq(INVALID_RESOURCE_ID), any(Pageable.class))).thenThrow(entityNotFoundException());
+	}
+
+	@ParameterizedTest
+	@MethodSource("withAdminUserAndOwnerContractor")
+	public void shouldReturnLatestInvoices_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
+	{
+		final Sort sort = Sort.by(Sort.Direction.DESC, "invoiceDate");
+		final Pageable pageable = PageRequest.of(0, 2, sort);
+
+		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+
+		final List<ContractorInvoiceRecord> invoices = List.of(invoice1, invoice2);
+		final Page<ContractorInvoiceRecord> page = new PageImpl<>(invoices, pageable, invoices.size());
+
+		when(contractorInvoiceService.findByContractor(eq(VALID_RESOURCE_ID), any(Pageable.class))).thenReturn(page);
+
+		getMvc().perform(getLatestInvoices(VALID_RESOURCE_ID, 0, 10).with(user))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("_embedded.invoices").isArray())
+			.andExpect(validateContractorInvoice("_embedded.invoices[0]", invoice1, getObjectMapper()))
+			.andExpect(validateContractorInvoice("_embedded.invoices[1]", invoice2, getObjectMapper()))
+			.andExpect(jsonPath("_links").exists())
+			.andExpect(jsonPath("_links.self").exists())
+			.andExpect(jsonPath("page").exists())
+			.andDo(document("listing-latest-invoices",
+				preprocessResponse(prettyPrint()),
+				requestHeaders(describeAdminOrContractorHeader()),
+				requestHeaders(describeAdminOrContractorHeader()),
+				pathParameters(contractorIdParameterDescription()),
+				links(linkWithRel("self").description("Self link to this page of <<resources_invoices, resource>>")),
+				responseFields(
+					subsectionWithPath("_embedded.invoices").description("An array of <<resources_invoice, Invoice resources>>"),
+					subsectionWithPath("_links").description("<<resources_invoices_links, Links>> to other resources"),
+					subsectionWithPath("page").description("Page metadata")
+				)
+			));
+
 	}
 
 	@Test
@@ -182,6 +230,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> protectedRequests() throws JsonProcessingException
 	{
 		return Stream.of(
+			getLatestInvoices(VALID_RESOURCE_ID, 0, 10),
 			getCurrentInvoiceRequest(VALID_RESOURCE_ID),
 			postContractorInvoiceRequest(VALID_RESOURCE_ID, buildValidContractorInvoiceRecord()),
 			patchCurrentInvoiceRequest(VALID_RESOURCE_ID, buildValidContractorInvoiceRecord())
@@ -192,6 +241,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException
 	{
 		return Stream.of(
+			getLatestInvoices(INVALID_RESOURCE_ID, 0, 10).with(getJwtRequestPostProcessors().admin()),
 			getCurrentInvoiceRequest(INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
 			postContractorInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(getJwtRequestPostProcessors().admin()),
 			patchCurrentInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(getJwtRequestPostProcessors().admin())
@@ -207,6 +257,11 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 			new CreateContractorInvoiceRecord(BigDecimal.valueOf(20), null),
 			new CreateContractorInvoiceRecord(BigDecimal.valueOf(20), BigDecimal.valueOf(-1))
 		);
+	}
+
+	private MockHttpServletRequestBuilder getLatestInvoices(Long contractorId, int page, int size)
+	{
+		return get("/contractors/{contractorId}/invoices?page={page}&size={size}", contractorId, page, size);
 	}
 
 	private MockHttpServletRequestBuilder getCurrentInvoiceRequest(Long contractorId)
