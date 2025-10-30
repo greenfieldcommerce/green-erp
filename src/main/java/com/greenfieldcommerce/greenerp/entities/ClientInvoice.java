@@ -4,6 +4,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
+
 public class ClientInvoice
 {
 

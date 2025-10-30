@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.springframework.test.web.servlet.ResultMatcher;
 
-import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
+import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
 
 public class ContractorTestValidations
 {

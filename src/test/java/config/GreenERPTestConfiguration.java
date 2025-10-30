@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.greenfieldcommerce.greenerp.assemblers.ContractorInvoiceModelAssembler;
-import com.greenfieldcommerce.greenerp.assemblers.ContractorModelAssembler;
-import com.greenfieldcommerce.greenerp.assemblers.ContractorRateModelAssembler;
+import com.greenfieldcommerce.greenerp.invoices.assemblers.ContractorInvoiceModelAssembler;
+import com.greenfieldcommerce.greenerp.contractors.assemblers.ContractorModelAssembler;
+import com.greenfieldcommerce.greenerp.rates.assemblers.ContractorRateModelAssembler;
 import com.greenfieldcommerce.greenerp.helpers.JwtRequestPostProcessors;
 
 @TestConfiguration

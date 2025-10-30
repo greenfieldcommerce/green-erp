@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.greenfieldcommerce.greenerp.records.contractorrate.ContractorRateRecord;
+import com.greenfieldcommerce.greenerp.rates.records.ContractorRateRecord;
 
 public class ContractorRateTestValidations
 {

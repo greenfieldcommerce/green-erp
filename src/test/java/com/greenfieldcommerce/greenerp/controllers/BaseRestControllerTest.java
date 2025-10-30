@@ -50,7 +50,7 @@ import config.TestSecurityConfig;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureRestDocs
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
-abstract class BaseRestControllerTest
+public abstract class BaseRestControllerTest
 {
 
 	protected static final List<String> INVALID_STRINGS = List.of("", " ", "\t", "\n");

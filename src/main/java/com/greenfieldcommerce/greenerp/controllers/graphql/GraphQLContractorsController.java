@@ -4,10 +4,10 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import com.greenfieldcommerce.greenerp.entities.Contractor;
-import com.greenfieldcommerce.greenerp.mappers.contractor.ContractorToRecordMapper;
-import com.greenfieldcommerce.greenerp.records.contractor.ContractorRecord;
-import com.greenfieldcommerce.greenerp.repositories.ContractorRepository;
+import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
+import com.greenfieldcommerce.greenerp.contractors.mappers.ContractorToRecordMapper;
+import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
+import com.greenfieldcommerce.greenerp.contractors.repositories.ContractorRepository;
 
 @Controller
 public class GraphQLContractorsController

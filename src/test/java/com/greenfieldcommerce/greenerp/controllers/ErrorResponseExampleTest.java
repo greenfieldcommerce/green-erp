@@ -22,9 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.greenfieldcommerce.greenerp.contractors.controllers.ContractorsController;
 import com.greenfieldcommerce.greenerp.helpers.JwtRequestPostProcessors;
-import com.greenfieldcommerce.greenerp.records.contractor.CreateContractorRecord;
-import com.greenfieldcommerce.greenerp.services.ContractorService;
+import com.greenfieldcommerce.greenerp.contractors.records.CreateContractorRecord;
+import com.greenfieldcommerce.greenerp.contractors.services.ContractorService;
 
 import config.GreenERPTestConfiguration;
 import config.TestSecurityConfig;
