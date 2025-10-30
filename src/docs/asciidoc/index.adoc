@@ -194,10 +194,13 @@ operation::deleting-a-rate[snippets='http-request,request-headers,path-parameter
 
 The Invoices resource is used to list and create invoices
 
+=== Links
+include::{snippets}/listing-latest-invoices/links.adoc[]
+
 === Listing the latest invoices
 A `GET` request is used to list the latest contractor invoices.
 
-operation::listing-latest-invoices[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+operation::listing-latest-invoices[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
 
 === Creating an invoice
 A `POST` request is used to create an invoice.

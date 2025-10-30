@@ -2,6 +2,7 @@ package com.greenfieldcommerce.greenerp.controllers;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
@@ -45,7 +46,8 @@ public class ContractorInvoicesController
 
 	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public PagedModel<EntityModel<ContractorInvoiceRecord>> findInvoices(@PathVariable("contractorId") Long contractorId, @PageableDefault(size = 12) Pageable pageable)
+	public PagedModel<EntityModel<ContractorInvoiceRecord>> findInvoices(@PathVariable("contractorId") Long contractorId,
+		@PageableDefault(size = 12, sort = "startDate", direction = Sort.Direction.DESC) Pageable pageable)
 	{
 		final Page<ContractorInvoiceRecord> page = contractorInvoiceService.findByContractor(contractorId, pageable);
 		return pagedContractorInvoiceResourcesAssembler.toModel(page, contractorInvoiceModelAssembler);

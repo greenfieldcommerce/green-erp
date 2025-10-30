@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Currency;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,12 +24,11 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import static com.greenfieldcommerce.greenerp.helpers.ContractorInvoiceTestValidations.validateContractorInvoice;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
@@ -43,14 +43,15 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.greenfieldcommerce.greenerp.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.records.contractorinvoice.CreateContractorInvoiceRecord;
@@ -76,31 +77,44 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnLatestInvoices_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
-		final Sort sort = Sort.by(Sort.Direction.DESC, "invoiceDate");
-		final Pageable pageable = PageRequest.of(0, 2, sort);
+		final Pageable pageable = buildPageable();
 
 		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord invoice3 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(2), ZonedDateTime.now().minusMonths(2).plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
-		final List<ContractorInvoiceRecord> invoices = List.of(invoice1, invoice2);
+		final List<ContractorInvoiceRecord> invoices = List.of(invoice1, invoice2, invoice3);
 		final Page<ContractorInvoiceRecord> page = new PageImpl<>(invoices, pageable, invoices.size());
 
 		when(contractorInvoiceService.findByContractor(eq(VALID_RESOURCE_ID), any(Pageable.class))).thenReturn(page);
 
-		getMvc().perform(getLatestInvoices(VALID_RESOURCE_ID, 0, 10).with(user))
+		getMvc().perform(getLatestInvoices(VALID_RESOURCE_ID, pageable).with(user))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("_embedded.invoices").isArray())
 			.andExpect(validateContractorInvoice("_embedded.invoices[0]", invoice1, getObjectMapper()))
 			.andExpect(validateContractorInvoice("_embedded.invoices[1]", invoice2, getObjectMapper()))
 			.andExpect(jsonPath("_links").exists())
 			.andExpect(jsonPath("_links.self").exists())
+			.andExpect(jsonPath("_links.next").exists())
+			.andExpect(jsonPath("_links.first").exists())
+			.andExpect(jsonPath("_links.last").exists())
 			.andExpect(jsonPath("page").exists())
+			.andDo(MockMvcResultHandlers.print())
 			.andDo(document("listing-latest-invoices",
 				preprocessResponse(prettyPrint()),
 				requestHeaders(describeAdminOrContractorHeader()),
 				requestHeaders(describeAdminOrContractorHeader()),
+				queryParameters(
+					parameterWithName("page").description("The requested response page, defaults to 0").optional(),
+					parameterWithName("size").description("The page size, defaults to 12").optional(),
+					parameterWithName("sort").description("The sorting option, defaults to startDate,desc").optional()
+				),
 				pathParameters(contractorIdParameterDescription()),
-				links(linkWithRel("self").description("Self link to this page of <<resources_invoices, resource>>")),
+				links(
+					linkWithRel("self").description("Self link to this page of <<resources_invoices, invoices>>"),
+					linkWithRel("next").description("Link to the next page of <<resources_invoices, invoices>>").optional(),
+					linkWithRel("first").description("Link to the first page of <<resources_invoices, invoices>>").optional(),
+					linkWithRel("last").description("Link to the last page of <<resources_invoices, invoices>>").optional()),
 				responseFields(
 					subsectionWithPath("_embedded.invoices").description("An array of <<resources_invoice, Invoice resources>>"),
 					subsectionWithPath("_links").description("<<resources_invoices_links, Links>> to other resources"),
@@ -230,7 +244,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> protectedRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			getLatestInvoices(VALID_RESOURCE_ID, 0, 10),
+			getLatestInvoices(VALID_RESOURCE_ID, buildPageable()),
 			getCurrentInvoiceRequest(VALID_RESOURCE_ID),
 			postContractorInvoiceRequest(VALID_RESOURCE_ID, buildValidContractorInvoiceRecord()),
 			patchCurrentInvoiceRequest(VALID_RESOURCE_ID, buildValidContractorInvoiceRecord())
@@ -241,7 +255,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	protected Stream<MockHttpServletRequestBuilder> invalidResourceRequests() throws JsonProcessingException
 	{
 		return Stream.of(
-			getLatestInvoices(INVALID_RESOURCE_ID, 0, 10).with(getJwtRequestPostProcessors().admin()),
+			getLatestInvoices(INVALID_RESOURCE_ID, buildPageable()).with(getJwtRequestPostProcessors().admin()),
 			getCurrentInvoiceRequest(INVALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()),
 			postContractorInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(getJwtRequestPostProcessors().admin()),
 			patchCurrentInvoiceRequest(INVALID_RESOURCE_ID, buildValidContractorInvoiceRecord()).with(getJwtRequestPostProcessors().admin())
@@ -259,9 +273,18 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		);
 	}
 
-	private MockHttpServletRequestBuilder getLatestInvoices(Long contractorId, int page, int size)
+	private MockHttpServletRequestBuilder getLatestInvoices(Long contractorId, Pageable pageable)
 	{
-		return get("/contractors/{contractorId}/invoices?page={page}&size={size}", contractorId, page, size);
+		final String sort = pageable.getSort().stream()
+			.map(order -> order.getProperty() + "," + order.getDirection().name())
+			.collect(Collectors.joining("&sort=")); // for multiple orders
+		return get("/contractors/{contractorId}/invoices?page={page}&size={size}&sort={sort}", contractorId, pageable.getPageNumber(), pageable.getPageSize(), sort);
+	}
+
+	private static Pageable buildPageable()
+	{
+		final Sort sort = Sort.by(Sort.Direction.DESC, "startDate");
+		return PageRequest.of(0, 2, sort);
 	}
 
 	private MockHttpServletRequestBuilder getCurrentInvoiceRequest(Long contractorId)
