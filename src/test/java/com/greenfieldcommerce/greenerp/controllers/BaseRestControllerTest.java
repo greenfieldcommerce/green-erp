@@ -33,7 +33,7 @@ import config.TestSecurityConfig;
 /**
  * Abstract base class for REST controller integration tests.
  * <p>
- * This class provides common testing functionality for REST controllers including:
+ * This class provides common testing functionality for REST controllers, including:
  * <ul>
  * <li>Security testing (authentication and authorization)</li>
  * <li>Spring REST Docs configuration and utilities</li>
@@ -86,7 +86,7 @@ public abstract class BaseRestControllerTest
 	 * Tests that admin-only resources return 403 Forbidden when accessed by non-admin users.
 	 * <p>
 	 * This parameterized test verifies that endpoints requiring admin privileges properly enforce
-	 * authorization by rejecting requests from authenticated users without admin role.
+	 * authorization by rejecting requests from authenticated users without an admin role.
 	 *
 	 * @param request the request builder for the admin-only endpoint to test
 	 * @throws Exception if the request execution fails
