@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
+import com.greenfieldcommerce.greenerp.invoices.entities.InvoiceExtraAmountLine;
+import com.greenfieldcommerce.greenerp.invoices.records.InvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorInvoiceException;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
@@ -63,14 +65,13 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	 *
 	 * @param contractorId       the ID of the contractor for whom to create the invoice
 	 * @param numberOfWorkedDays the number of days worked by the contractor
-	 * @param extraAmount        the additional amount to be added to the invoice
 	 * @return a {@code ContractorInvoiceRecord} representing the created invoice
 	 * @throws EntityNotFoundException             if the contractor with the given ID is not found
 	 * @throws DuplicateContractorInvoiceException if an invoice already exists for the contractor in the current period
 	 * @throws NoActiveContractorRateException     if the contractor has no active rate
 	 */
 	@Override
-	public ContractorInvoiceRecord create(final Long contractorId, final BigDecimal numberOfWorkedDays, final BigDecimal extraAmount)
+	public ContractorInvoiceRecord create(final Long contractorId, final BigDecimal numberOfWorkedDays)
 	{
 		final Contractor contractor = contractorService.findEntityById(contractorId);
 		final Optional<ContractorInvoice> currentInvoiceOpt = contractorInvoiceRepository.findCurrentContractorInvoice(contractor, TimeService.now());
@@ -79,11 +80,33 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 			throw new DuplicateContractorInvoiceException("DUPLICATE_INVOICE", String.format("Invoice for %s already exists in the current period", contractor.getName()));
 
 		final ContractorRate currentRateForContractor = contractorRateService.findCurrentRateForContractor(contractor);
-		final ContractorInvoice invoice = ContractorInvoice.create(currentRateForContractor, numberOfWorkedDays, extraAmount);
+		final ContractorInvoice invoice = ContractorInvoice.create(currentRateForContractor, numberOfWorkedDays);
 
 		final ContractorInvoiceRecord createdInvoiceRecord = contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
 		contractorInvoiceMessagingService.sendContractorInvoiceCreatedMessage(createdInvoiceRecord);
 		return createdInvoiceRecord;
+	}
+
+	/**
+	 * Adds an extra amount line to an existing contractor invoice and persists the change.
+	 *
+	 * <p>The provided {@code extraAmountLineRecord} is converted to an {@code InvoiceExtraAmountLine}
+	 * associated with the invoice identified by {@code invoiceId}. The invoice is saved and mapped to a
+	 * {@code ContractorInvoiceRecord} which is returned.
+	 *
+	 * @param invoiceId the id of the invoice to update
+	 * @param extraAmountLineRecord record containing the extra amount and description
+	 * @return the updated {@code ContractorInvoiceRecord}
+	 * @throws EntityNotFoundException if the invoice with the given id does not exist
+	 */
+	@Override
+	public ContractorInvoiceRecord addExtraAmountLineToInvoice(final Long invoiceId, final InvoiceExtraAmountLineRecord extraAmountLineRecord)
+	{
+		final ContractorInvoice invoice = findEntityById(invoiceId);
+		final InvoiceExtraAmountLine extraAmountLine = InvoiceExtraAmountLine.create(invoice, extraAmountLineRecord.extraAmount(), extraAmountLineRecord.description());
+		invoice.addExtraAmountLine(extraAmountLine);
+
+		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
 	}
 
 	/**
@@ -106,16 +129,14 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	 *
 	 * @param contractorId       the ID of the contractor
 	 * @param numberOfWorkedDays the updated number of days worked
-	 * @param extraAmount        the updated additional amount
 	 * @return a {@code ContractorInvoiceRecord} representing the updated invoice
 	 * @throws EntityNotFoundException if the contractor is not found or no current invoice exists
 	 */
 	@Override
-	public ContractorInvoiceRecord 	patchInvoice(final Long contractorId, final BigDecimal numberOfWorkedDays, final BigDecimal extraAmount)
+	public ContractorInvoiceRecord 	patchInvoice(final Long contractorId, final BigDecimal numberOfWorkedDays)
 	{
 		final ContractorInvoice currentInvoice = internalFindCurrentInvoiceForContractor(contractorId);
 		currentInvoice.setNumberOfWorkedDays(numberOfWorkedDays);
-		currentInvoice.setExtraAmount(extraAmount);
 		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(currentInvoice));
 	}
 

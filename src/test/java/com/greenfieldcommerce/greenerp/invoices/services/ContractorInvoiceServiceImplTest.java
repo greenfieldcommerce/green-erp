@@ -27,6 +27,7 @@ import org.springframework.data.domain.Sort;
 
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
+import com.greenfieldcommerce.greenerp.invoices.records.InvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorInvoiceException;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
@@ -64,12 +65,11 @@ public class ContractorInvoiceServiceImplTest
 		final ContractorInvoice existing = mock(ContractorInvoice.class);
 
 		final BigDecimal workedDays = new BigDecimal(22);
-		final BigDecimal extra = new BigDecimal(100);
 
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
 		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(existing));
 
-		assertThrows(DuplicateContractorInvoiceException.class, () -> service.create(VALID_RESOURCE_ID, workedDays, extra));
+		assertThrows(DuplicateContractorInvoiceException.class, () -> service.create(VALID_RESOURCE_ID, workedDays));
 		verify(contractorInvoiceRepository).findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now));
 	}
 
@@ -84,18 +84,16 @@ public class ContractorInvoiceServiceImplTest
 		final ContractorInvoiceRecord savedRecord = mock(ContractorInvoiceRecord.class);
 
 		final BigDecimal workedDays = new BigDecimal(22);
-		final BigDecimal extra = new BigDecimal(100);
 
 		when(currentRateForContractor.getRate()).thenReturn(new BigDecimal(100));
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
 		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.empty());
 		when(contractorRateService.findCurrentRateForContractor(contractor)).thenReturn(currentRateForContractor);
 		when(contractorInvoiceRepository.save(
-			argThat(i -> i.getRate().equals(currentRateForContractor)
-				&& i.getNumberOfWorkedDays().equals(workedDays) && i.getExtraAmount().equals(extra)))).thenReturn(saved);
+			argThat(i -> i.getRate().equals(currentRateForContractor) && i.getNumberOfWorkedDays().equals(workedDays)))).thenReturn(saved);
 		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(savedRecord);
 
-		final ContractorInvoiceRecord result = service.create(VALID_RESOURCE_ID, workedDays, extra);
+		final ContractorInvoiceRecord result = service.create(VALID_RESOURCE_ID, workedDays);
 
 		assertEquals(savedRecord, result);
 		verify(contractorInvoiceMessagingService).sendContractorInvoiceCreatedMessage(eq(savedRecord));
@@ -142,17 +140,15 @@ public class ContractorInvoiceServiceImplTest
 		final ContractorInvoiceRecord invoiceRecord = mock(ContractorInvoiceRecord.class);
 
 		final BigDecimal workedDays = new BigDecimal(22);
-		final BigDecimal extra = new BigDecimal(100);
 
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
 		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(invoice));
 		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
 		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(invoiceRecord);
 
-		final ContractorInvoiceRecord result = service.patchInvoice(VALID_RESOURCE_ID, workedDays, extra);
+		final ContractorInvoiceRecord result = service.patchInvoice(VALID_RESOURCE_ID, workedDays);
 		assertEquals(invoiceRecord, result);
 		verify(invoice).setNumberOfWorkedDays(workedDays);
-		verify(invoice).setExtraAmount(extra);
 		verify(contractorInvoiceRepository).save(invoice);
 	}
 
@@ -183,6 +179,26 @@ public class ContractorInvoiceServiceImplTest
 		assertEquals(invoice2Record, result.getContent().get(1));
 		assertEquals(invoices.size(), result.getTotalElements());
 		assertEquals(pageable, result.getPageable());
+	}
+
+	@Test
+	@DisplayName("Should add an extra amount line to an existing invoice")
+	public void shouldAddAnExtraAmountLineToAnExistingInvoice()
+	{
+		final ContractorInvoice invoice = mock(ContractorInvoice.class);
+		final ContractorInvoice	saved = mock(ContractorInvoice.class);
+		final ContractorInvoiceRecord expectedRecord = mock(ContractorInvoiceRecord.class);
+
+		final InvoiceExtraAmountLineRecord extraAmountLineRecord = new InvoiceExtraAmountLineRecord(BigDecimal.valueOf(100), "Extra Amount");
+
+		when(contractorInvoiceRepository.findById(VALID_RESOURCE_ID)).thenReturn(Optional.of(invoice));
+		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
+		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(expectedRecord);
+
+		final ContractorInvoiceRecord contractorInvoiceRecord = service.addExtraAmountLineToInvoice(VALID_RESOURCE_ID, extraAmountLineRecord);
+
+		verify(invoice).addExtraAmountLine(argThat(l -> l.getAmount().equals(extraAmountLineRecord.extraAmount()) && l.getDescription().equals(extraAmountLineRecord.description())));
+		assertEquals(expectedRecord, contractorInvoiceRecord);
 	}
 
 	private static ZonedDateTime dateIsSameDay(final ZonedDateTime now)

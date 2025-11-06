@@ -6,28 +6,32 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Currency;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.IllegalInvoiceModificationException;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(name = "UniqueInvoiceForContractorPerMonth", columnNames = { "contractor_id", "startDate", "endDate" }))
+@Table(uniqueConstraints = @UniqueConstraint(name = "UniqueInvoiceForContractorPerMonth", columnNames = { "contractorId", "startDate", "endDate" }))
 public class ContractorInvoice
 {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue
 	private Long id;
 
 	@ManyToOne
@@ -35,8 +39,11 @@ public class ContractorInvoice
 	private ContractorRate rate;
 
 	@ManyToOne
-	@JoinColumn(name = "contractor_id", nullable = false)
+	@JoinColumn(name = "contractorId", nullable = false)
 	private Contractor contractor;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "invoice")
+	private Set<InvoiceExtraAmountLine> extraAmountLines;
 
 	@Column(nullable = false)
 	private Currency currency;
@@ -50,8 +57,6 @@ public class ContractorInvoice
 	@Column(nullable = false)
 	private BigDecimal numberOfWorkedDays;
 
-	private BigDecimal extraAmount;
-
 	@Column(nullable = false)
 	private BigDecimal total;
 
@@ -62,11 +67,12 @@ public class ContractorInvoice
 	{
 	}
 
-	private ContractorInvoice(ContractorRate rate, BigDecimal numberOfWorkedDays, BigDecimal extraAmount)
+	private ContractorInvoice(ContractorRate rate, BigDecimal numberOfWorkedDays)
 	{
 		this.rate = rate;
 		this.contractor = rate.getContractor();
 		this.currency = rate.getCurrency();
+		this.extraAmountLines = new HashSet<>();
 
 		this.status = InvoiceStatus.OPEN;
 
@@ -74,19 +80,19 @@ public class ContractorInvoice
 		this.endDate = startDate.plusMonths(1).minusSeconds(1);
 
 		this.numberOfWorkedDays = numberOfWorkedDays;
-		this.extraAmount = extraAmount;
 
 		this.total = calculateTotalInvoiceAmount();
 	}
 
-	public static ContractorInvoice create(@NotNull ContractorRate rate, @NotNull BigDecimal numberOfWorkedDays, @NotNull BigDecimal extraAmount)
+	public static ContractorInvoice create(@NotNull ContractorRate rate, @NotNull BigDecimal numberOfWorkedDays)
 	{
-		return new ContractorInvoice(rate, numberOfWorkedDays, extraAmount);
+		return new ContractorInvoice(rate, numberOfWorkedDays);
 	}
 
 	private BigDecimal calculateTotalInvoiceAmount()
 	{
-		return this.numberOfWorkedDays.multiply(this.rate.getRate()).add(this.extraAmount).setScale(2, RoundingMode.HALF_UP);
+		final BigDecimal extraAmount = this.getExtraAmountLines().stream().map(InvoiceExtraAmountLine::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+		return this.numberOfWorkedDays.multiply(this.rate.getRate()).add(extraAmount).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	public Contractor getContractor()
@@ -107,11 +113,6 @@ public class ContractorInvoice
 	public BigDecimal getNumberOfWorkedDays()
 	{
 		return numberOfWorkedDays;
-	}
-
-	public BigDecimal getExtraAmount()
-	{
-		return extraAmount;
 	}
 
 	public BigDecimal getTotal()
@@ -137,11 +138,9 @@ public class ContractorInvoice
 		this.total = calculateTotalInvoiceAmount();
 	}
 
-	public void setExtraAmount(final BigDecimal extraAmount)
+	public void addExtraAmountLine(final InvoiceExtraAmountLine extraAmountLine)
 	{
-		if (!isOpen()) throw new IllegalInvoiceModificationException("NOT_OPEN_INVOICE_MODIFICATION", "Cannot change number of worked days after invoice has been billed");
-
-		this.extraAmount = extraAmount;
+		this.extraAmountLines.add(extraAmountLine);
 		this.total = calculateTotalInvoiceAmount();
 	}
 
@@ -158,6 +157,11 @@ public class ContractorInvoice
 	public void close()
 	{
 		this.status = InvoiceStatus.CLOSED;
+	}
+
+	public Set<InvoiceExtraAmountLine> getExtraAmountLines()
+	{
+		return extraAmountLines;
 	}
 
 	private enum InvoiceStatus

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -69,8 +70,8 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void setup()
 	{
 		when(contractorInvoiceService.findCurrentInvoiceForContractor(INVALID_RESOURCE_ID)).thenThrow(entityNotFoundException());
-		when(contractorInvoiceService.create(eq(INVALID_RESOURCE_ID), any(BigDecimal.class), any(BigDecimal.class))).thenThrow(entityNotFoundException());
-		when(contractorInvoiceService.patchInvoice(eq(INVALID_RESOURCE_ID), any(BigDecimal.class), any(BigDecimal.class))).thenThrow(entityNotFoundException());
+		when(contractorInvoiceService.create(eq(INVALID_RESOURCE_ID), any(BigDecimal.class))).thenThrow(entityNotFoundException());
+		when(contractorInvoiceService.patchInvoice(eq(INVALID_RESOURCE_ID), any(BigDecimal.class))).thenThrow(entityNotFoundException());
 		when(contractorInvoiceService.findByContractor(eq(INVALID_RESOURCE_ID), any(Pageable.class))).thenThrow(entityNotFoundException());
 	}
 
@@ -80,9 +81,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	{
 		final Pageable pageable = buildPageable();
 
-		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
-		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
-		final ContractorInvoiceRecord invoice3 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(2), ZonedDateTime.now().minusMonths(2).plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord invoice3 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(2), ZonedDateTime.now().minusMonths(2).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
 		final List<ContractorInvoiceRecord> invoices = List.of(invoice1, invoice2, invoice3);
 		final Page<ContractorInvoiceRecord> page = new PageImpl<>(invoices, pageable, invoices.size());
@@ -140,7 +141,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
-		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), BigDecimal.valueOf(100), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
 		when(contractorInvoiceService.findCurrentInvoiceForContractor(eq(VALID_RESOURCE_ID))).thenReturn(record);
 
@@ -159,7 +160,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 					fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
 					fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"),
 					fieldWithPath("total").description("The invoice total"),
-					fieldWithPath("extraAmount").description("Any extra amount included in the invoice"),
+					fieldWithPath("extraAmountLines").description("An array of extra amount lines"),
 					fieldWithPath("currency").description("The invoice currency"),
 					subsectionWithPath("_links").description("HATEOAS links to related resources"))
 			));
@@ -180,9 +181,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldCreateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
-		when(contractorInvoiceService.create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()))).thenReturn(result);
+		when(contractorInvoiceService.create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()))).thenReturn(result);
 
 		getMvc().perform(postContractorInvoiceRequest(VALID_RESOURCE_ID, createContractorInvoiceRecord).with(user))
 			.andExpect(status().isCreated())
@@ -200,12 +201,13 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 				)
 			);
 
-		verify(contractorInvoiceService).create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()));
+		verify(contractorInvoiceService).create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()));
 	}
 
 	private static RequestFieldsSnippet describeCreateOrUpdateContractorInvoiceBody()
 	{
-		return requestFields(fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"), fieldWithPath("extraAmount").description("Any extra amount to be included in the invoice"));
+		return requestFields(
+			fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"));
 	}
 
 	@ParameterizedTest
@@ -221,9 +223,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldUpdateCurrentInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), createContractorInvoiceRecord.extraAmount(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
 
-		when(contractorInvoiceService.patchInvoice(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()))).thenReturn(result);
+		when(contractorInvoiceService.patchInvoice(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()))).thenReturn(result);
 
 		getMvc().perform(patchCurrentInvoiceRequest(VALID_RESOURCE_ID, createContractorInvoiceRecord).with(user))
 			.andExpect(status().isOk())
@@ -238,7 +240,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 				)
 			);
 
-		verify(contractorInvoiceService).patchInvoice(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()), eq(createContractorInvoiceRecord.extraAmount()));
+		verify(contractorInvoiceService).patchInvoice(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()));
 	}
 
 	@Override
@@ -266,11 +268,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	private Stream<CreateContractorInvoiceRecord> invalidCreateContractorInvoiceRecordOptions()
 	{
 		return Stream.of(
-			new CreateContractorInvoiceRecord(null, BigDecimal.valueOf(100)),
-			new CreateContractorInvoiceRecord(BigDecimal.valueOf(-1), BigDecimal.valueOf(100)),
-			new CreateContractorInvoiceRecord(BigDecimal.valueOf(32), BigDecimal.valueOf(100)),
-			new CreateContractorInvoiceRecord(BigDecimal.valueOf(20), null),
-			new CreateContractorInvoiceRecord(BigDecimal.valueOf(20), BigDecimal.valueOf(-1))
+			new CreateContractorInvoiceRecord(null),
+			new CreateContractorInvoiceRecord(BigDecimal.valueOf(-1)),
+			new CreateContractorInvoiceRecord(BigDecimal.valueOf(32))
 		);
 	}
 
@@ -305,7 +305,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 	private CreateContractorInvoiceRecord buildValidContractorInvoiceRecord()
 	{
-		return new CreateContractorInvoiceRecord(BigDecimal.valueOf(22), BigDecimal.valueOf(100.50));
+		return new CreateContractorInvoiceRecord(BigDecimal.valueOf(22));
 	}
 
 	private static ResultMatcher[] invoiceLinksMatcher()

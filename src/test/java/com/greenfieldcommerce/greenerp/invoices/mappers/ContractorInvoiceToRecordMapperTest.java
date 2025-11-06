@@ -1,18 +1,25 @@
 package com.greenfieldcommerce.greenerp.invoices.mappers;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Set;
 
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
+import com.greenfieldcommerce.greenerp.invoices.entities.InvoiceExtraAmountLine;
 import com.greenfieldcommerce.greenerp.invoices.records.ContractorInvoiceRecord;
+import com.greenfieldcommerce.greenerp.invoices.records.InvoiceExtraAmountLineRecord;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,17 +28,27 @@ class ContractorInvoiceToRecordMapperTest {
 	private static final ZonedDateTime START = ZonedDateTime.now();
 	private static final ZonedDateTime END = START.plusDays(30);
 	private static final BigDecimal WORKED_DAYS = BigDecimal.valueOf(20);
-	private static final BigDecimal EXTRA_AMOUNT = BigDecimal.valueOf(200.0);
 	private static final BigDecimal TOTAL = BigDecimal.valueOf(5000.0);
 	private static final Long CONTRACTOR_ID = 1L;
 
-    private final ContractorInvoiceToRecordMapper mapper = new ContractorInvoiceToRecordMapper();
+	@Mock
+	private InvoiceExtraAmountLineRecordMapper invoiceExtraAmountLineRecordMapper;
+
+	@InjectMocks
+    private ContractorInvoiceToRecordMapper mapper;
 
     @Test
     @DisplayName("Should map ContractorInvoice to ContractorInvoiceRecord with valid data")
     void shouldMapContractorInvoiceToContractorInvoiceRecordWithValidData()
 	{
-		ContractorInvoice contractorInvoice = validInvoice();
+		final ContractorInvoice contractorInvoice = validInvoice();
+		final InvoiceExtraAmountLine extraAmountLine = mock(InvoiceExtraAmountLine.class);
+		final InvoiceExtraAmountLineRecord extraAmountLineRecord = mock(InvoiceExtraAmountLineRecord.class);
+
+		when(contractorInvoice.getExtraAmountLines()).thenReturn(Set.of(extraAmountLine));
+
+
+		when(invoiceExtraAmountLineRecordMapper.map(eq(extraAmountLine))).thenReturn(extraAmountLineRecord);
 
 		ContractorInvoiceRecord result = mapper.map(contractorInvoice);
 
@@ -40,13 +57,15 @@ class ContractorInvoiceToRecordMapperTest {
 		assertEquals(START, result.startDate());
 		assertEquals(END, result.endDate());
 		assertEquals(WORKED_DAYS, result.numberOfWorkedDays());
-		assertEquals(EXTRA_AMOUNT, result.extraAmount());
+		assertEquals(1, result.extraAmountLines().size());
+		assertEquals(extraAmountLineRecord, result.extraAmountLines().iterator().next());
 		assertEquals(TOTAL, result.total());
 	}
 
 	ContractorInvoice validInvoice()
 	{
 		ContractorInvoice invoice = mock(ContractorInvoice.class);
+
 		Contractor contractor = mock(Contractor.class);
 		when(contractor.getId()).thenReturn(CONTRACTOR_ID);
 
@@ -54,7 +73,6 @@ class ContractorInvoiceToRecordMapperTest {
 		when(invoice.getStartDate()).thenReturn(START);
 		when(invoice.getEndDate()).thenReturn(END);
 		when(invoice.getNumberOfWorkedDays()).thenReturn(WORKED_DAYS);
-		when(invoice.getExtraAmount()).thenReturn(EXTRA_AMOUNT);
 		when(invoice.getTotal()).thenReturn(TOTAL);
 
 		return invoice;

@@ -57,7 +57,7 @@ public class ContractorInvoicesController
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
 	public ResponseEntity<EntityModel<ContractorInvoiceRecord>> createInvoice(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
-		final ContractorInvoiceRecord createdInvoice = contractorInvoiceService.create(contractorId, record.numberOfWorkedDays(), record.extraAmount());
+		final ContractorInvoiceRecord createdInvoice = contractorInvoiceService.create(contractorId, record.numberOfWorkedDays());
 		final EntityModel<ContractorInvoiceRecord> response = contractorInvoiceModelAssembler.toModel(createdInvoice);
 
 		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
@@ -75,7 +75,7 @@ public class ContractorInvoicesController
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
 	public EntityModel<ContractorInvoiceRecord> patchCurrentInvoice(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
-		final ContractorInvoiceRecord updated = contractorInvoiceService.patchInvoice(contractorId, record.numberOfWorkedDays(), record.extraAmount());
+		final ContractorInvoiceRecord updated = contractorInvoiceService.patchInvoice(contractorId, record.numberOfWorkedDays());
 		return contractorInvoiceModelAssembler.toModel(updated);
 	}
 
