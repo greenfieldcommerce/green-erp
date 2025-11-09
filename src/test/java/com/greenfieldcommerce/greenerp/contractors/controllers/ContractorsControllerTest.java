@@ -101,29 +101,6 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	}
 
 	@ParameterizedTest
-	@MethodSource("withAdminUserAndOwnerContractor")
-	void shouldReturnContractorDetails_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwt) throws Exception
-	{
-		final ContractorRecord expected = buildFullContractorExample();
-		when(contractorService.findById(eq(VALID_RESOURCE_ID))).thenReturn(expected);
-
-		getMvc().perform(getContractorDetailsRequest(VALID_RESOURCE_ID).with(jwt)).andExpect(status().isOk())
-			.andExpect(validContractor("$", expected))
-			.andExpect(validContractorRate("$.currentRate", expected.currentRate(), getObjectMapper()))
-			.andExpectAll(contractorLinksMatchers(VALID_RESOURCE_ID))
-			.andDo(print())
-			.andDo(
-				document("detailing-contractor",
-					preprocessResponse(prettyPrint()),
-					describeContractorLinks(),
-					requestHeaders(describeAdminOrContractorHeader()),
-					pathParameters(contractorIdParameterDescription()),
-					describeContractorResponse()
-				)
-			);
-	}
-
-	@ParameterizedTest
 	@MethodSource("invalidCreateContractorRecordOptions")
 	void shouldReturnUnprocessableEntityWhenCreatingContractorWithInvalidData(CreateContractorRecord invalidRecord) throws Exception
 	{
@@ -152,6 +129,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 				requestHeaders(describeAdminHeader()),
 				responseHeaders(describeResourceLocationHeader()),
 				describeContractorLinks(),
+				describeContractorResponse(),
 				requestFields(
 					fieldWithPath("email").description("The contractor's email"),
 					fieldWithPath("name").description("The contractor's name"))
@@ -159,6 +137,29 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 			);
 
 		verify(contractorService).create(any(CreateContractorRecord.class));
+	}
+
+	@ParameterizedTest
+	@MethodSource("withAdminUserAndOwnerContractor")
+	void shouldReturnContractorDetails_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwt) throws Exception
+	{
+		final ContractorRecord expected = buildFullContractorExample();
+		when(contractorService.findById(eq(VALID_RESOURCE_ID))).thenReturn(expected);
+
+		getMvc().perform(getContractorDetailsRequest(VALID_RESOURCE_ID).with(jwt)).andExpect(status().isOk())
+			.andExpect(validContractor("$", expected))
+			.andExpect(validContractorRate("$.currentRate", expected.currentRate(), getObjectMapper()))
+			.andExpectAll(contractorLinksMatchers(VALID_RESOURCE_ID))
+			.andDo(print())
+			.andDo(
+				document("detailing-contractor",
+					preprocessResponse(prettyPrint()),
+					describeContractorLinks(),
+					requestHeaders(describeAdminOrContractorHeader()),
+					pathParameters(contractorIdParameterDescription()),
+					describeContractorResponse()
+				)
+			);
 	}
 
 	@ParameterizedTest
@@ -179,6 +180,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 				describeContractorLinks(),
 				requestHeaders(describeAdminOrContractorHeader()),
 				pathParameters(contractorIdParameterDescription()),
+				describeContractorResponse(),
 				requestFields(
 					fieldWithPath("email").description("The updated contractor's email"),
 					fieldWithPath("name").description("The updated contractor's name"))
@@ -217,7 +219,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 			fieldWithPath("email").description("The contractor's email"),
 			fieldWithPath("name").description("The contractor's name"),
 			subsectionWithPath("currentRate").description("The contractor's currently active <<resources_rate, rate>>, if any").optional(),
-			subsectionWithPath("_links").description("HATEOAS links to related resources"));
+			subsectionWithPath("_links").description("HATEOAS <<resources_contractor_links, contractor links>> to related resources"));
 	}
 
 	private Stream<CreateContractorRecord> invalidCreateContractorRecordOptions()
@@ -274,12 +276,10 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 	private static ResultMatcher[] contractorLinksMatchers(Long contractorId) {
 		return new ResultMatcher[] {
 			jsonPath("$._links").exists(),
-			jsonPath("$._links.self").exists(),
 			jsonPath("$._links.self.href").value("http://localhost:8080/contractors/" + contractorId),
-			jsonPath("$._links.rates").exists(),
 			jsonPath("$._links.rates.href").value(String.format("http://localhost:8080/contractors/%s/rates", contractorId)),
-			jsonPath("$._links.currentInvoice").exists(),
-			jsonPath("$._links.currentInvoice.href").value(String.format("http://localhost:8080/contractors/%s/invoices/current", contractorId))
+			jsonPath("$._links.latestInvoices.href").value(String.format("http://localhost:8080/contractors/%s/invoices", contractorId)),
+			jsonPath("$._links.allContractors.href").value("http://localhost:8080/contractors")
 		};
 	}
 
@@ -288,8 +288,8 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 		return links(
 			linkWithRel("self").description("Self link to this <<resources_contractor, Contractor>>"),
 			linkWithRel("rates").description("Link to this contractor's <<resources_rates, Rates>>"),
-			linkWithRel("currentInvoice").description("Link to this contractor's <<resources_invoice, current Invoice>>"),
-			linkWithRel("latestInvoices").description("Link to this contractor's latest <<resources_invoices, Invoices>>")
+			linkWithRel("latestInvoices").description("Link to this contractor's latest <<resources_invoices, Invoices>>"),
+			linkWithRel("allContractors").description("Link to all <<resources_contractors, Contractors>>")
 		);
 	}
 }

@@ -118,7 +118,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	public void shouldCreateContractorRate_forAdmin() throws Exception
 	{
 		final CreateContractorRateRecord createContractorRateRecord = buildValidContractorRate();
-		final ContractorRateRecord result = buildExpectedSuccessResult(VALID_RESOURCE_ID, VALID_RESOURCE_ID, createContractorRateRecord);
+		final ContractorRateRecord result = buildExpectedSuccessResult(createContractorRateRecord);
 
 		when(contractorRateService.create(eq(VALID_RESOURCE_ID), argThat(matchesRate(createContractorRateRecord)))).thenReturn(result);
 
@@ -134,8 +134,9 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 				requestHeaders(describeAdminHeader()),
 				responseHeaders(describeResourceLocationHeader()),
 				pathParameters(contractorIdParameterDescription()),
+				describeContractorRateResponse(),
 				requestFields(
-					fieldWithPath("rate").description("The contractor's rate"),
+					fieldWithPath("rate").description("The contractor's daily rate"),
 					fieldWithPath("currency").description("The rate currency"),
 					fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
 					fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')")
@@ -198,6 +199,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 					describeRateLinks(),
 					requestHeaders(describeAdminHeader()),
 					pathParameters(contractorIdParameterDescription(), contractorRateIdParameterDescription()),
+					describeContractorRateResponse(),
 					requestFields(
 						fieldWithPath("newEndDateTime").description("The updated rate's end date and time")
 					)
@@ -210,7 +212,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@Test
 	public void shouldDeleteContractorRate_forAdmin() throws Exception
 	{
-		getMvc().perform(deleteContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID)
+		getMvc().perform(deleteContractorRateRequest()
 			.with(getJwtRequestPostProcessors().admin())).andExpect(status().isNoContent())
 			.andDo(document("deleting-a-rate",
 				requestHeaders(describeAdminHeader()),
@@ -228,7 +230,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 			postContractorRateRequest(VALID_RESOURCE_ID, buildValidContractorRate()),
 			getContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID),
 			patchContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, buildValidEndDateTimeRecord()),
-			deleteContractorRateRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID));
+			deleteContractorRateRequest());
 	}
 
 	@Override
@@ -274,9 +276,9 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		return patch("/contractors/{contractorId}/rates/{rateId}", contractorId, rateId).contentType(MediaType.APPLICATION_JSON).content(asJson(record));
 	}
 
-	private MockHttpServletRequestBuilder deleteContractorRateRequest(Long contractorId, Long rateId)
+	private MockHttpServletRequestBuilder deleteContractorRateRequest()
 	{
-		return delete("/contractors/{contractorId}/rates/{rateId}", contractorId, rateId);
+		return delete("/contractors/{contractorId}/rates/{rateId}", VALID_RESOURCE_ID, VALID_RESOURCE_ID);
 	}
 
 	private CreateContractorRateRecord buildValidContractorRate()
@@ -284,9 +286,9 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		return new CreateContractorRateRecord(BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 	}
 
-	private static ContractorRateRecord buildExpectedSuccessResult(final Long contractorId, final Long rateId, final CreateContractorRateRecord createContractorRateRecord)
+	private static ContractorRateRecord buildExpectedSuccessResult(final CreateContractorRateRecord createContractorRateRecord)
 	{
-		return new ContractorRateRecord(contractorId, rateId, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
+		return new ContractorRateRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
 	}
 
 	private ZonedDateTimeRecord buildValidEndDateTimeRecord()

@@ -130,10 +130,9 @@ public class ContractorInvoiceServiceImplTest
 	}
 
 	@Test
-	@DisplayName("Should update current invoice for contractor")
-	public void shouldUpdateCurrentInvoiceForContractor()
+	@DisplayName("Should update invoice for contractor")
+	public void shouldUpdateInvoiceForContractor()
 	{
-		final ZonedDateTime now = ZonedDateTime.now();
 		final Contractor contractor = mock(Contractor.class);
 		final ContractorInvoice invoice = mock(ContractorInvoice.class);
 		final ContractorInvoice saved = mock(ContractorInvoice.class);
@@ -142,11 +141,11 @@ public class ContractorInvoiceServiceImplTest
 		final BigDecimal workedDays = new BigDecimal(22);
 
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(invoice));
+		when(contractorInvoiceRepository.findByContractorAndId(eq(contractor), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(invoice));
 		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
 		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(invoiceRecord);
 
-		final ContractorInvoiceRecord result = service.patchInvoice(VALID_RESOURCE_ID, workedDays);
+		final ContractorInvoiceRecord result = service.patchInvoice(VALID_RESOURCE_ID, VALID_RESOURCE_ID, workedDays);
 		assertEquals(invoiceRecord, result);
 		verify(invoice).setNumberOfWorkedDays(workedDays);
 		verify(contractorInvoiceRepository).save(invoice);

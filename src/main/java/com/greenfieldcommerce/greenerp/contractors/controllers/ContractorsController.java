@@ -43,13 +43,6 @@ public class ContractorsController
 		return contractorModelAssembler.toCollectionModel(contractorService.findAll());
 	}
 
-	@GetMapping(value = "/{contractorId}")
-	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorRecord> getContractorDetails(@PathVariable("contractorId") Long contractorId)
-	{
-		return contractorModelAssembler.toModel(contractorService.findById(contractorId));
-	}
-
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
 	public ResponseEntity<EntityModel<ContractorRecord>> createContractor(@Valid @RequestBody CreateContractorRecord record)
@@ -58,6 +51,13 @@ public class ContractorsController
 		final EntityModel<ContractorRecord> response = contractorModelAssembler.toModel(newContractor);
 
 		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
+	}
+
+	@GetMapping(value = "/{contractorId}")
+	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
+	public EntityModel<ContractorRecord> getContractorDetails(@PathVariable("contractorId") Long contractorId)
+	{
+		return contractorModelAssembler.toModel(contractorService.findById(contractorId));
 	}
 
 	@PatchMapping(value = "/{contractorId}", consumes = MediaType.APPLICATION_JSON_VALUE)

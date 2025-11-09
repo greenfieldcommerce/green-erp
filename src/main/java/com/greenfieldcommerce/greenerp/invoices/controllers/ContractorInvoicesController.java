@@ -63,20 +63,19 @@ public class ContractorInvoicesController
 		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
 	}
 
-	@GetMapping(value = "/current")
+	@GetMapping("/{invoiceId}")
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorInvoiceRecord> findCurrentInvoice(@PathVariable("contractorId") Long contractorId)
+	public EntityModel<ContractorInvoiceRecord> getInvoice(@PathVariable("contractorId") Long contractorId, @PathVariable("invoiceId") Long invoiceId)
 	{
-		final ContractorInvoiceRecord currentInvoiceForContractor = contractorInvoiceService.findCurrentInvoiceForContractor(contractorId);
-		return contractorInvoiceModelAssembler.toModel(currentInvoiceForContractor);
+		final ContractorInvoiceRecord invoice = contractorInvoiceService.findByContractorAndId(contractorId, invoiceId);
+		return contractorInvoiceModelAssembler.toModel(invoice);
 	}
 
-	@PatchMapping(value = "/current", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PatchMapping(value = "/{invoiceId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorInvoiceRecord> patchCurrentInvoice(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
+	public EntityModel<ContractorInvoiceRecord> patchInvoice(@PathVariable("contractorId") Long contractorId, @PathVariable("invoiceId") Long invoiceId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
-		final ContractorInvoiceRecord updated = contractorInvoiceService.patchInvoice(contractorId, record.numberOfWorkedDays());
-		return contractorInvoiceModelAssembler.toModel(updated);
+		final ContractorInvoiceRecord updatedInvoice = contractorInvoiceService.patchInvoice(contractorId, invoiceId, record.numberOfWorkedDays());
+		return contractorInvoiceModelAssembler.toModel(updatedInvoice);
 	}
-
 }

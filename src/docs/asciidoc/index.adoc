@@ -70,7 +70,7 @@ that describes the problem. The error object has the following structure:
 
 include::{snippets}/error-example/response-fields.adoc[]
 
-For example, a request that attempts to retrieve data on a non-existent contractor will produce a `404 Not Found` response:
+For example, a request that attempts to create a contractor with invalid data will produce a `422 Unprocessable Entity` response in the following format:
 
 include::{snippets}/error-example/http-response.adoc[]
 
@@ -120,7 +120,7 @@ operation::listing-contractors[snippets='http-request,request-headers,response-f
 === Creating a contractor
 A `POST` request is used to create a contractor.
 
-operation::creating-a-contractor[snippets='http-request,request-headers,request-fields,response-headers,http-response']
+operation::creating-a-contractor[snippets='http-request,request-headers,request-fields,response-headers,response-fields,http-response']
 
 [[resources_contractor]]
 == Contractor
@@ -139,7 +139,7 @@ operation::detailing-contractor[snippets='http-request,request-headers,path-para
 === Updating a contractor
 A `PATCH` request will update the data for a specific contractor.
 
-operation::updating-a-contractor[snippets='http-request,request-headers,path-parameters,http-response']
+operation::updating-a-contractor[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
 
 
 
@@ -162,7 +162,7 @@ operation::listing-contractor-rates[snippets='http-request,request-headers,path-
 === Creating a contractor rate
 A `POST` request is used to create a contractor rate.
 
-operation::creating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,response-headers,http-response']
+operation::creating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,response-headers,response-fields,http-response']
 
 [[resources_rate]]
 == Rate
@@ -182,7 +182,7 @@ operation::detailing-a-rate[snippets='http-request,request-headers,path-paramete
 === Updating a contractor rate
 A `PATCH` request will update the data for a specific contractor's rate.
 
-operation::updating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
+operation::updating-a-rate[snippets='http-request,request-headers,path-parameters,request-fields,response-fields,http-response']
 
 === Deleting a contractor rate
 A `DELETE` request will delete a specific contractor's rate.
@@ -194,35 +194,35 @@ operation::deleting-a-rate[snippets='http-request,request-headers,path-parameter
 
 The Invoices resource is used to list and create invoices
 
+[[resources_invoices_links]]
 === Links
 include::{snippets}/listing-latest-invoices/links.adoc[]
 
 === Listing the latest invoices
 A `GET` request is used to list the latest contractor invoices.
 
-operation::listing-latest-invoices[snippets='http-request,request-headers,path-parameters,query-parameters,http-response']
+operation::listing-latest-invoices[snippets='http-request,request-headers,path-parameters,query-parameters,response-fields,http-response']
 
 === Creating an invoice
 A `POST` request is used to create an invoice.
 
-operation::creating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,response-headers,http-response']
+operation::creating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,response-headers,response-fields,http-response']
 
 [[resources_invoice]]
-== Current Invoice
-The Current Invoice resource is used to retrieve and update the current invoice for a contractor.
+== Invoice
+The Invoice resource is used to retrieve and update an invoice for a contractor.
 
 [[resources_invoice_links]]
 === Links
 
-include::{snippets}/detailing-current-invoice/links.adoc[]
+include::{snippets}/detailing-an-invoice/links.adoc[]
 
-=== Detailing the current invoice
-A `GET` request will retrieve the current invoice for a contractor.
+=== Detailing an invoice
+A `GET` request will retrieve an invoice for a contractor.
 
-operation::detailing-current-invoice[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
+operation::detailing-an-invoice[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
 
-=== Updating the current invoice
-A `PATCH` request will update the current invoice for a contractor.
+=== Updating an invoice
+A `PATCH` request will update an invoice for a contractor.
 
-operation::updating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,http-response']
-
+operation::updating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,response-fields,http-response']

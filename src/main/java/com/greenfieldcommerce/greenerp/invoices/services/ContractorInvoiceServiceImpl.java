@@ -87,6 +87,13 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 		return createdInvoiceRecord;
 	}
 
+	@Override
+	public ContractorInvoiceRecord findByContractorAndId(final Long contractorId, final Long invoiceId)
+	{
+		final ContractorInvoice invoice = internalFindByContractorAndId(contractorId, invoiceId);
+		return contractorInvoiceToRecordMapper.map(invoice);
+	}
+
 	/**
 	 * Adds an extra amount line to an existing contractor invoice and persists the change.
 	 *
@@ -133,9 +140,9 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	 * @throws EntityNotFoundException if the contractor is not found or no current invoice exists
 	 */
 	@Override
-	public ContractorInvoiceRecord 	patchInvoice(final Long contractorId, final BigDecimal numberOfWorkedDays)
+	public ContractorInvoiceRecord 	patchInvoice(final Long contractorId, final Long invoiceId, final BigDecimal numberOfWorkedDays)
 	{
-		final ContractorInvoice currentInvoice = internalFindCurrentInvoiceForContractor(contractorId);
+		final ContractorInvoice currentInvoice = internalFindByContractorAndId(contractorId, invoiceId);
 		currentInvoice.setNumberOfWorkedDays(numberOfWorkedDays);
 		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(currentInvoice));
 	}
@@ -170,5 +177,12 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 		final Contractor contractor = contractorService.findEntityById(contractorId);
 		return contractorInvoiceRepository.findCurrentContractorInvoice(contractor, TimeService.now())
 			.orElseThrow(() -> new EntityNotFoundException("CURRENT_INVOICE_NOT_FOUND", String.format("No current invoice for contractor %s found", contractorId)));
+	}
+
+	private ContractorInvoice internalFindByContractorAndId(final Long contractorId, final Long invoiceId)
+	{
+		final Contractor contractor = contractorService.findEntityById(contractorId);
+		return contractorInvoiceRepository.findByContractorAndId(contractor, invoiceId)
+			.orElseThrow(() -> new EntityNotFoundException("INVOICE_NOT_FOUND", String.format("No invoice with id %s for contractor %s was found", invoiceId, contractorId)));
 	}
 }

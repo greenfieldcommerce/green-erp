@@ -16,4 +16,5 @@ public interface ContractorInvoiceRepository extends ListCrudRepository<Contract
 	@Query("SELECT i FROM #{#entityName} i WHERE i.contractor = :contractor and i.startDate <= :now AND i.endDate >= :now")
 	Optional<ContractorInvoice> findCurrentContractorInvoice(Contractor contractor, ZonedDateTime now);
 	Page<ContractorInvoice> findByContractor(Contractor contractor, Pageable pageable);
+	Optional<ContractorInvoice> findByContractorAndId(Contractor contractor, Long id);
 }

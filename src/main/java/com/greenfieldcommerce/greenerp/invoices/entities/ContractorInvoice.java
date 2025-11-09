@@ -95,6 +95,11 @@ public class ContractorInvoice
 		return this.numberOfWorkedDays.multiply(this.rate.getRate()).add(extraAmount).setScale(2, RoundingMode.HALF_UP);
 	}
 
+	public Long getId()
+	{
+		return id;
+	}
+
 	public Contractor getContractor()
 	{
 		return contractor;

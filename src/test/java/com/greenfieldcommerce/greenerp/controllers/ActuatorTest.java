@@ -1,6 +1,8 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,8 +31,8 @@ public class ActuatorTest
 	void actuatorEndpointsShouldPermitAll() throws Exception
 	{
 		mvc.perform(get("/actuator/health")).andExpect(status().isOk())
-			.andDo(document("health"));
+			.andDo(document("health", preprocessResponse(prettyPrint())));
 		mvc.perform(get("/actuator/metrics")).andExpect(status().isOk())
-			.andDo(document("metrics"));
+			.andDo(document("metrics", preprocessResponse(prettyPrint())));
 	}
 }

@@ -24,6 +24,6 @@ public class ContractorInvoiceToRecordMapper implements Mapper<ContractorInvoice
 	public ContractorInvoiceRecord map(final ContractorInvoice contractorInvoice)
 	{
 		final Set<InvoiceExtraAmountLineRecord> extraLines = contractorInvoice.getExtraAmountLines().stream().map(invoiceExtraAmountLineRecordMapper::map).collect(Collectors.toSet());
-		return new ContractorInvoiceRecord(contractorInvoice.getContractor().getId(), contractorInvoice.getStartDate(), contractorInvoice.getEndDate(), contractorInvoice.getNumberOfWorkedDays(), extraLines, contractorInvoice.getTotal(), contractorInvoice.getCurrency());
+		return new ContractorInvoiceRecord(contractorInvoice.getContractor().getId(), contractorInvoice.getId(), contractorInvoice.getStartDate(), contractorInvoice.getEndDate(), contractorInvoice.getNumberOfWorkedDays(), extraLines, contractorInvoice.getTotal(), contractorInvoice.getCurrency());
 	}
 }

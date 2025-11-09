@@ -28,8 +28,8 @@ public class ContractorModelAssembler extends RepresentationModelAssemblerSuppor
 		return EntityModel.of(contractor,
 			linkTo(methodOn(ContractorsController.class).getContractorDetails(contractor.id())).withSelfRel(),
 			linkTo(methodOn(ContractorRatesController.class).findRatesForContractor(contractor.id())).withRel("rates"),
-			linkTo(methodOn(ContractorInvoicesController.class).findCurrentInvoice(contractor.id())).withRel("currentInvoice"),
-			linkTo(methodOn(ContractorInvoicesController.class).findInvoices(contractor.id(), PageRequest.of(0, 12))).withRel("latestInvoices")
+			linkTo(methodOn(ContractorInvoicesController.class).findInvoices(contractor.id(), PageRequest.of(0, 12))).withRel("latestInvoices"),
+			linkTo(methodOn(ContractorsController.class).getAllContractors()).withRel("allContractors")
 		);
 	}
 
