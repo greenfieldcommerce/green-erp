@@ -295,7 +295,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 			jsonPath("_links").exists(),
 			jsonPath("_links.self.href").value(String.format("http://localhost:8080/contractors/%s/invoices/%s", VALID_RESOURCE_ID, VALID_RESOURCE_ID)),
 			jsonPath("_links.contractor.href").value(String.format("http://localhost:8080/contractors/%s", VALID_RESOURCE_ID)),
-			jsonPath("_links.latestInvoices.href").value(String.format("http://localhost:8080/contractors/%s/invoices", VALID_RESOURCE_ID, VALID_RESOURCE_ID)),
+			jsonPath("_links.latestInvoices.href").value(String.format("http://localhost:8080/contractors/%s/invoices", VALID_RESOURCE_ID)),
 		};
 	}
 

@@ -57,20 +57,32 @@ public class ContractorInvoiceServiceImplTest
 	private ContractorInvoiceServiceImpl service;
 
 	@Test
-	@DisplayName("Should throw DuplicateContractorInvoiceException when trying to create invoice if one already exists in the current period")
-	public void shouldThrowDuplicateContractorInvoiceExceptionWhenCreatingInvoiceIfOneAlreadyExistsInTheCurrentPeriod()
+	@DisplayName("Should find the sorted latest x invoices for contractor")
+	public void shouldFindTheSortedLatestXInvoicesForContractor()
 	{
-		final ZonedDateTime now = ZonedDateTime.now();
 		final Contractor contractor = mock(Contractor.class);
-		final ContractorInvoice existing = mock(ContractorInvoice.class);
+		final Sort sort = Sort.by(Sort.Direction.DESC, "invoiceDate");
+		final Pageable pageable = PageRequest.of(0, 2, sort);
+		final ContractorInvoice invoice1 = mock(ContractorInvoice.class);
+		final ContractorInvoice invoice2 = mock(ContractorInvoice.class);
 
-		final BigDecimal workedDays = new BigDecimal(22);
+		final ContractorInvoiceRecord invoice1Record = mock(ContractorInvoiceRecord.class);
+		final ContractorInvoiceRecord invoice2Record = mock(ContractorInvoiceRecord.class);
 
+		final List<ContractorInvoice> invoices = List.of(invoice1, invoice2);
+		final Page<ContractorInvoice> page = new PageImpl<>(invoices, pageable, invoices.size());
+
+		when(contractorInvoiceRepository.findByContractor(eq(contractor), eq(pageable))).thenReturn(page);
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(existing));
+		when(contractorInvoiceToRecordMapper.map(eq(invoice1))).thenReturn(invoice1Record);
+		when(contractorInvoiceToRecordMapper.map(eq(invoice2))).thenReturn(invoice2Record);
 
-		assertThrows(DuplicateContractorInvoiceException.class, () -> service.create(VALID_RESOURCE_ID, workedDays));
-		verify(contractorInvoiceRepository).findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now));
+		final Page<ContractorInvoiceRecord> result = service.findByContractor(VALID_RESOURCE_ID, pageable);
+		assertEquals(2, result.getNumberOfElements());
+		assertEquals(invoice1Record, result.getContent().get(0));
+		assertEquals(invoice2Record, result.getContent().get(1));
+		assertEquals(invoices.size(), result.getTotalElements());
+		assertEquals(pageable, result.getPageable());
 	}
 
 	@Test
@@ -97,6 +109,93 @@ public class ContractorInvoiceServiceImplTest
 
 		assertEquals(savedRecord, result);
 		verify(contractorInvoiceMessagingService).sendContractorInvoiceCreatedMessage(eq(savedRecord));
+	}
+
+	@Test
+	@DisplayName("Should throw DuplicateContractorInvoiceException when trying to create invoice if one already exists in the current period")
+	public void shouldThrowDuplicateContractorInvoiceExceptionWhenCreatingInvoiceIfOneAlreadyExistsInTheCurrentPeriod()
+	{
+		final ZonedDateTime now = ZonedDateTime.now();
+		final Contractor contractor = mock(Contractor.class);
+		final ContractorInvoice existing = mock(ContractorInvoice.class);
+
+		final BigDecimal workedDays = new BigDecimal(22);
+
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(existing));
+
+		assertThrows(DuplicateContractorInvoiceException.class, () -> service.create(VALID_RESOURCE_ID, workedDays));
+		verify(contractorInvoiceRepository).findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now));
+	}
+
+	@Test
+	@DisplayName("Should find an invoice by contractor Id and invoice Id")
+	public void shouldFindAnInvoiceByContractorIdAndInvoiceId()
+	{
+		final Contractor contractor = mock(Contractor.class);
+		final ContractorInvoice invoice = mock(ContractorInvoice.class);
+		final ContractorInvoiceRecord expectedRecord = mock(ContractorInvoiceRecord.class);
+
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceRepository.findByContractorAndId(eq(contractor), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(invoice));
+		when(contractorInvoiceToRecordMapper.map(eq(invoice))).thenReturn(expectedRecord);
+
+		final ContractorInvoiceRecord contractorInvoiceRecord = service.findByContractorAndId(VALID_RESOURCE_ID, VALID_RESOURCE_ID);
+		assertEquals(expectedRecord, contractorInvoiceRecord);
+	}
+
+	@Test
+	@DisplayName("Should throw EntityNotFoundException when searching an inexistent invoice")
+	public void shouldThrowEntityNotFoundExceptionWhenSearchingAnInexistentInvoice()
+	{
+		final Contractor contractor = mock(Contractor.class);
+
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceRepository.findByContractorAndId(eq(contractor), eq(0L))).thenReturn(Optional.empty());
+
+		assertThrows(EntityNotFoundException.class, () -> service.findByContractorAndId(VALID_RESOURCE_ID, 0L));
+	}
+
+	@Test
+	@DisplayName("Should add an extra amount line to an existing invoice")
+	public void shouldAddAnExtraAmountLineToAnExistingInvoice()
+	{
+		final ContractorInvoice invoice = mock(ContractorInvoice.class);
+		final ContractorInvoice	saved = mock(ContractorInvoice.class);
+		final ContractorInvoiceRecord expectedRecord = mock(ContractorInvoiceRecord.class);
+
+		final InvoiceExtraAmountLineRecord extraAmountLineRecord = new InvoiceExtraAmountLineRecord(BigDecimal.valueOf(100), "Extra Amount");
+
+		when(contractorInvoiceRepository.findById(VALID_RESOURCE_ID)).thenReturn(Optional.of(invoice));
+		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
+		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(expectedRecord);
+
+		final ContractorInvoiceRecord contractorInvoiceRecord = service.addExtraAmountLineToInvoice(VALID_RESOURCE_ID, extraAmountLineRecord);
+
+		verify(invoice).addExtraAmountLine(argThat(l -> l.getAmount().equals(extraAmountLineRecord.extraAmount()) && l.getDescription().equals(extraAmountLineRecord.description())));
+		assertEquals(expectedRecord, contractorInvoiceRecord);
+	}
+
+	@Test
+	@DisplayName("Should update invoice for contractor")
+	public void shouldUpdateInvoiceForContractor()
+	{
+		final Contractor contractor = mock(Contractor.class);
+		final ContractorInvoice invoice = mock(ContractorInvoice.class);
+		final ContractorInvoice saved = mock(ContractorInvoice.class);
+		final ContractorInvoiceRecord invoiceRecord = mock(ContractorInvoiceRecord.class);
+
+		final BigDecimal workedDays = new BigDecimal(22);
+
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceRepository.findByContractorAndId(eq(contractor), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(invoice));
+		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
+		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(invoiceRecord);
+
+		final ContractorInvoiceRecord result = service.patchInvoice(VALID_RESOURCE_ID, VALID_RESOURCE_ID, workedDays);
+		assertEquals(invoiceRecord, result);
+		verify(invoice).setNumberOfWorkedDays(workedDays);
+		verify(contractorInvoiceRepository).save(invoice);
 	}
 
 	@Test
@@ -127,77 +226,6 @@ public class ContractorInvoiceServiceImplTest
 
 		final ContractorInvoiceRecord result = service.findCurrentInvoiceForContractor(VALID_RESOURCE_ID);
 		assertEquals(invoiceRecord, result);
-	}
-
-	@Test
-	@DisplayName("Should update invoice for contractor")
-	public void shouldUpdateInvoiceForContractor()
-	{
-		final Contractor contractor = mock(Contractor.class);
-		final ContractorInvoice invoice = mock(ContractorInvoice.class);
-		final ContractorInvoice saved = mock(ContractorInvoice.class);
-		final ContractorInvoiceRecord invoiceRecord = mock(ContractorInvoiceRecord.class);
-
-		final BigDecimal workedDays = new BigDecimal(22);
-
-		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceRepository.findByContractorAndId(eq(contractor), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(invoice));
-		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
-		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(invoiceRecord);
-
-		final ContractorInvoiceRecord result = service.patchInvoice(VALID_RESOURCE_ID, VALID_RESOURCE_ID, workedDays);
-		assertEquals(invoiceRecord, result);
-		verify(invoice).setNumberOfWorkedDays(workedDays);
-		verify(contractorInvoiceRepository).save(invoice);
-	}
-
-	@Test
-	@DisplayName("Should find the sorted latest x invoices for contractor")
-	public void shouldFindTheSortedLatestXInvoicesForContractor()
-	{
-		final Contractor contractor = mock(Contractor.class);
-		final Sort sort = Sort.by(Sort.Direction.DESC, "invoiceDate");
-		final Pageable pageable = PageRequest.of(0, 2, sort);
-		final ContractorInvoice invoice1 = mock(ContractorInvoice.class);
-		final ContractorInvoice invoice2 = mock(ContractorInvoice.class);
-
-		final ContractorInvoiceRecord invoice1Record = mock(ContractorInvoiceRecord.class);
-		final ContractorInvoiceRecord invoice2Record = mock(ContractorInvoiceRecord.class);
-
-		final List<ContractorInvoice> invoices = List.of(invoice1, invoice2);
-		final Page<ContractorInvoice> page = new PageImpl<>(invoices, pageable, invoices.size());
-
-		when(contractorInvoiceRepository.findByContractor(eq(contractor), eq(pageable))).thenReturn(page);
-		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceToRecordMapper.map(eq(invoice1))).thenReturn(invoice1Record);
-		when(contractorInvoiceToRecordMapper.map(eq(invoice2))).thenReturn(invoice2Record);
-
-		final Page<ContractorInvoiceRecord> result = service.findByContractor(VALID_RESOURCE_ID, pageable);
-		assertEquals(2, result.getNumberOfElements());
-		assertEquals(invoice1Record, result.getContent().get(0));
-		assertEquals(invoice2Record, result.getContent().get(1));
-		assertEquals(invoices.size(), result.getTotalElements());
-		assertEquals(pageable, result.getPageable());
-	}
-
-	@Test
-	@DisplayName("Should add an extra amount line to an existing invoice")
-	public void shouldAddAnExtraAmountLineToAnExistingInvoice()
-	{
-		final ContractorInvoice invoice = mock(ContractorInvoice.class);
-		final ContractorInvoice	saved = mock(ContractorInvoice.class);
-		final ContractorInvoiceRecord expectedRecord = mock(ContractorInvoiceRecord.class);
-
-		final InvoiceExtraAmountLineRecord extraAmountLineRecord = new InvoiceExtraAmountLineRecord(BigDecimal.valueOf(100), "Extra Amount");
-
-		when(contractorInvoiceRepository.findById(VALID_RESOURCE_ID)).thenReturn(Optional.of(invoice));
-		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
-		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(expectedRecord);
-
-		final ContractorInvoiceRecord contractorInvoiceRecord = service.addExtraAmountLineToInvoice(VALID_RESOURCE_ID, extraAmountLineRecord);
-
-		verify(invoice).addExtraAmountLine(argThat(l -> l.getAmount().equals(extraAmountLineRecord.extraAmount()) && l.getDescription().equals(extraAmountLineRecord.description())));
-		assertEquals(expectedRecord, contractorInvoiceRecord);
 	}
 
 	private static ZonedDateTime dateIsSameDay(final ZonedDateTime now)

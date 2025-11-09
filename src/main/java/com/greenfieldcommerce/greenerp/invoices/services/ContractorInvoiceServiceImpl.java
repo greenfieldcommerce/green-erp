@@ -58,6 +58,21 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	}
 
 	/**
+	 * Retrieves a paginated list of invoices for a specific contractor.
+	 *
+	 * @param contractorId	  the ID of the contractor whose invoices are to be retrieved
+	 * @param pageable        the pagination information (i.e., page number, size, and sorting)
+	 * @return a {@code Page} of {@code ContractorInvoiceRecord} containing the contractor's invoices
+	 * @throws EntityNotFoundException if the contractor with the given ID is not found
+	 */
+	@Override
+	public Page<ContractorInvoiceRecord> findByContractor(final Long contractorId, final Pageable pageable)
+	{
+		final Contractor contractor = contractorService.findEntityById(contractorId);
+		return contractorInvoiceRepository.findByContractor(contractor, pageable).map(contractorInvoiceToRecordMapper::map);
+	}
+
+	/**
 	 * Creates a new contractor invoice for the current period.
 	 * This method validates that no invoice already exists for the contractor in the current period
 	 * before creating a new one. The invoice amount is calculated based on the contractor's current
@@ -87,6 +102,14 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 		return createdInvoiceRecord;
 	}
 
+	/**
+	 * Retrieves a specific invoice for a contractor by contractor ID and invoice ID.
+	 *
+	 * @param contractorId the ID of the contractor
+	 * @param invoiceId    the ID of the invoice to retrieve
+	 * @return a {@code ContractorInvoiceRecord} representing the requested invoice
+	 * @throws EntityNotFoundException if the contractor is not found, or if no invoice with the given ID exists for the contractor
+	 */
 	@Override
 	public ContractorInvoiceRecord findByContractorAndId(final Long contractorId, final Long invoiceId)
 	{
@@ -117,20 +140,6 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	}
 
 	/**
-	 * Retrieves the current invoice for a specific contractor.
-	 *
-	 * @param contractorId the ID of the contractor
-	 * @return a {@code ContractorInvoiceRecord} representing the current invoice
-	 * @throws EntityNotFoundException if the contractor is not found or no current invoice exists
-	 */
-	@Override
-	public ContractorInvoiceRecord findCurrentInvoiceForContractor(final Long contractorId)
-	{
-		final ContractorInvoice currentInvoice = internalFindCurrentInvoiceForContractor(contractorId);
-		return contractorInvoiceToRecordMapper.map(currentInvoice);
-	}
-
-	/**
 	 * Updates the number of worked days and extra amount for the current invoice for a contractor.
 	 * This will recalculate the invoice total.
 	 *
@@ -148,18 +157,17 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	}
 
 	/**
-	 * Retrieves a paginated list of invoices for a specific contractor.
+	 * Retrieves the current invoice for a specific contractor.
 	 *
-	 * @param contractorId	  the ID of the contractor whose invoices are to be retrieved
-	 * @param pageable        the pagination information (i.e., page number, size, and sorting)
-	 * @return a {@code Page} of {@code ContractorInvoiceRecord} containing the contractor's invoices
-	 * @throws EntityNotFoundException if the contractor with the given ID is not found
+	 * @param contractorId the ID of the contractor
+	 * @return a {@code ContractorInvoiceRecord} representing the current invoice
+	 * @throws EntityNotFoundException if the contractor is not found or no current invoice exists
 	 */
 	@Override
-	public Page<ContractorInvoiceRecord> findByContractor(final Long contractorId, final Pageable pageable)
+	public ContractorInvoiceRecord findCurrentInvoiceForContractor(final Long contractorId)
 	{
-		final Contractor contractor = contractorService.findEntityById(contractorId);
-		return contractorInvoiceRepository.findByContractor(contractor, pageable).map(contractorInvoiceToRecordMapper::map);
+		final ContractorInvoice currentInvoice = internalFindCurrentInvoiceForContractor(contractorId);
+		return contractorInvoiceToRecordMapper.map(currentInvoice);
 	}
 
 	/**
@@ -179,6 +187,18 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 			.orElseThrow(() -> new EntityNotFoundException("CURRENT_INVOICE_NOT_FOUND", String.format("No current invoice for contractor %s found", contractorId)));
 	}
 
+
+	/**
+	 * Internal helper method to find a specific invoice for a contractor.
+	 * <p>
+	 * This method retrieves the contractor entity and searches for an invoice
+	 * with the specified ID that belongs to that contractor.
+	 *
+	 * @param contractorId the ID of the contractor
+	 * @param invoiceId    the ID of the invoice to find
+	 * @return the {@code ContractorInvoice} entity matching the given contractor and invoice ID
+	 * @throws EntityNotFoundException if the contractor is not found or no invoice with the given ID exists for the contractor
+	 */
 	private ContractorInvoice internalFindByContractorAndId(final Long contractorId, final Long invoiceId)
 	{
 		final Contractor contractor = contractorService.findEntityById(contractorId);
