@@ -485,6 +485,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creating_a_contractor_request_headers">Request headers</a></li>
 <li><a href="#_creating_a_contractor_request_fields">Request fields</a></li>
 <li><a href="#_creating_a_contractor_response_headers">Response headers</a></li>
+<li><a href="#_creating_a_contractor_response_fields">Response fields</a></li>
 <li><a href="#_creating_a_contractor_http_response">Example response</a></li>
 </ul>
 </li>
@@ -507,6 +508,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_updating_a_contractor_http_request">HTTP request</a></li>
 <li><a href="#_updating_a_contractor_request_headers">Request headers</a></li>
 <li><a href="#_updating_a_contractor_path_parameters">Path parameters</a></li>
+<li><a href="#_updating_a_contractor_response_fields">Response fields</a></li>
 <li><a href="#_updating_a_contractor_http_response">Example response</a></li>
 </ul>
 </li>
@@ -531,6 +533,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creating_a_contractor_rate_path_parameters">Path parameters</a></li>
 <li><a href="#_creating_a_contractor_rate_request_fields">Request fields</a></li>
 <li><a href="#_creating_a_contractor_rate_response_headers">Response headers</a></li>
+<li><a href="#_creating_a_contractor_rate_response_fields">Response fields</a></li>
 <li><a href="#_creating_a_contractor_rate_http_response">Example response</a></li>
 </ul>
 </li>
@@ -554,6 +557,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_updating_a_contractor_rate_request_headers">Request headers</a></li>
 <li><a href="#_updating_a_contractor_rate_path_parameters">Path parameters</a></li>
 <li><a href="#_updating_a_contractor_rate_request_fields">Request fields</a></li>
+<li><a href="#_updating_a_contractor_rate_response_fields">Response fields</a></li>
 <li><a href="#_updating_a_contractor_rate_http_response">Example response</a></li>
 </ul>
 </li>
@@ -569,13 +573,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 <li><a href="#resources_invoices">Invoices</a>
 <ul class="sectlevel2">
-<li><a href="#_links">Links</a></li>
+<li><a href="#resources_invoices_links">Links</a></li>
 <li><a href="#_listing_the_latest_invoices">Listing the latest invoices</a>
 <ul class="sectlevel3">
 <li><a href="#_listing_the_latest_invoices_http_request">HTTP request</a></li>
 <li><a href="#_listing_the_latest_invoices_request_headers">Request headers</a></li>
 <li><a href="#_listing_the_latest_invoices_path_parameters">Path parameters</a></li>
 <li><a href="#_listing_the_latest_invoices_query_parameters">Query parameters</a></li>
+<li><a href="#_listing_the_latest_invoices_response_fields">Response fields</a></li>
 <li><a href="#_listing_the_latest_invoices_http_response">Example response</a></li>
 </ul>
 </li>
@@ -586,30 +591,32 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_creating_an_invoice_path_parameters">Path parameters</a></li>
 <li><a href="#_creating_an_invoice_request_fields">Request fields</a></li>
 <li><a href="#_creating_an_invoice_response_headers">Response headers</a></li>
+<li><a href="#_creating_an_invoice_response_fields">Response fields</a></li>
 <li><a href="#_creating_an_invoice_http_response">Example response</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#resources_invoice">Current Invoice</a>
+<li><a href="#resources_invoice">Invoice</a>
 <ul class="sectlevel2">
 <li><a href="#resources_invoice_links">Links</a></li>
-<li><a href="#_detailing_the_current_invoice">Detailing the current invoice</a>
+<li><a href="#_detailing_an_invoice">Detailing an invoice</a>
 <ul class="sectlevel3">
-<li><a href="#_detailing_the_current_invoice_http_request">HTTP request</a></li>
-<li><a href="#_detailing_the_current_invoice_request_headers">Request headers</a></li>
-<li><a href="#_detailing_the_current_invoice_path_parameters">Path parameters</a></li>
-<li><a href="#_detailing_the_current_invoice_response_fields">Response fields</a></li>
-<li><a href="#_detailing_the_current_invoice_http_response">Example response</a></li>
+<li><a href="#_detailing_an_invoice_http_request">HTTP request</a></li>
+<li><a href="#_detailing_an_invoice_request_headers">Request headers</a></li>
+<li><a href="#_detailing_an_invoice_path_parameters">Path parameters</a></li>
+<li><a href="#_detailing_an_invoice_response_fields">Response fields</a></li>
+<li><a href="#_detailing_an_invoice_http_response">Example response</a></li>
 </ul>
 </li>
-<li><a href="#_updating_the_current_invoice">Updating the current invoice</a>
+<li><a href="#_updating_an_invoice">Updating an invoice</a>
 <ul class="sectlevel3">
-<li><a href="#_updating_the_current_invoice_http_request">HTTP request</a></li>
-<li><a href="#_updating_the_current_invoice_request_headers">Request headers</a></li>
-<li><a href="#_updating_the_current_invoice_path_parameters">Path parameters</a></li>
-<li><a href="#_updating_the_current_invoice_request_fields">Request fields</a></li>
-<li><a href="#_updating_the_current_invoice_http_response">Example response</a></li>
+<li><a href="#_updating_an_invoice_http_request">HTTP request</a></li>
+<li><a href="#_updating_an_invoice_request_headers">Request headers</a></li>
+<li><a href="#_updating_an_invoice_path_parameters">Path parameters</a></li>
+<li><a href="#_updating_an_invoice_request_fields">Request fields</a></li>
+<li><a href="#_updating_an_invoice_response_fields">Response fields</a></li>
+<li><a href="#_updating_an_invoice_http_response">Example response</a></li>
 </ul>
 </li>
 </ul>
@@ -765,7 +772,7 @@ that describes the problem. The error object has the following structure:</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>For example, a request that attempts to retrieve data on a non-existent contractor will produce a <code>404 Not Found</code> response:</p>
+<p>For example, a request that attempts to create a contractor with invalid data will produce a <code>422 Unprocessable Entity</code> response in the following format:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -780,7 +787,7 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "timestamp" : "2025-11-06T22:07:32.804130881Z",
+  "timestamp" : "2025-11-09T14:45:49.385077009Z",
   "status" : 422,
   "error" : "Unprocessable Entity",
   "code" : "VALIDATION_ERROR",
@@ -822,9 +829,40 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 365
+Content-Length: 612
 
-{"status":"UP","components":{"db":{"status":"UP","details":{"database":"H2","validationQuery":"isValid()"}},"diskSpace":{"status":"UP","details":{"total":76887154688,"free":22794194944,"threshold":10485760,"path":"/home/runner/work/green-erp/green-erp/.","exists":true}},"ping":{"status":"UP"},"ssl":{"status":"UP","details":{"validChains":[],"invalidChains":[]}}}}</code></pre>
+{
+  "status" : "UP",
+  "components" : {
+    "db" : {
+      "status" : "UP",
+      "details" : {
+        "database" : "H2",
+        "validationQuery" : "isValid()"
+      }
+    },
+    "diskSpace" : {
+      "status" : "UP",
+      "details" : {
+        "total" : 76887154688,
+        "free" : 22946922496,
+        "threshold" : 10485760,
+        "path" : "/home/runner/work/green-erp/green-erp/.",
+        "exists" : true
+      }
+    },
+    "ping" : {
+      "status" : "UP"
+    },
+    "ssl" : {
+      "status" : "UP",
+      "details" : {
+        "validChains" : [ ],
+        "invalidChains" : [ ]
+      }
+    }
+  }
+}</code></pre>
 </div>
 </div>
 </div>
@@ -857,9 +895,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 2452
+Content-Length: 2533
 
-{"names":["application.ready.time","application.started.time","disk.free","disk.total","executor.active","executor.completed","executor.pool.core","executor.pool.max","executor.pool.size","executor.queue.remaining","executor.queued","http.server.requests","http.server.requests.active","jvm.buffer.count","jvm.buffer.memory.used","jvm.buffer.total.capacity","jvm.classes.loaded","jvm.classes.unloaded","jvm.compilation.time","jvm.gc.live.data.size","jvm.gc.max.data.size","jvm.gc.memory.allocated","jvm.gc.memory.promoted","jvm.gc.overhead","jvm.info","jvm.memory.committed","jvm.memory.max","jvm.memory.usage.after.gc","jvm.memory.used","jvm.threads.daemon","jvm.threads.live","jvm.threads.peak","jvm.threads.started","jvm.threads.states","logback.events","process.cpu.time","process.cpu.usage","process.files.max","process.files.open","process.start.time","process.uptime","spring.security.authorizations","spring.security.authorizations.active","spring.security.filterchains","spring.security.filterchains.AuthenticationFilter.after","spring.security.filterchains.AuthenticationFilter.before","spring.security.filterchains.access.exceptions.after","spring.security.filterchains.access.exceptions.before","spring.security.filterchains.active","spring.security.filterchains.authentication.anonymous.after","spring.security.filterchains.authentication.anonymous.before","spring.security.filterchains.authentication.bearer.after","spring.security.filterchains.authentication.bearer.before","spring.security.filterchains.authorization.after","spring.security.filterchains.authorization.before","spring.security.filterchains.context.async.after","spring.security.filterchains.context.async.before","spring.security.filterchains.context.holder.after","spring.security.filterchains.context.holder.before","spring.security.filterchains.context.servlet.after","spring.security.filterchains.context.servlet.before","spring.security.filterchains.header.after","spring.security.filterchains.header.before","spring.security.filterchains.logout.after","spring.security.filterchains.logout.before","spring.security.filterchains.requestcache.after","spring.security.filterchains.requestcache.before","spring.security.filterchains.session.urlencoding.after","spring.security.filterchains.session.urlencoding.before","spring.security.http.secured.requests","spring.security.http.secured.requests.active","system.cpu.count","system.cpu.usage","system.load.average.1m"]}</code></pre>
+{
+  "names" : [ "application.ready.time", "application.started.time", "disk.free", "disk.total", "executor.active", "executor.completed", "executor.pool.core", "executor.pool.max", "executor.pool.size", "executor.queue.remaining", "executor.queued", "http.server.requests", "http.server.requests.active", "jvm.buffer.count", "jvm.buffer.memory.used", "jvm.buffer.total.capacity", "jvm.classes.loaded", "jvm.classes.unloaded", "jvm.compilation.time", "jvm.gc.live.data.size", "jvm.gc.max.data.size", "jvm.gc.memory.allocated", "jvm.gc.memory.promoted", "jvm.gc.overhead", "jvm.info", "jvm.memory.committed", "jvm.memory.max", "jvm.memory.usage.after.gc", "jvm.memory.used", "jvm.threads.daemon", "jvm.threads.live", "jvm.threads.peak", "jvm.threads.started", "jvm.threads.states", "logback.events", "process.cpu.time", "process.cpu.usage", "process.files.max", "process.files.open", "process.start.time", "process.uptime", "spring.security.authorizations", "spring.security.authorizations.active", "spring.security.filterchains", "spring.security.filterchains.AuthenticationFilter.after", "spring.security.filterchains.AuthenticationFilter.before", "spring.security.filterchains.access.exceptions.after", "spring.security.filterchains.access.exceptions.before", "spring.security.filterchains.active", "spring.security.filterchains.authentication.anonymous.after", "spring.security.filterchains.authentication.anonymous.before", "spring.security.filterchains.authentication.bearer.after", "spring.security.filterchains.authentication.bearer.before", "spring.security.filterchains.authorization.after", "spring.security.filterchains.authorization.before", "spring.security.filterchains.context.async.after", "spring.security.filterchains.context.async.before", "spring.security.filterchains.context.holder.after", "spring.security.filterchains.context.holder.before", "spring.security.filterchains.context.servlet.after", "spring.security.filterchains.context.servlet.before", "spring.security.filterchains.header.after", "spring.security.filterchains.header.before", "spring.security.filterchains.logout.after", "spring.security.filterchains.logout.before", "spring.security.filterchains.requestcache.after", "spring.security.filterchains.requestcache.before", "spring.security.filterchains.session.urlencoding.after", "spring.security.filterchains.session.urlencoding.before", "spring.security.http.secured.requests", "spring.security.http.secured.requests.active", "system.cpu.count", "system.cpu.usage", "system.load.average.1m" ]
+}</code></pre>
 </div>
 </div>
 </div>
@@ -981,7 +1021,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 1475
+Content-Length: 1437
 
 {
   "_embedded" : {
@@ -994,8 +1034,8 @@ Content-Length: 1475
         "id" : 1,
         "rate" : 10,
         "currency" : "USD",
-        "startDateTime" : "2025-11-06T22:07:42.972910224Z",
-        "endDateTime" : "2025-12-06T22:07:42.972917849Z"
+        "startDateTime" : "2025-11-09T14:46:00.174884831Z",
+        "endDateTime" : "2025-12-09T14:46:00.174893678Z"
       },
       "_links" : {
         "self" : {
@@ -1004,11 +1044,11 @@ Content-Length: 1475
         "rates" : {
           "href" : "http://localhost:8080/contractors/1/rates"
         },
-        "currentInvoice" : {
-          "href" : "http://localhost:8080/contractors/1/invoices/current"
-        },
         "latestInvoices" : {
           "href" : "http://localhost:8080/contractors/1/invoices"
+        },
+        "allContractors" : {
+          "href" : "http://localhost:8080/contractors"
         }
       }
     }, {
@@ -1023,11 +1063,11 @@ Content-Length: 1475
         "rates" : {
           "href" : "http://localhost:8080/contractors/2/rates"
         },
-        "currentInvoice" : {
-          "href" : "http://localhost:8080/contractors/2/invoices/current"
-        },
         "latestInvoices" : {
           "href" : "http://localhost:8080/contractors/2/invoices"
+        },
+        "allContractors" : {
+          "href" : "http://localhost:8080/contractors"
         }
       }
     } ]
@@ -1135,6 +1175,50 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
+<h4 id="_creating_a_contractor_response_fields"><a class="link" href="#_creating_a_contractor_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The unique identifier of the contractor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s email</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>currentRate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s currently active <a href="#resources_rate">rate</a>, if any</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS <a href="#resources_contractor_links">contractor links</a> to related resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="_creating_a_contractor_http_response"><a class="link" href="#_creating_a_contractor_http_response">Example response</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -1147,7 +1231,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 478
+Content-Length: 459
 
 {
   "id" : 3,
@@ -1161,11 +1245,11 @@ Content-Length: 478
     "rates" : {
       "href" : "http://localhost:8080/contractors/3/rates"
     },
-    "currentInvoice" : {
-      "href" : "http://localhost:8080/contractors/3/invoices/current"
-    },
     "latestInvoices" : {
       "href" : "http://localhost:8080/contractors/3/invoices"
+    },
+    "allContractors" : {
+      "href" : "http://localhost:8080/contractors"
     }
   }
 }</code></pre>
@@ -1204,12 +1288,12 @@ Content-Length: 478
 <td class="tableblock halign-left valign-top"><p class="tableblock">Link to this contractor&#8217;s <a href="#resources_rates">Rates</a></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>currentInvoice</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Link to this contractor&#8217;s <a href="#resources_invoice">current Invoice</a></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>latestInvoices</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Link to this contractor&#8217;s latest <a href="#resources_invoices">Invoices</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>allContractors</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Link to all <a href="#resources_contractors">Contractors</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -1310,7 +1394,7 @@ Host: localhost:8080</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS links to related resources</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS <a href="#resources_contractor_links">contractor links</a> to related resources</p></td>
 </tr>
 </tbody>
 </table>
@@ -1327,7 +1411,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 670
+Content-Length: 651
 
 {
   "id" : 1,
@@ -1338,8 +1422,8 @@ Content-Length: 670
     "id" : 1,
     "rate" : 10,
     "currency" : "USD",
-    "startDateTime" : "2025-11-06T22:07:42.948492344Z",
-    "endDateTime" : "2025-12-06T22:07:42.948519404Z"
+    "startDateTime" : "2025-11-09T14:46:00.156254882Z",
+    "endDateTime" : "2025-12-09T14:46:00.156311217Z"
   },
   "_links" : {
     "self" : {
@@ -1348,11 +1432,11 @@ Content-Length: 670
     "rates" : {
       "href" : "http://localhost:8080/contractors/1/rates"
     },
-    "currentInvoice" : {
-      "href" : "http://localhost:8080/contractors/1/invoices/current"
-    },
     "latestInvoices" : {
       "href" : "http://localhost:8080/contractors/1/invoices"
+    },
+    "allContractors" : {
+      "href" : "http://localhost:8080/contractors"
     }
   }
 }</code></pre>
@@ -1425,6 +1509,50 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
+<h4 id="_updating_a_contractor_response_fields"><a class="link" href="#_updating_a_contractor_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The unique identifier of the contractor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s email</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>currentRate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Null</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s currently active <a href="#resources_rate">rate</a>, if any</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS <a href="#resources_contractor_links">contractor links</a> to related resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="_updating_a_contractor_http_response"><a class="link" href="#_updating_a_contractor_http_response">Example response</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -1436,7 +1564,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 478
+Content-Length: 459
 
 {
   "id" : 1,
@@ -1450,11 +1578,11 @@ Content-Length: 478
     "rates" : {
       "href" : "http://localhost:8080/contractors/1/rates"
     },
-    "currentInvoice" : {
-      "href" : "http://localhost:8080/contractors/1/invoices/current"
-    },
     "latestInvoices" : {
       "href" : "http://localhost:8080/contractors/1/invoices"
+    },
+    "allContractors" : {
+      "href" : "http://localhost:8080/contractors"
     }
   }
 }</code></pre>
@@ -1598,8 +1726,8 @@ Content-Length: 994
       "id" : 1,
       "rate" : 100,
       "currency" : "USD",
-      "startDateTime" : "2025-11-06T22:07:39.089236882Z",
-      "endDateTime" : "2025-12-06T22:07:39.089255577Z",
+      "startDateTime" : "2025-11-09T14:45:56.197203338Z",
+      "endDateTime" : "2025-12-09T14:45:56.197220961Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1613,8 +1741,8 @@ Content-Length: 994
       "id" : 2,
       "rate" : 100.5,
       "currency" : "USD",
-      "startDateTime" : "2025-12-06T22:07:39.089289801Z",
-      "endDateTime" : "2026-02-06T22:07:39.089298407Z",
+      "startDateTime" : "2025-12-09T14:45:56.197251157Z",
+      "endDateTime" : "2026-02-09T14:45:56.197259382Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/2"
@@ -1652,8 +1780,8 @@ Host: localhost:8080
 {
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-06T22:07:39.013068483Z",
-  "endDateTime" : "2025-12-06T22:07:39.013084924Z"
+  "startDateTime" : "2025-11-09T14:45:56.106992422Z",
+  "endDateTime" : "2025-12-09T14:45:56.107007731Z"
 }</code></pre>
 </div>
 </div>
@@ -1720,7 +1848,7 @@ Host: localhost:8080
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rate</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s rate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s daily rate</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>currency</code></p></td>
@@ -1762,6 +1890,60 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
+<h4 id="_creating_a_contractor_rate_response_fields"><a class="link" href="#_creating_a_contractor_rate_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the contractor this rate belongs to</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rate ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s daily rate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>currency</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The currency of the rate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>startDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date and time when the rate starts being valid ('valid from')</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>endDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date and time when the rate stops being valid ('valid until')</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#resources_rate_links">Links</a> to other resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="_creating_a_contractor_rate_http_response"><a class="link" href="#_creating_a_contractor_rate_http_response">Example response</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -1781,8 +1963,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-06T22:07:39.013068483Z",
-  "endDateTime" : "2025-12-06T22:07:39.013084924Z",
+  "startDateTime" : "2025-11-09T14:45:56.106992422Z",
+  "endDateTime" : "2025-12-09T14:45:56.107007731Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1963,8 +2145,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-06T22:07:38.941288524Z",
-  "endDateTime" : "2025-12-06T22:07:38.941305566Z",
+  "startDateTime" : "2025-11-09T14:45:56.036873616Z",
+  "endDateTime" : "2025-12-09T14:45:56.036891519Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1993,7 +2175,7 @@ Content-Length: 57
 Host: localhost:8080
 
 {
-  "newEndDateTime" : "2025-12-06T22:07:38.971761266Z"
+  "newEndDateTime" : "2025-12-09T14:45:56.074902689Z"
 }</code></pre>
 </div>
 </div>
@@ -2070,6 +2252,60 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
+<h4 id="_updating_a_contractor_rate_response_fields"><a class="link" href="#_updating_a_contractor_rate_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the contractor this rate belongs to</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The rate ID</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>rate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s daily rate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>currency</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The currency of the rate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>startDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date and time when the rate starts being valid ('valid from')</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>endDateTime</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Date and time when the rate stops being valid ('valid until')</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#resources_rate_links">Links</a> to other resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="_updating_a_contractor_rate_http_response"><a class="link" href="#_updating_a_contractor_rate_http_response">Example response</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -2088,8 +2324,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-06T22:07:38.971828952Z",
-  "endDateTime" : "2025-12-06T22:07:38.971761266Z",
+  "startDateTime" : "2025-11-09T14:45:56.074938175Z",
+  "endDateTime" : "2025-12-09T14:45:56.074902689Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2188,7 +2424,7 @@ X-Frame-Options: DENY</code></pre>
 <p>The Invoices resource is used to list and create invoices</p>
 </div>
 <div class="sect2">
-<h3 id="_links"><a class="link" href="#_links">Links</a></h3>
+<h3 id="resources_invoices_links"><a class="link" href="#resources_invoices_links">Links</a></h3>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -2307,6 +2543,40 @@ Host: localhost:8080</code></pre>
 </table>
 </div>
 <div class="sect3">
+<h4 id="_listing_the_latest_invoices_response_fields"><a class="link" href="#_listing_the_latest_invoices_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_embedded.invoices</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An array of <a href="#resources_invoice">Invoice resources</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#resources_invoices_links">Links</a> to other resources</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>page</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Page metadata</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
 <h4 id="_listing_the_latest_invoices_http_response"><a class="link" href="#_listing_the_latest_invoices_http_response">Example response</a></h4>
 <div class="listingblock">
 <div class="content">
@@ -2318,21 +2588,25 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 2065
+Content-Length: 2435
 
 {
   "_embedded" : {
     "invoices" : [ {
       "contractorId" : 1,
-      "startDate" : "2025-11-06T22:07:43.832871815Z",
-      "endDate" : "2025-12-06T22:07:43.83287947Z",
+      "invoiceId" : 1,
+      "startDate" : "2025-11-09T14:46:01.009633178Z",
+      "endDate" : "2025-12-09T14:46:01.009642225Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
       "currency" : "USD",
       "_links" : {
         "self" : {
-          "href" : "http://localhost:8080/contractors/1/invoices/current"
+          "href" : "http://localhost:8080/contractors/1/invoices/1"
+        },
+        "latestInvoices" : {
+          "href" : "http://localhost:8080/contractors/1/invoices"
         },
         "contractor" : {
           "href" : "http://localhost:8080/contractors/1"
@@ -2340,15 +2614,19 @@ Content-Length: 2065
       }
     }, {
       "contractorId" : 1,
-      "startDate" : "2025-10-06T22:07:43.832898665Z",
-      "endDate" : "2025-11-06T22:07:43.832903013Z",
+      "invoiceId" : 1,
+      "startDate" : "2025-10-09T14:46:01.009663636Z",
+      "endDate" : "2025-11-09T14:46:01.009668986Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
       "currency" : "USD",
       "_links" : {
         "self" : {
-          "href" : "http://localhost:8080/contractors/1/invoices/current"
+          "href" : "http://localhost:8080/contractors/1/invoices/1"
+        },
+        "latestInvoices" : {
+          "href" : "http://localhost:8080/contractors/1/invoices"
         },
         "contractor" : {
           "href" : "http://localhost:8080/contractors/1"
@@ -2356,15 +2634,19 @@ Content-Length: 2065
       }
     }, {
       "contractorId" : 1,
-      "startDate" : "2025-09-06T22:07:43.832909215Z",
-      "endDate" : "2025-10-06T22:07:43.832912311Z",
+      "invoiceId" : 1,
+      "startDate" : "2025-09-09T14:46:01.009675939Z",
+      "endDate" : "2025-10-09T14:46:01.009679536Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
       "currency" : "USD",
       "_links" : {
         "self" : {
-          "href" : "http://localhost:8080/contractors/1/invoices/current"
+          "href" : "http://localhost:8080/contractors/1/invoices/1"
+        },
+        "latestInvoices" : {
+          "href" : "http://localhost:8080/contractors/1/invoices"
         },
         "contractor" : {
           "href" : "http://localhost:8080/contractors/1"
@@ -2506,133 +2788,7 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
-<h4 id="_creating_an_invoice_http_response"><a class="link" href="#_creating_an_invoice_http_response">Example response</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
-Location: http://localhost:8080/contractors/1/invoices/current
-Content-Type: application/hal+json
-X-Content-Type-Options: nosniff
-X-XSS-Protection: 0
-Cache-Control: no-cache, no-store, max-age=0, must-revalidate
-Pragma: no-cache
-Expires: 0
-X-Frame-Options: DENY
-Content-Length: 411
-
-{
-  "contractorId" : 1,
-  "startDate" : "2025-11-06T22:07:43.757633514Z",
-  "endDate" : "2025-12-06T22:07:43.757639816Z",
-  "numberOfWorkedDays" : 22,
-  "extraAmountLines" : [ ],
-  "total" : 3600,
-  "currency" : "USD",
-  "_links" : {
-    "self" : {
-      "href" : "http://localhost:8080/contractors/1/invoices/current"
-    },
-    "contractor" : {
-      "href" : "http://localhost:8080/contractors/1"
-    }
-  }
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="resources_invoice"><a class="link" href="#resources_invoice">Current Invoice</a></h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The Current Invoice resource is used to retrieve and update the current invoice for a contractor.</p>
-</div>
-<div class="sect2">
-<h3 id="resources_invoice_links"><a class="link" href="#resources_invoice_links">Links</a></h3>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Relation</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>self</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Self link to this <a href="#resources_invoice">Invoice</a></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractor</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Link to the <a href="#resources_contractor">Contractor</a> for whom this invoice is issued</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_detailing_the_current_invoice"><a class="link" href="#_detailing_the_current_invoice">Detailing the current invoice</a></h3>
-<div class="paragraph">
-<p>A <code>GET</code> request will retrieve the current invoice for a contractor.</p>
-</div>
-<div class="sect3">
-<h4 id="_detailing_the_current_invoice_http_request"><a class="link" href="#_detailing_the_current_invoice_http_request">HTTP request</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /contractors/1/invoices/current HTTP/1.1
-Host: localhost:8080</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_detailing_the_current_invoice_request_headers"><a class="link" href="#_detailing_the_current_invoice_request_headers">Request headers</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Name</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer token used to authenticate the request. Must have 'ADMIN' role or be owned by the associated 'CONTRACTOR'</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_detailing_the_current_invoice_path_parameters"><a class="link" href="#_detailing_the_current_invoice_path_parameters">Path parameters</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /contractors/{contractorId}/invoices/current</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Contractor id</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_detailing_the_current_invoice_response_fields"><a class="link" href="#_detailing_the_current_invoice_response_fields">Response fields</a></h4>
+<h4 id="_creating_an_invoice_response_fields"><a class="link" href="#_creating_an_invoice_response_fields">Response fields</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -2651,6 +2807,11 @@ Host: localhost:8080</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">ID of the contractor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invoiceId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the invoice</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>startDate</code></p></td>
@@ -2685,16 +2846,17 @@ Host: localhost:8080</code></pre>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS links to related resources</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS <a href="#resources_invoice_links">invoice links</a> to related resources</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_detailing_the_current_invoice_http_response"><a class="link" href="#_detailing_the_current_invoice_http_response">Example response</a></h4>
+<h4 id="_creating_an_invoice_http_response"><a class="link" href="#_creating_an_invoice_http_response">Example response</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
+Location: http://localhost:8080/contractors/1/invoices/1
 Content-Type: application/hal+json
 X-Content-Type-Options: nosniff
 X-XSS-Protection: 0
@@ -2702,19 +2864,23 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 411
+Content-Length: 518
 
 {
   "contractorId" : 1,
-  "startDate" : "2025-11-06T22:07:43.651769128Z",
-  "endDate" : "2025-12-06T22:07:43.651776452Z",
-  "numberOfWorkedDays" : 20,
+  "invoiceId" : 1,
+  "startDate" : "2025-11-09T14:46:00.934650876Z",
+  "endDate" : "2025-12-09T14:46:00.934659182Z",
+  "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
   "currency" : "USD",
   "_links" : {
     "self" : {
-      "href" : "http://localhost:8080/contractors/1/invoices/current"
+      "href" : "http://localhost:8080/contractors/1/invoices/1"
+    },
+    "latestInvoices" : {
+      "href" : "http://localhost:8080/contractors/1/invoices"
     },
     "contractor" : {
       "href" : "http://localhost:8080/contractors/1"
@@ -2725,28 +2891,59 @@ Content-Length: 411
 </div>
 </div>
 </div>
-<div class="sect2">
-<h3 id="_updating_the_current_invoice"><a class="link" href="#_updating_the_current_invoice">Updating the current invoice</a></h3>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resources_invoice"><a class="link" href="#resources_invoice">Invoice</a></h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>A <code>PATCH</code> request will update the current invoice for a contractor.</p>
+<p>The Invoice resource is used to retrieve and update an invoice for a contractor.</p>
+</div>
+<div class="sect2">
+<h3 id="resources_invoice_links"><a class="link" href="#resources_invoice_links">Links</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Relation</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>self</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Self link to this <a href="#resources_invoice">Invoice</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractor</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Link to the <a href="#resources_contractor">Contractor</a> for whom this invoice is issued</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>latestInvoices</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Link to the latest <a href="#resources_invoices">invoices</a> for the contractor</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_detailing_an_invoice"><a class="link" href="#_detailing_an_invoice">Detailing an invoice</a></h3>
+<div class="paragraph">
+<p>A <code>GET</code> request will retrieve an invoice for a contractor.</p>
 </div>
 <div class="sect3">
-<h4 id="_updating_the_current_invoice_http_request"><a class="link" href="#_updating_the_current_invoice_http_request">HTTP request</a></h4>
+<h4 id="_detailing_an_invoice_http_request"><a class="link" href="#_detailing_an_invoice_http_request">HTTP request</a></h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /contractors/1/invoices/current HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Content-Length: 31
-Host: localhost:8080
-
-{
-  "numberOfWorkedDays" : 22
-}</code></pre>
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /contractors/1/invoices/1 HTTP/1.1
+Host: localhost:8080</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_updating_the_current_invoice_request_headers"><a class="link" href="#_updating_the_current_invoice_request_headers">Request headers</a></h4>
+<h4 id="_detailing_an_invoice_request_headers"><a class="link" href="#_detailing_an_invoice_request_headers">Request headers</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -2767,9 +2964,9 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
-<h4 id="_updating_the_current_invoice_path_parameters"><a class="link" href="#_updating_the_current_invoice_path_parameters">Path parameters</a></h4>
+<h4 id="_detailing_an_invoice_path_parameters"><a class="link" href="#_detailing_an_invoice_path_parameters">Path parameters</a></h4>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /contractors/{contractorId}/invoices/current</caption>
+<caption class="title">Table 1. /contractors/{contractorId}/invoices/{invoiceId}</caption>
 <colgroup>
 <col style="width: 50%;">
 <col style="width: 50%;">
@@ -2785,11 +2982,185 @@ Host: localhost:8080
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Contractor id</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invoiceId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Invoice id</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="sect3">
-<h4 id="_updating_the_current_invoice_request_fields"><a class="link" href="#_updating_the_current_invoice_request_fields">Request fields</a></h4>
+<h4 id="_detailing_an_invoice_response_fields"><a class="link" href="#_detailing_an_invoice_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the contractor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invoiceId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the invoice</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>startDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The start of the period for which the invoice is valid</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>endDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The end of the period for which the invoice is valid</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>numberOfWorkedDays</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of days worked by the contractor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>total</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The invoice total</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>extraAmountLines</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An array of extra amount lines</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>currency</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The invoice currency</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS <a href="#resources_invoice_links">invoice links</a> to related resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_detailing_an_invoice_http_response"><a class="link" href="#_detailing_an_invoice_http_response">Example response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/hal+json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Length: 518
+
+{
+  "contractorId" : 1,
+  "invoiceId" : 1,
+  "startDate" : "2025-11-09T14:46:01.050749484Z",
+  "endDate" : "2025-12-09T14:46:01.050770264Z",
+  "numberOfWorkedDays" : 20,
+  "extraAmountLines" : [ ],
+  "total" : 3600,
+  "currency" : "USD",
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/contractors/1/invoices/1"
+    },
+    "latestInvoices" : {
+      "href" : "http://localhost:8080/contractors/1/invoices"
+    },
+    "contractor" : {
+      "href" : "http://localhost:8080/contractors/1"
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_updating_an_invoice"><a class="link" href="#_updating_an_invoice">Updating an invoice</a></h3>
+<div class="paragraph">
+<p>A <code>PATCH</code> request will update an invoice for a contractor.</p>
+</div>
+<div class="sect3">
+<h4 id="_updating_an_invoice_http_request"><a class="link" href="#_updating_an_invoice_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">PATCH /contractors/1/invoices/1 HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Content-Length: 31
+Host: localhost:8080
+
+{
+  "numberOfWorkedDays" : 22
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_updating_an_invoice_request_headers"><a class="link" href="#_updating_an_invoice_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer token used to authenticate the request. Must have 'ADMIN' role or be owned by the associated 'CONTRACTOR'</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_updating_an_invoice_path_parameters"><a class="link" href="#_updating_an_invoice_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /contractors/{contractorId}/invoices/{invoiceId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Contractor id</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invoiceId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Invoice id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_updating_an_invoice_request_fields"><a class="link" href="#_updating_an_invoice_request_fields">Request fields</a></h4>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -2813,7 +3184,71 @@ Host: localhost:8080
 </table>
 </div>
 <div class="sect3">
-<h4 id="_updating_the_current_invoice_http_response"><a class="link" href="#_updating_the_current_invoice_http_response">Example response</a></h4>
+<h4 id="_updating_an_invoice_response_fields"><a class="link" href="#_updating_an_invoice_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>contractorId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the contractor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>invoiceId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ID of the invoice</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>startDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The start of the period for which the invoice is valid</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>endDate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The end of the period for which the invoice is valid</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>numberOfWorkedDays</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of days worked by the contractor</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>total</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The invoice total</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>extraAmountLines</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An array of extra amount lines</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>currency</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The invoice currency</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS <a href="#resources_invoice_links">invoice links</a> to related resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_updating_an_invoice_http_response"><a class="link" href="#_updating_an_invoice_http_response">Example response</a></h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
@@ -2824,19 +3259,23 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 411
+Content-Length: 518
 
 {
   "contractorId" : 1,
-  "startDate" : "2025-11-06T22:07:43.722748852Z",
-  "endDate" : "2025-12-06T22:07:43.722757628Z",
+  "invoiceId" : 1,
+  "startDate" : "2025-11-09T14:46:00.874469468Z",
+  "endDate" : "2025-12-09T14:46:00.874478996Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
   "currency" : "USD",
   "_links" : {
     "self" : {
-      "href" : "http://localhost:8080/contractors/1/invoices/current"
+      "href" : "http://localhost:8080/contractors/1/invoices/1"
+    },
+    "latestInvoices" : {
+      "href" : "http://localhost:8080/contractors/1/invoices"
     },
     "contractor" : {
       "href" : "http://localhost:8080/contractors/1"
@@ -2852,7 +3291,7 @@ Content-Length: 411
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-06 22:07:13 UTC
+Last updated 2025-11-09 14:45:29 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
