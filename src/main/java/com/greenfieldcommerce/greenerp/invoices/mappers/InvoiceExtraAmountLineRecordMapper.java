@@ -12,6 +12,6 @@ public class InvoiceExtraAmountLineRecordMapper implements Mapper<InvoiceExtraAm
 	@Override
 	public InvoiceExtraAmountLineRecord map(final InvoiceExtraAmountLine extraAmountLine)
 	{
-		return new InvoiceExtraAmountLineRecord(extraAmountLine.getAmount(), extraAmountLine.getDescription());
+		return new InvoiceExtraAmountLineRecord(extraAmountLine.getId(), extraAmountLine.getAmount(), extraAmountLine.getDescription());
 	}
 }

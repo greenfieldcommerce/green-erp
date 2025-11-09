@@ -13,7 +13,9 @@ import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.invoices.entities.InvoiceExtraAmountLine;
 import com.greenfieldcommerce.greenerp.invoices.records.ContractorInvoiceRecord;
+import com.greenfieldcommerce.greenerp.invoices.records.CreateInvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.invoices.records.InvoiceExtraAmountLineRecord;
+import com.greenfieldcommerce.greenerp.mappers.Mapper;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,7 @@ class ContractorInvoiceToRecordMapperTest {
 	private static final Long CONTRACTOR_ID = 1L;
 
 	@Mock
-	private InvoiceExtraAmountLineRecordMapper invoiceExtraAmountLineRecordMapper;
+	private Mapper<InvoiceExtraAmountLine, InvoiceExtraAmountLineRecord> invoiceExtraAmountLineRecordMapper;
 
 	@InjectMocks
     private ContractorInvoiceToRecordMapper mapper;
@@ -46,8 +48,6 @@ class ContractorInvoiceToRecordMapperTest {
 		final InvoiceExtraAmountLineRecord extraAmountLineRecord = mock(InvoiceExtraAmountLineRecord.class);
 
 		when(contractorInvoice.getExtraAmountLines()).thenReturn(Set.of(extraAmountLine));
-
-
 		when(invoiceExtraAmountLineRecordMapper.map(eq(extraAmountLine))).thenReturn(extraAmountLineRecord);
 
 		ContractorInvoiceRecord result = mapper.map(contractorInvoice);

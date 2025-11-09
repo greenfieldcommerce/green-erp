@@ -2,9 +2,11 @@ package com.greenfieldcommerce.greenerp.invoices.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +30,8 @@ import org.springframework.data.domain.Sort;
 
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
-import com.greenfieldcommerce.greenerp.invoices.records.InvoiceExtraAmountLineRecord;
+import com.greenfieldcommerce.greenerp.invoices.entities.InvoiceExtraAmountLine;
+import com.greenfieldcommerce.greenerp.invoices.records.CreateInvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorInvoiceException;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
@@ -160,19 +164,21 @@ public class ContractorInvoiceServiceImplTest
 	@DisplayName("Should add an extra amount line to an existing invoice")
 	public void shouldAddAnExtraAmountLineToAnExistingInvoice()
 	{
+		final Contractor contractor = mock(Contractor.class);
 		final ContractorInvoice invoice = mock(ContractorInvoice.class);
 		final ContractorInvoice	saved = mock(ContractorInvoice.class);
 		final ContractorInvoiceRecord expectedRecord = mock(ContractorInvoiceRecord.class);
 
-		final InvoiceExtraAmountLineRecord extraAmountLineRecord = new InvoiceExtraAmountLineRecord(BigDecimal.valueOf(100), "Extra Amount");
+		final CreateInvoiceExtraAmountLineRecord extraAmountLineRecord = new CreateInvoiceExtraAmountLineRecord(BigDecimal.valueOf(100), "Extra Amount");
 
-		when(contractorInvoiceRepository.findById(VALID_RESOURCE_ID)).thenReturn(Optional.of(invoice));
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceRepository.findByContractorAndId(contractor, VALID_RESOURCE_ID)).thenReturn(Optional.of(invoice));
 		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
 		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(expectedRecord);
 
-		final ContractorInvoiceRecord contractorInvoiceRecord = service.addExtraAmountLineToInvoice(VALID_RESOURCE_ID, extraAmountLineRecord);
+		final ContractorInvoiceRecord contractorInvoiceRecord = service.addExtraAmountLineToInvoice(VALID_RESOURCE_ID, VALID_RESOURCE_ID, extraAmountLineRecord);
 
-		verify(invoice).addExtraAmountLine(argThat(l -> l.getAmount().equals(extraAmountLineRecord.extraAmount()) && l.getDescription().equals(extraAmountLineRecord.description())));
+		verify(invoice).addExtraAmountLine(argThat(l -> l.getAmount().equals(extraAmountLineRecord.amount()) && l.getDescription().equals(extraAmountLineRecord.description())));
 		assertEquals(expectedRecord, contractorInvoiceRecord);
 	}
 
@@ -196,6 +202,55 @@ public class ContractorInvoiceServiceImplTest
 		assertEquals(invoiceRecord, result);
 		verify(invoice).setNumberOfWorkedDays(workedDays);
 		verify(contractorInvoiceRepository).save(invoice);
+	}
+
+	@Test
+	@DisplayName("Should update an extra amount line in an invoice")
+	public void shouldUpdateAnExtraAmountLineInAnInvoice()
+	{
+		final Contractor contractor = mock(Contractor.class);
+		final ContractorInvoice invoice = mock(ContractorInvoice.class);
+		final InvoiceExtraAmountLine line = mock(InvoiceExtraAmountLine.class);
+		final ContractorInvoice saved = mock(ContractorInvoice.class);
+		final ContractorInvoiceRecord invoiceRecord = mock(ContractorInvoiceRecord.class);
+
+		final CreateInvoiceExtraAmountLineRecord extraAmountLineRecord = new CreateInvoiceExtraAmountLineRecord(BigDecimal.valueOf(150), "Updated Extra Amount");
+
+		when(line.getId()).thenReturn(VALID_RESOURCE_ID);
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceRepository.findByContractorAndId(eq(contractor), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(invoice));
+		when(contractorInvoiceRepository.save(invoice)).thenReturn(saved);
+		when(contractorInvoiceToRecordMapper.map(eq(saved))).thenReturn(invoiceRecord);
+		when(invoice.getExtraAmountLines()).thenReturn(Set.of(line));
+
+		final ContractorInvoiceRecord result = service.patchExtraAmountLine(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, extraAmountLineRecord);
+		assertEquals(invoiceRecord, result);
+		verify(invoice).calculateTotalInvoiceAmount();
+		verify(line).setAmount(extraAmountLineRecord.amount());
+		verify(line).setDescription(extraAmountLineRecord.description());
+		verify(contractorInvoiceRepository).save(invoice);
+	}
+
+	@Test
+	@DisplayName("Should throw EntityNotFoundException when updating an inexistent extra amount line")
+	public void shouldThrowEntityNotFoundExceptionWhenUpdatingAnInexistentExtraAmountLine()
+	{
+		final Contractor contractor = mock(Contractor.class);
+		final ContractorInvoice invoice = mock(ContractorInvoice.class);
+		final InvoiceExtraAmountLine line = mock(InvoiceExtraAmountLine.class);
+
+		final CreateInvoiceExtraAmountLineRecord extraAmountLineRecord = new CreateInvoiceExtraAmountLineRecord(BigDecimal.valueOf(150), "Updated Extra Amount");
+
+		when(line.getId()).thenReturn(VALID_RESOURCE_ID);
+		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
+		when(contractorInvoiceRepository.findByContractorAndId(eq(contractor), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(invoice));
+		when(invoice.getExtraAmountLines()).thenReturn(Set.of(line));
+
+		assertThrows(EntityNotFoundException.class, () -> service.patchExtraAmountLine(VALID_RESOURCE_ID, VALID_RESOURCE_ID, 0L, extraAmountLineRecord));
+		verify(line, never()).setAmount(any(BigDecimal.class));
+		verify(line, never()).setDescription(any(String.class));
+		verify(invoice, never()).calculateTotalInvoiceAmount();
+		verify(contractorInvoiceRepository, never()).save(any(ContractorInvoice.class));
 	}
 
 	@Test

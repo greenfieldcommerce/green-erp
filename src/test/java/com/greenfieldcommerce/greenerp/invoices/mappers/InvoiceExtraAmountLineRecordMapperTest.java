@@ -27,12 +27,14 @@ public class InvoiceExtraAmountLineRecordMapperTest
 	{
 		final InvoiceExtraAmountLine line = mock(InvoiceExtraAmountLine.class);
 
+		when(line.getId()).thenReturn(1L);
 		when(line.getAmount()).thenReturn(BigDecimal.valueOf(150D));
 		when(line.getDescription()).thenReturn("Service Charge");
 
 		final InvoiceExtraAmountLineRecord mapped = mapper.map(line);
 
-		assertEquals(line.getAmount(), mapped.extraAmount());
+		assertEquals(line.getId(), mapped.id());
+		assertEquals(line.getAmount(), mapped.amount());
 		assertEquals(line.getDescription(), mapped.description());
 	}
 }

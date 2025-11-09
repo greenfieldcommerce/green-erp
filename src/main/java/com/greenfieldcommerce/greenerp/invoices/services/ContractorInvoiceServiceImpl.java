@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.invoices.entities.InvoiceExtraAmountLine;
-import com.greenfieldcommerce.greenerp.invoices.records.InvoiceExtraAmountLineRecord;
+import com.greenfieldcommerce.greenerp.invoices.records.CreateInvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorInvoiceException;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
@@ -119,21 +119,21 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 
 	/**
 	 * Adds an extra amount line to an existing contractor invoice and persists the change.
-	 *
 	 * <p>The provided {@code extraAmountLineRecord} is converted to an {@code InvoiceExtraAmountLine}
 	 * associated with the invoice identified by {@code invoiceId}. The invoice is saved and mapped to a
 	 * {@code ContractorInvoiceRecord} which is returned.
 	 *
-	 * @param invoiceId the id of the invoice to update
+	 * @param contractorId          the id of the contractor to which the invoice belongs
+	 * @param invoiceId             the id of the invoice to update
 	 * @param extraAmountLineRecord record containing the extra amount and description
 	 * @return the updated {@code ContractorInvoiceRecord}
 	 * @throws EntityNotFoundException if the invoice with the given id does not exist
 	 */
 	@Override
-	public ContractorInvoiceRecord addExtraAmountLineToInvoice(final Long invoiceId, final InvoiceExtraAmountLineRecord extraAmountLineRecord)
+	public ContractorInvoiceRecord addExtraAmountLineToInvoice(final Long contractorId, final Long invoiceId, final CreateInvoiceExtraAmountLineRecord extraAmountLineRecord)
 	{
-		final ContractorInvoice invoice = findEntityById(invoiceId);
-		final InvoiceExtraAmountLine extraAmountLine = InvoiceExtraAmountLine.create(invoice, extraAmountLineRecord.extraAmount(), extraAmountLineRecord.description());
+		final ContractorInvoice invoice = internalFindByContractorAndId(contractorId, invoiceId);
+		final InvoiceExtraAmountLine extraAmountLine = InvoiceExtraAmountLine.create(invoice, extraAmountLineRecord.amount(), extraAmountLineRecord.description());
 		invoice.addExtraAmountLine(extraAmountLine);
 
 		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
@@ -144,16 +144,45 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	 * This will recalculate the invoice total.
 	 *
 	 * @param contractorId       the ID of the contractor
+	 * @param invoiceId          the ID of the invoice to update
 	 * @param numberOfWorkedDays the updated number of days worked
 	 * @return a {@code ContractorInvoiceRecord} representing the updated invoice
-	 * @throws EntityNotFoundException if the contractor is not found or no current invoice exists
+	 * @throws EntityNotFoundException if the contractor is not found or the invoice does not exist
 	 */
 	@Override
-	public ContractorInvoiceRecord 	patchInvoice(final Long contractorId, final Long invoiceId, final BigDecimal numberOfWorkedDays)
+	public ContractorInvoiceRecord patchInvoice(final Long contractorId, final Long invoiceId, final BigDecimal numberOfWorkedDays)
 	{
-		final ContractorInvoice currentInvoice = internalFindByContractorAndId(contractorId, invoiceId);
-		currentInvoice.setNumberOfWorkedDays(numberOfWorkedDays);
-		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(currentInvoice));
+		final ContractorInvoice invoice = internalFindByContractorAndId(contractorId, invoiceId);
+		invoice.setNumberOfWorkedDays(numberOfWorkedDays);
+		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
+	}
+
+	/**
+	 * Updates an existing extra amount line on a contractor invoice.
+	 * <p>
+	 * This method locates the specified extra amount line within the invoice and updates its amount
+	 * and description based on the provided record. After updating the line, the total invoice amount
+	 * is recalculated and the changes are persisted.
+	 *
+	 * @param contractorId          the ID of the contractor who owns the invoice
+	 * @param invoiceId             the ID of the invoice containing the extra amount line
+	 * @param extraLineId           the ID of the extra amount line to update
+	 * @param extraAmountLineRecord record containing the updated extra amount and description
+	 * @return a {@code ContractorInvoiceRecord} representing the updated invoice
+	 * @throws EntityNotFoundException if the contractor, invoice, or extra amount line with the given ID is not found
+	 */
+	@Override
+	public ContractorInvoiceRecord patchExtraAmountLine(final Long contractorId, final Long invoiceId, final Long extraLineId, final CreateInvoiceExtraAmountLineRecord extraAmountLineRecord)
+	{
+		final ContractorInvoice invoice = internalFindByContractorAndId(contractorId, invoiceId);
+		final InvoiceExtraAmountLine extraAmountLine = invoice.getExtraAmountLines().stream().filter(extraLine -> extraLine.getId().equals(extraLineId)).findFirst()
+			.orElseThrow(() -> new EntityNotFoundException("EXTRA_AMOUNT_LINE_NOT_FOUND", String.format("No extra amount line with id %s found for invoice %s of contractor %s", extraLineId, invoiceId, contractorId)));
+
+		extraAmountLine.setAmount(extraAmountLineRecord.amount());
+		extraAmountLine.setDescription(extraAmountLineRecord.description());
+
+		invoice.calculateTotalInvoiceAmount();
+		return contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
 	}
 
 	/**

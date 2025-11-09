@@ -226,3 +226,13 @@ operation::detailing-an-invoice[snippets='http-request,request-headers,path-para
 A `PATCH` request will update an invoice for a contractor.
 
 operation::updating-an-invoice[snippets='http-request,request-headers,path-parameters,request-fields,response-fields,http-response']
+
+=== Adding extra lines to an invoice
+A `POST` request will add extra lines to an invoice for a contractor.
+
+operation::creating-an-invoice-extra-line[snippets='http-request,request-headers,path-parameters,request-fields,response-fields,http-response']
+
+=== Updating extra lines of an invoice
+A `PATCH` request will update an extra line in an invoice for a contractor.
+
+operation::updating-an-invoice-extra-line[snippets='http-request,request-headers,path-parameters,request-fields,response-fields,http-response']

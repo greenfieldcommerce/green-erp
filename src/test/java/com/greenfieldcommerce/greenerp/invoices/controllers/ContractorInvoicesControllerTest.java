@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.hypermedia.LinksSnippet;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.ParameterDescriptor;
@@ -289,7 +290,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		return new CreateContractorInvoiceRecord(BigDecimal.valueOf(22));
 	}
 
-	private static ResultMatcher[] invoiceLinksMatcher()
+	protected static ResultMatcher[] invoiceLinksMatcher()
 	{
 		return new ResultMatcher[] {
 			jsonPath("_links").exists(),
@@ -299,7 +300,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		};
 	}
 
-	private static LinksSnippet describeInvoiceLinks()
+	protected static LinksSnippet describeInvoiceLinks()
 	{
 		return links(
 			linkWithRel("self").description("Self link to this <<resources_invoice, Invoice>>"),
@@ -307,17 +308,26 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 			linkWithRel("latestInvoices").description("Link to the latest <<resources_invoices, invoices>> for the contractor"));
 	}
 
-	private static ParameterDescriptor invoiceIdParameterDescription()
+	protected static ParameterDescriptor invoiceIdParameterDescription()
 	{
 		return parameterWithName("invoiceId").description("Invoice id");
 	}
 
-	private static ResponseFieldsSnippet describeInvoiceResponse()
+	protected static ResponseFieldsSnippet describeInvoiceResponse()
 	{
-		return responseFields(fieldWithPath("contractorId").description("ID of the contractor"), fieldWithPath("invoiceId").description("ID of the invoice"),
-			fieldWithPath("startDate").description("The start of the period for which the invoice is valid"), fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
-			fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"), fieldWithPath("total").description("The invoice total"), fieldWithPath("extraAmountLines").description("An array of extra amount lines"),
-			fieldWithPath("currency").description("The invoice currency"), subsectionWithPath("_links").description("HATEOAS <<resources_invoice_links, invoice links>> to related resources"));
+		return responseFields(
+			fieldWithPath("contractorId").description("ID of the contractor"),
+			fieldWithPath("invoiceId").description("ID of the invoice"),
+			fieldWithPath("startDate").description("The start of the period for which the invoice is valid"),
+			fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
+			fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"),
+			fieldWithPath("total").description("The invoice total"),
+			fieldWithPath("extraAmountLines").description("An array of extra amount lines"),
+			fieldWithPath("extraAmountLines[].id").type(JsonFieldType.NUMBER).description("Id for the extra amount line").optional(),
+			fieldWithPath("extraAmountLines[].amount").type(JsonFieldType.NUMBER).description("The amount for the extra amount line").optional(),
+			fieldWithPath("extraAmountLines[].description").type(JsonFieldType.STRING).description("The description for the extra line").optional(),
+			fieldWithPath("currency").description("The invoice currency"),
+			subsectionWithPath("_links").description("HATEOAS <<resources_invoice_links, invoice links>> to related resources"));
 	}
 
 	private static RequestFieldsSnippet describeCreateOrUpdateContractorInvoiceBody()

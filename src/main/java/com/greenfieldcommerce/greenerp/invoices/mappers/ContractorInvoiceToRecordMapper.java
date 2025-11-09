@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
+import com.greenfieldcommerce.greenerp.invoices.entities.InvoiceExtraAmountLine;
 import com.greenfieldcommerce.greenerp.invoices.records.InvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.mappers.Mapper;
 import com.greenfieldcommerce.greenerp.invoices.records.ContractorInvoiceRecord;
@@ -13,9 +14,9 @@ import com.greenfieldcommerce.greenerp.invoices.records.ContractorInvoiceRecord;
 @Component
 public class ContractorInvoiceToRecordMapper implements Mapper<ContractorInvoice, ContractorInvoiceRecord>
 {
-	private final InvoiceExtraAmountLineRecordMapper invoiceExtraAmountLineRecordMapper;
+	private final Mapper<InvoiceExtraAmountLine, InvoiceExtraAmountLineRecord> invoiceExtraAmountLineRecordMapper;
 
-	public ContractorInvoiceToRecordMapper(final InvoiceExtraAmountLineRecordMapper invoiceExtraAmountLineRecordMapper)
+	public ContractorInvoiceToRecordMapper(final Mapper<InvoiceExtraAmountLine, InvoiceExtraAmountLineRecord> invoiceExtraAmountLineRecordMapper)
 	{
 		this.invoiceExtraAmountLineRecordMapper = invoiceExtraAmountLineRecordMapper;
 	}

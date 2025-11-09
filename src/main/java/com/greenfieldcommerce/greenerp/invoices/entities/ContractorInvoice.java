@@ -89,7 +89,7 @@ public class ContractorInvoice
 		return new ContractorInvoice(rate, numberOfWorkedDays);
 	}
 
-	private BigDecimal calculateTotalInvoiceAmount()
+	public BigDecimal calculateTotalInvoiceAmount()
 	{
 		final BigDecimal extraAmount = this.getExtraAmountLines().stream().map(InvoiceExtraAmountLine::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 		return this.numberOfWorkedDays.multiply(this.rate.getRate()).add(extraAmount).setScale(2, RoundingMode.HALF_UP);
