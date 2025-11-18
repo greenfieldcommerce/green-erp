@@ -807,7 +807,7 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "timestamp" : "2025-11-10T21:36:38.073018878Z",
+  "timestamp" : "2025-11-18T21:41:55.168031775Z",
   "status" : 422,
   "error" : "Unprocessable Entity",
   "code" : "VALIDATION_ERROR",
@@ -849,10 +849,11 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 612
+Content-Length: 761
 
 {
   "status" : "UP",
+  "groups" : [ "liveness", "readiness" ],
   "components" : {
     "db" : {
       "status" : "UP",
@@ -865,13 +866,19 @@ Content-Length: 612
       "status" : "UP",
       "details" : {
         "total" : 76887154688,
-        "free" : 22946844672,
+        "free" : 19918258176,
         "threshold" : 10485760,
         "path" : "/home/runner/work/green-erp/green-erp/.",
         "exists" : true
       }
     },
+    "livenessState" : {
+      "status" : "UP"
+    },
     "ping" : {
+      "status" : "UP"
+    },
+    "readinessState" : {
       "status" : "UP"
     },
     "ssl" : {
@@ -915,10 +922,10 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 2533
+Content-Length: 2549
 
 {
-  "names" : [ "application.ready.time", "application.started.time", "disk.free", "disk.total", "executor.active", "executor.completed", "executor.pool.core", "executor.pool.max", "executor.pool.size", "executor.queue.remaining", "executor.queued", "http.server.requests", "http.server.requests.active", "jvm.buffer.count", "jvm.buffer.memory.used", "jvm.buffer.total.capacity", "jvm.classes.loaded", "jvm.classes.unloaded", "jvm.compilation.time", "jvm.gc.live.data.size", "jvm.gc.max.data.size", "jvm.gc.memory.allocated", "jvm.gc.memory.promoted", "jvm.gc.overhead", "jvm.info", "jvm.memory.committed", "jvm.memory.max", "jvm.memory.usage.after.gc", "jvm.memory.used", "jvm.threads.daemon", "jvm.threads.live", "jvm.threads.peak", "jvm.threads.started", "jvm.threads.states", "logback.events", "process.cpu.time", "process.cpu.usage", "process.files.max", "process.files.open", "process.start.time", "process.uptime", "spring.security.authorizations", "spring.security.authorizations.active", "spring.security.filterchains", "spring.security.filterchains.AuthenticationFilter.after", "spring.security.filterchains.AuthenticationFilter.before", "spring.security.filterchains.access.exceptions.after", "spring.security.filterchains.access.exceptions.before", "spring.security.filterchains.active", "spring.security.filterchains.authentication.anonymous.after", "spring.security.filterchains.authentication.anonymous.before", "spring.security.filterchains.authentication.bearer.after", "spring.security.filterchains.authentication.bearer.before", "spring.security.filterchains.authorization.after", "spring.security.filterchains.authorization.before", "spring.security.filterchains.context.async.after", "spring.security.filterchains.context.async.before", "spring.security.filterchains.context.holder.after", "spring.security.filterchains.context.holder.before", "spring.security.filterchains.context.servlet.after", "spring.security.filterchains.context.servlet.before", "spring.security.filterchains.header.after", "spring.security.filterchains.header.before", "spring.security.filterchains.logout.after", "spring.security.filterchains.logout.before", "spring.security.filterchains.requestcache.after", "spring.security.filterchains.requestcache.before", "spring.security.filterchains.session.urlencoding.after", "spring.security.filterchains.session.urlencoding.before", "spring.security.http.secured.requests", "spring.security.http.secured.requests.active", "system.cpu.count", "system.cpu.usage", "system.load.average.1m" ]
+  "names" : [ "application.ready.time", "application.started.time", "disk.free", "disk.total", "executor.active", "executor.completed", "executor.pool.core", "executor.pool.max", "executor.pool.size", "executor.queue.remaining", "executor.queued", "http.server.requests", "http.server.requests.active", "jvm.buffer.count", "jvm.buffer.memory.used", "jvm.buffer.total.capacity", "jvm.classes.loaded", "jvm.classes.unloaded", "jvm.compilation.time", "jvm.gc.live.data.size", "jvm.gc.max.data.size", "jvm.gc.memory.allocated", "jvm.gc.memory.promoted", "jvm.gc.overhead", "jvm.gc.pause", "jvm.info", "jvm.memory.committed", "jvm.memory.max", "jvm.memory.usage.after.gc", "jvm.memory.used", "jvm.threads.daemon", "jvm.threads.live", "jvm.threads.peak", "jvm.threads.started", "jvm.threads.states", "logback.events", "process.cpu.time", "process.cpu.usage", "process.files.max", "process.files.open", "process.start.time", "process.uptime", "spring.security.authorizations", "spring.security.authorizations.active", "spring.security.filterchains", "spring.security.filterchains.AuthenticationFilter.after", "spring.security.filterchains.AuthenticationFilter.before", "spring.security.filterchains.access.exceptions.after", "spring.security.filterchains.access.exceptions.before", "spring.security.filterchains.active", "spring.security.filterchains.authentication.anonymous.after", "spring.security.filterchains.authentication.anonymous.before", "spring.security.filterchains.authentication.bearer.after", "spring.security.filterchains.authentication.bearer.before", "spring.security.filterchains.authorization.after", "spring.security.filterchains.authorization.before", "spring.security.filterchains.context.async.after", "spring.security.filterchains.context.async.before", "spring.security.filterchains.context.holder.after", "spring.security.filterchains.context.holder.before", "spring.security.filterchains.context.servlet.after", "spring.security.filterchains.context.servlet.before", "spring.security.filterchains.header.after", "spring.security.filterchains.header.before", "spring.security.filterchains.logout.after", "spring.security.filterchains.logout.before", "spring.security.filterchains.requestcache.after", "spring.security.filterchains.requestcache.before", "spring.security.filterchains.session.urlencoding.after", "spring.security.filterchains.session.urlencoding.before", "spring.security.http.secured.requests", "spring.security.http.secured.requests.active", "system.cpu.count", "system.cpu.usage", "system.load.average.1m" ]
 }</code></pre>
 </div>
 </div>
@@ -1054,8 +1061,8 @@ Content-Length: 1437
         "id" : 1,
         "rate" : 10,
         "currency" : "USD",
-        "startDateTime" : "2025-11-10T21:36:48.754146289Z",
-        "endDateTime" : "2025-12-10T21:36:48.754153874Z"
+        "startDateTime" : "2025-11-18T21:42:04.871568229Z",
+        "endDateTime" : "2025-12-18T21:42:04.871577126Z"
       },
       "_links" : {
         "self" : {
@@ -1431,7 +1438,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 651
+Content-Length: 650
 
 {
   "id" : 1,
@@ -1442,8 +1449,8 @@ Content-Length: 651
     "id" : 1,
     "rate" : 10,
     "currency" : "USD",
-    "startDateTime" : "2025-11-10T21:36:48.733090849Z",
-    "endDateTime" : "2025-12-10T21:36:48.733130796Z"
+    "startDateTime" : "2025-11-18T21:42:04.844348506Z",
+    "endDateTime" : "2025-12-18T21:42:04.84437764Z"
   },
   "_links" : {
     "self" : {
@@ -1737,7 +1744,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 993
+Content-Length: 994
 
 {
   "_embedded" : {
@@ -1746,8 +1753,8 @@ Content-Length: 993
       "id" : 1,
       "rate" : 100,
       "currency" : "USD",
-      "startDateTime" : "2025-11-10T21:36:44.711827032Z",
-      "endDateTime" : "2025-12-10T21:36:44.711845476Z",
+      "startDateTime" : "2025-11-18T21:42:01.947232031Z",
+      "endDateTime" : "2025-12-18T21:42:01.947247951Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1761,8 +1768,8 @@ Content-Length: 993
       "id" : 2,
       "rate" : 100.5,
       "currency" : "USD",
-      "startDateTime" : "2025-12-10T21:36:44.711876905Z",
-      "endDateTime" : "2026-02-10T21:36:44.71188523Z",
+      "startDateTime" : "2025-12-18T21:42:01.947277266Z",
+      "endDateTime" : "2026-02-18T21:42:01.947286272Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/2"
@@ -1800,8 +1807,8 @@ Host: localhost:8080
 {
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-10T21:36:44.627546015Z",
-  "endDateTime" : "2025-12-10T21:36:44.627563388Z"
+  "startDateTime" : "2025-11-18T21:42:01.840674491Z",
+  "endDateTime" : "2025-12-18T21:42:01.840691943Z"
 }</code></pre>
 </div>
 </div>
@@ -1983,8 +1990,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-10T21:36:44.627546015Z",
-  "endDateTime" : "2025-12-10T21:36:44.627563388Z",
+  "startDateTime" : "2025-11-18T21:42:01.840674491Z",
+  "endDateTime" : "2025-12-18T21:42:01.840691943Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2165,8 +2172,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-10T21:36:44.566438915Z",
-  "endDateTime" : "2025-12-10T21:36:44.566482005Z",
+  "startDateTime" : "2025-11-18T21:42:01.755555018Z",
+  "endDateTime" : "2025-12-18T21:42:01.755594181Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2195,7 +2202,7 @@ Content-Length: 57
 Host: localhost:8080
 
 {
-  "newEndDateTime" : "2025-12-10T21:36:44.598704659Z"
+  "newEndDateTime" : "2025-12-18T21:42:01.807105811Z"
 }</code></pre>
 </div>
 </div>
@@ -2344,8 +2351,8 @@ Content-Length: 363
   "id" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-10T21:36:44.598733844Z",
-  "endDateTime" : "2025-12-10T21:36:44.598704659Z",
+  "startDateTime" : "2025-11-18T21:42:01.807130286Z",
+  "endDateTime" : "2025-12-18T21:42:01.807105811Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2608,15 +2615,15 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 2435
+Content-Length: 2433
 
 {
   "_embedded" : {
     "invoices" : [ {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-11-10T21:36:50.145767313Z",
-      "endDate" : "2025-12-10T21:36:50.145774576Z",
+      "startDate" : "2025-11-18T21:42:06.18730193Z",
+      "endDate" : "2025-12-18T21:42:06.187308863Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2635,8 +2642,8 @@ Content-Length: 2435
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-10-10T21:36:50.145794183Z",
-      "endDate" : "2025-11-10T21:36:50.145798791Z",
+      "startDate" : "2025-10-18T21:42:06.187327247Z",
+      "endDate" : "2025-11-18T21:42:06.187332267Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2655,8 +2662,8 @@ Content-Length: 2435
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-09-10T21:36:50.145804882Z",
-      "endDate" : "2025-10-10T21:36:50.145807978Z",
+      "startDate" : "2025-09-18T21:42:06.18733946Z",
+      "endDate" : "2025-10-18T21:42:06.187343057Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2904,8 +2911,8 @@ Content-Length: 518
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-10T21:36:50.073002473Z",
-  "endDate" : "2025-12-10T21:36:50.073009095Z",
+  "startDate" : "2025-11-18T21:42:06.119090289Z",
+  "endDate" : "2025-12-18T21:42:06.119097002Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3120,8 +3127,8 @@ Content-Length: 518
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-10T21:36:50.183168154Z",
-  "endDate" : "2025-12-10T21:36:50.183174025Z",
+  "startDate" : "2025-11-18T21:42:06.223821773Z",
+  "endDate" : "2025-12-18T21:42:06.223826582Z",
   "numberOfWorkedDays" : 20,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3324,13 +3331,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 516
+Content-Length: 518
 
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-10T21:36:50.020797736Z",
-  "endDate" : "2025-12-10T21:36:50.0208049Z",
+  "startDate" : "2025-11-18T21:42:06.053166119Z",
+  "endDate" : "2025-12-18T21:42:06.053172812Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3544,8 +3551,8 @@ Content-Length: 594
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-10T21:36:49.402974528Z",
-  "endDate" : "2025-12-10T21:36:49.402982021Z",
+  "startDate" : "2025-11-18T21:42:05.567151007Z",
+  "endDate" : "2025-12-18T21:42:05.567159312Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3762,13 +3769,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 592
+Content-Length: 594
 
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-10T21:36:49.484418057Z",
-  "endDate" : "2025-12-10T21:36:49.4844248Z",
+  "startDate" : "2025-11-18T21:42:05.647967123Z",
+  "endDate" : "2025-12-18T21:42:05.647974738Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3798,7 +3805,7 @@ Content-Length: 592
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-10 21:36:17 UTC
+Last updated 2025-11-18 21:41:13 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
