@@ -1,5 +1,6 @@
 server:
   port: 9000
+  shutdown: graceful
 
 spring:
   profiles:
@@ -31,7 +32,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,metrics
+        include: health,metrics,info,beans,conditions,configprops,env,loggers,mappings
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
