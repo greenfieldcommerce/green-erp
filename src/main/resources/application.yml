@@ -3,6 +3,12 @@ server:
   shutdown: graceful
 
 spring:
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
   profiles:
     default: local
 
