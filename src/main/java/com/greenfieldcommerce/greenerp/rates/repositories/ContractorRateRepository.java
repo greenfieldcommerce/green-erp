@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 
@@ -19,8 +20,8 @@ public interface ContractorRateRepository extends ListCrudRepository<ContractorR
 	List<ContractorRate> findByContractorIdOrderByEndDateTimeDesc(final Long contractorId);
 	Optional<ContractorRate> findByIdAndContractorId(final Long id, final Long contractorId);
 
-	@Query("SELECT r FROM #{#entityName} r WHERE r.contractor = :contractor AND (:excludeId IS NULL OR r.id <> :excludeId) AND r.startDateTime <= :endDateTime AND :startDateTime <= r.endDateTime")
-	List<ContractorRate> findRatesForContractorIdOverlappingWithPeriod(Contractor contractor, ZonedDateTime startDateTime, ZonedDateTime endDateTime, @Nullable Long excludeId);
+	@Query("SELECT r FROM #{#entityName} r WHERE r.contractor = :contractor AND r.client = :client AND (:excludeId IS NULL OR r.id <> :excludeId) AND r.startDateTime <= :endDateTime AND :startDateTime <= r.endDateTime")
+	List<ContractorRate> findRatesForContractorIdOverlappingWithPeriod(Contractor contractor, Client client, ZonedDateTime startDateTime, ZonedDateTime endDateTime, @Nullable Long excludeId);
 
 	void deleteByContractorIdAndId(Long contractorId, Long id);
 }

@@ -264,7 +264,7 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 
 	private static ContractorRecord buildFullContractorExample()
 	{
-		final ContractorRateRecord rate = new ContractorRateRecord(1L, 1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ContractorRateRecord rate = new ContractorRateRecord(1L, 1L, 1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 		return new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
 	}
 

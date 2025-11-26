@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.rates.records.ContractorRateRecord;
@@ -21,8 +22,9 @@ import java.util.Currency;
 class ContractorRateToRecordMapperTest
 {
 
-	public static final long CONTRACTOR_ID = 1L;
-	private static final Long ID = 1L;
+	private static final Long CONTRACTOR_ID = 1L;
+	private static final Long ID = 2L;
+	private static final Long CLIENT_ID = 3L;
 	private static final BigDecimal RATE = BigDecimal.valueOf(300);
 	private static final Currency CURRENCY = Currency.getInstance("USD");
 	private static final ZonedDateTime START = ZonedDateTime.now();
@@ -51,10 +53,13 @@ class ContractorRateToRecordMapperTest
 	{
 		ContractorRate rate = mock(ContractorRate.class);
 		Contractor contractor = mock(Contractor.class);
+		Client client = mock(Client.class);
 		when(contractor.getId()).thenReturn(CONTRACTOR_ID);
+		when(client.getId()).thenReturn(CLIENT_ID);
 
-		when(rate.getContractor()).thenReturn(contractor);
 		when(rate.getId()).thenReturn(ID);
+		when(rate.getContractor()).thenReturn(contractor);
+		when(rate.getClient()).thenReturn(client);
 		when(rate.getRate()).thenReturn(RATE);
 		when(rate.getCurrency()).thenReturn(CURRENCY);
 		when(rate.getStartDateTime()).thenReturn(START);

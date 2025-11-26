@@ -7,4 +7,4 @@ import java.util.Currency;
 import org.springframework.hateoas.server.core.Relation;
 
 @Relation(collectionRelation = "rates")
-public record ContractorRateRecord(Long contractorId, Long id, BigDecimal rate, Currency currency, ZonedDateTime startDateTime, ZonedDateTime endDateTime) { }
+public record ContractorRateRecord(Long id, Long contractorId, Long clientId, BigDecimal rate, Currency currency, ZonedDateTime startDateTime, ZonedDateTime endDateTime) { }

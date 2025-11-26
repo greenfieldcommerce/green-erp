@@ -13,7 +13,7 @@ public interface ContractorRateService extends EntityService<ContractorRate, Lon
 {
 	List<ContractorRateRecord> findRatesForContractor(Long contractorId);
 	ContractorRateRecord findByIdAndContractorId(Long rateId, Long contractorId);
-	ContractorRateRecord create(Long contractorId, CreateContractorRateRecord record);
+	ContractorRateRecord create(Long contractorId, final CreateContractorRateRecord record);
 	ContractorRateRecord changeEndDateTime(Long contractorId, Long rateId, ZonedDateTime newEndDateTime);
 	ContractorRate findCurrentRateForContractor(Contractor contractor);
 	void delete(Long contractorId, Long rateId);

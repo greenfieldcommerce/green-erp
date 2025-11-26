@@ -23,7 +23,7 @@ import com.greenfieldcommerce.greenerp.contractors.records.CreateContractorRecor
 import com.greenfieldcommerce.greenerp.contractors.repositories.ContractorRepository;
 
 @ExtendWith(MockitoExtension.class)
-class ContractorServiceImplTest
+public class ContractorServiceImplTest
 {
 	private static final String EMAIL = "email";
 	private static final String NAME = "name";

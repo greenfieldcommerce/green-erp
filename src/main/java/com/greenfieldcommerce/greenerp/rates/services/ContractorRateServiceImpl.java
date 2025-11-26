@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
+import com.greenfieldcommerce.greenerp.clients.services.ClientService;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
@@ -37,13 +39,15 @@ import jakarta.transaction.Transactional;
 public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate, Long> implements ContractorRateService
 {
 	private final ContractorService contractorService;
+	private final ClientService clientService;
 	private final ContractorRateRepository contractorRateRepository;
 	private final Mapper<ContractorRate, ContractorRateRecord> contractorRateToRecordMapper;
 
-	public ContractorRateServiceImpl(final ContractorService contractorService, final ContractorRateRepository contractorRateRepository, final Mapper<ContractorRate, ContractorRateRecord> contractorRateToRecordMapper)
+	public ContractorRateServiceImpl(final ContractorService contractorService, final ClientService clientService, final ContractorRateRepository contractorRateRepository, final Mapper<ContractorRate, ContractorRateRecord> contractorRateToRecordMapper)
 	{
 		super(contractorRateRepository, ContractorRate.class);
 		this.contractorService = contractorService;
+		this.clientService = clientService;
 		this.contractorRateRepository = contractorRateRepository;
 		this.contractorRateToRecordMapper = contractorRateToRecordMapper;
 	}
@@ -82,7 +86,7 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 	 * rate periods for the same contractor before creating the rate.
 	 *
 	 * @param contractorId the ID of the contractor
-	 * @param record the record containing rate details (rate amount, currency, start/end dates)
+	 * @param record the record containing rate details (clientId, rate amount, currency, start/end dates)
 	 * @return a {@code ContractorRateRecord} representing the created rate
 	 * @throws EntityNotFoundException if the contractor with the given ID is not found
 	 * @throws OverlappingContractorRateException if the rate period overlaps with existing rates
@@ -91,9 +95,10 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 	public ContractorRateRecord create(final Long contractorId, final CreateContractorRateRecord record)
 	{
 		final Contractor contractor = contractorService.findEntityById(contractorId);
+		final Client client = clientService.findEntityById(record.clientId());
 
-		validateIfNotOverlapping(contractor, record.startDateTime(), record.endDateTime(), null);
-		final ContractorRate rate = ContractorRate.create(contractor, record.rate(), record.currency(), record.startDateTime(), record.endDateTime());
+		validateIfNotOverlapping(contractor, client, record.startDateTime(), record.endDateTime(), null);
+		final ContractorRate rate = ContractorRate.create(contractor, client, record.rate(), record.currency(), record.startDateTime(), record.endDateTime());
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(rate));
 	}
 
@@ -114,7 +119,7 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 	public ContractorRateRecord changeEndDateTime(final Long contractorId, final Long rateId, final ZonedDateTime newEndDateTimeRecord)
 	{
 		final ContractorRate contractorRate = internalFindByIdAndContractorId(rateId, contractorId);
-		validateIfNotOverlapping(contractorRate.getContractor(), contractorRate.getStartDateTime(), newEndDateTimeRecord, contractorRate.getId());
+		validateIfNotOverlapping(contractorRate.getContractor(), contractorRate.getClient(), contractorRate.getStartDateTime(), newEndDateTimeRecord, contractorRate.getId());
 
 		contractorRate.setEndDateTime(newEndDateTimeRecord);
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(contractorRate));
@@ -160,17 +165,18 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 	}
 
 	/**
-	 * Validates that a rate period does not overlap with existing rate periods for the contractor.
+	 * Validates that a rate period does not overlap with existing rate periods for the contractor, for the same client
 	 *
 	 * @param contractor the contractor entity
+	 * @param client the client associated with the rate
 	 * @param startDateTime the start date/time of the rate period
 	 * @param endDateTime the end date/time of the rate period
 	 * @param excludeId optional rate ID to exclude from the overlap check (used when updating)
 	 * @throws OverlappingContractorRateException if overlapping rates are found
 	 */
-	private void validateIfNotOverlapping(final Contractor contractor, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime, @Nullable final Long excludeId)
+	private void validateIfNotOverlapping(final Contractor contractor, final Client client, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime, @Nullable final Long excludeId)
 	{
-		final List<ContractorRate> overlapping = contractorRateRepository.findRatesForContractorIdOverlappingWithPeriod(contractor, startDateTime, endDateTime, excludeId);
+		final List<ContractorRate> overlapping = contractorRateRepository.findRatesForContractorIdOverlappingWithPeriod(contractor, client, startDateTime, endDateTime, excludeId);
 		if (CollectionUtils.isNotEmpty(overlapping))
 			throw new OverlappingContractorRateException("OVERLAPPING_RATE", "Overlapping contractor rates are not allowed");
 	}

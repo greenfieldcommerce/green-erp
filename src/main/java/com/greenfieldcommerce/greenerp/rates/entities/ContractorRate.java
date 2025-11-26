@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Currency;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 
 import jakarta.persistence.Column;
@@ -26,6 +27,10 @@ public class ContractorRate
 	@JoinColumn(name = "contractor_id", nullable = false)
 	private Contractor contractor;
 
+	@ManyToOne
+	@JoinColumn(name = "client_id", nullable = false)
+	private Client client;
+
 	@Column(nullable = false)
 	private BigDecimal rate;
 
@@ -43,18 +48,19 @@ public class ContractorRate
 
 	protected ContractorRate(){}
 
-	private ContractorRate(final Contractor contractor, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
+	private ContractorRate(final Contractor contractor, final Client client, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
 	{
 		this.contractor = contractor;
+		this.client = client;
 		this.rate = rate;
 		this.currency = currency;
 		this.startDateTime = startDateTime;
 		this.endDateTime = endDateTime;
 	}
 
-	public static ContractorRate create(final Contractor contractor, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
+	public static ContractorRate create(final Contractor contractor, final Client client, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
 	{
-		return new ContractorRate(contractor, rate, currency, startDateTime, endDateTime);
+		return new ContractorRate(contractor, client, rate, currency, startDateTime, endDateTime);
 	}
 
 	public boolean isActive()
@@ -81,6 +87,11 @@ public class ContractorRate
 	public Contractor getContractor()
 	{
 		return contractor;
+	}
+
+	public Client getClient()
+	{
+		return client;
 	}
 
 	public BigDecimal getRate()

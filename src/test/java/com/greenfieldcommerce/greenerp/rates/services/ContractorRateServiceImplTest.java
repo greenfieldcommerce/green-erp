@@ -25,6 +25,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
+import com.greenfieldcommerce.greenerp.clients.services.ClientService;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
@@ -45,6 +47,8 @@ public class ContractorRateServiceImplTest
 
 	@Mock
 	private ContractorService contractorService;
+	@Mock
+	private ClientService clientService;
 	@Mock
 	private ContractorRateRepository contractorRateRepository;
 	@Mock
@@ -126,13 +130,18 @@ public class ContractorRateServiceImplTest
 	public void shouldThrowOverlappingContractorRateExceptionWhenCreatingOverlappingRate()
 	{
 		final Contractor contractor = mock(Contractor.class);
+		final Client client = mock(Client.class);
+
 		final ContractorRate overlapping = mock(ContractorRate.class);
 		final CreateContractorRateRecord record = mock(CreateContractorRateRecord.class);
 
+		when(record.clientId()).thenReturn(VALID_RESOURCE_ID);
 		when(record.startDateTime()).thenReturn(ZonedDateTime.now());
 		when(record.endDateTime()).thenReturn(ZonedDateTime.now().plusMonths(1));
 		when(contractorService.findEntityById(eq(VALID_RESOURCE_ID))).thenReturn(contractor);
-		mockOverlappingLookup(contractor, record.startDateTime(), record.endDateTime(),null, List.of(overlapping));
+		when(clientService.findEntityById(eq(VALID_RESOURCE_ID))).thenReturn(client);
+
+		mockOverlappingLookup(contractor, client, record.startDateTime(), record.endDateTime(),null, List.of(overlapping));
 
 		assertThrows(OverlappingContractorRateException.class, () -> service.create(VALID_RESOURCE_ID, record));
 		verify(contractorRateRepository, never()).save(any(ContractorRate.class));
@@ -143,12 +152,15 @@ public class ContractorRateServiceImplTest
 	public void shouldCreateContractorRate()
 	{
 		final Contractor contractor = mock(Contractor.class);
+		final Client client = mock(Client.class);
 		final CreateContractorRateRecord record = mockRecord();
 		final ContractorRate saved = mock(ContractorRate.class);
 		final ContractorRateRecord savedRecord = mock(ContractorRateRecord.class);
 
+		when(record.clientId()).thenReturn(VALID_RESOURCE_ID);
 		when(contractorService.findEntityById(eq(VALID_RESOURCE_ID))).thenReturn(contractor);
-		mockOverlappingLookup(contractor, record.startDateTime(), record.endDateTime(),null, new ArrayList<>());
+		when(clientService.findEntityById(eq(VALID_RESOURCE_ID))).thenReturn(client);
+		mockOverlappingLookup(contractor, client, record.startDateTime(), record.endDateTime(),null, new ArrayList<>());
 		when(contractorRateRepository.save(argThat(matchesContractor(contractor, record)))).thenReturn(saved);
 		when(contractorRateToRecordMapper.map(eq(saved))).thenReturn(savedRecord);
 
@@ -156,6 +168,7 @@ public class ContractorRateServiceImplTest
 		verify(contractorRateRepository).save(any(ContractorRate.class));
 		verify(contractorRateRepository).findRatesForContractorIdOverlappingWithPeriod(
 			eq(contractor),
+			eq(client),
 			argThat(d -> d.toInstant().equals(record.startDateTime().toInstant())),
 			argThat(d -> d.toInstant().equals(record.endDateTime().toInstant())),
 			eq(null));
@@ -178,15 +191,17 @@ public class ContractorRateServiceImplTest
 	{
 		final ZonedDateTime now = ZonedDateTime.now();
 		final Contractor contractor = mock(Contractor.class);
+		final Client client = mock(Client.class);
 		final ContractorRate existing = mock(ContractorRate.class);
 		final ContractorRate overlapping = mock(ContractorRate.class);
 
 		when(existing.getContractor()).thenReturn(contractor);
+		when(existing.getClient()).thenReturn(client);
 		when(existing.getStartDateTime()).thenReturn(ZonedDateTime.now());
 		when(existing.getId()).thenReturn(VALID_RESOURCE_ID);
 
 		when(contractorRateRepository.findByIdAndContractorId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(existing));
-		mockOverlappingLookup(contractor, existing.getStartDateTime(), now, VALID_RESOURCE_ID, List.of(overlapping));
+		mockOverlappingLookup(contractor, client, existing.getStartDateTime(), now, VALID_RESOURCE_ID, List.of(overlapping));
 
 		assertThrows(OverlappingContractorRateException.class, () -> service.changeEndDateTime(VALID_RESOURCE_ID, VALID_RESOURCE_ID, now));
 		verify(contractorRateRepository, never()).save(any(ContractorRate.class));
@@ -198,16 +213,18 @@ public class ContractorRateServiceImplTest
 	{
 		final ZonedDateTime now = ZonedDateTime.now();
 		final Contractor contractor = mock(Contractor.class);
+		final Client client = mock(Client.class);
 		final ContractorRate existing = mock(ContractorRate.class);
 		final ContractorRate saved = mock(ContractorRate.class);
 		final ContractorRateRecord savedRecord = mock(ContractorRateRecord.class);
 
 		when(existing.getContractor()).thenReturn(contractor);
+		when(existing.getClient()).thenReturn(client);
 		when(existing.getStartDateTime()).thenReturn(ZonedDateTime.now());
 		when(existing.getId()).thenReturn(VALID_RESOURCE_ID);
 
 		when(contractorRateRepository.findByIdAndContractorId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID))).thenReturn(Optional.of(existing));
-		mockOverlappingLookup(contractor, existing.getStartDateTime(), now, VALID_RESOURCE_ID, new ArrayList<>());
+		mockOverlappingLookup(contractor, client, existing.getStartDateTime(), now, VALID_RESOURCE_ID, new ArrayList<>());
 		when(contractorRateRepository.save(existing)).thenReturn(saved);
 		when(contractorRateToRecordMapper.map(eq(saved))).thenReturn(savedRecord);
 
@@ -270,9 +287,9 @@ public class ContractorRateServiceImplTest
 		return record;
 	}
 
-	private void mockOverlappingLookup(final Contractor contractor, final ZonedDateTime start, final ZonedDateTime end, final Long excludedId, List<ContractorRate> expectedReturn)
+	private void mockOverlappingLookup(final Contractor contractor, final Client client, final ZonedDateTime start, final ZonedDateTime end, final Long excludedId, List<ContractorRate> expectedReturn)
 	{
-		when(contractorRateRepository.findRatesForContractorIdOverlappingWithPeriod(eq(contractor), argThat(d -> d.toInstant().equals(start.toInstant())), argThat(d -> d.toInstant().equals(end.toInstant())), eq(excludedId))).thenReturn(expectedReturn);
+		when(contractorRateRepository.findRatesForContractorIdOverlappingWithPeriod(eq(contractor), eq(client), argThat(d -> d.toInstant().equals(start.toInstant())), argThat(d -> d.toInstant().equals(end.toInstant())), eq(excludedId))).thenReturn(expectedReturn);
 	}
 
 }
