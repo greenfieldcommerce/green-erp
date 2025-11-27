@@ -2,73 +2,67 @@ package com.greenfieldcommerce.greenerp.contractors.batch;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.validator.BeanValidatingItemProcessor;
 import org.springframework.batch.item.validator.ValidatingItemProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.greenfieldcommerce.greenerp.batch.AbstractBatchConfiguration;
+import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.CreateContractorRecord;
 import com.greenfieldcommerce.greenerp.contractors.services.ContractorService;
 
 @Configuration
-public class ContractorsBatchConfiguration
+public class ContractorsBatchConfiguration extends AbstractBatchConfiguration<CreateContractorRecord, ContractorRecord>
 {
 
 	private final ContractorService contractorService;
 
 	public ContractorsBatchConfiguration(final ContractorService contractorService)
 	{
+		super("data-load/contractors.csv", new String[] { "email", "name" }, "readContractors");
 		this.contractorService = contractorService;
 	}
 
 	@Bean
-	public FlatFileItemReader<CreateContractorRecord> itemReader()
+	public FlatFileItemReader<CreateContractorRecord> contractorItemReader()
 	{
-		return new FlatFileItemReaderBuilder<CreateContractorRecord>()
-			.name("contractorReader")
-			.resource(new ClassPathResource("data-load/contractors.csv"))
-			.delimited().delimiter(",").names("email", "name")
-			.linesToSkip(1)
-			.fieldSetMapper(fieldSet -> new CreateContractorRecord(fieldSet.readString("email"), fieldSet.readString("name")))
-			.build();
+		return super.itemReader();
 	}
 
 	@Bean
-	public BeanValidatingItemProcessor<CreateContractorRecord> validatingProcessor() {
-		BeanValidatingItemProcessor<CreateContractorRecord> processor = new BeanValidatingItemProcessor<>();
-		processor.setFilter(false);
-		return processor;
+	public BeanValidatingItemProcessor<CreateContractorRecord> contractorValidatingProcessor()
+	{
+		return super.validatingProcessor();
 	}
 
 	@Bean
-	public ItemWriter<CreateContractorRecord> itemWriter()
+	public ItemWriter<CreateContractorRecord> contractorItemWriter()
 	{
-		return items -> items.forEach(contractorService::create);
+		return super.itemWriter(contractorService::create);
 	}
 
 	@Bean
-	public Step readFromCsv(JobRepository repository, PlatformTransactionManager transactionManager, FlatFileItemReader<CreateContractorRecord> itemReader, ValidatingItemProcessor<CreateContractorRecord> validatingProcessor, ItemWriter<CreateContractorRecord> itemWriter)
+	public Step readContractorFromCsv(JobRepository repository, PlatformTransactionManager transactionManager, FlatFileItemReader<CreateContractorRecord> contractorItemReader, ValidatingItemProcessor<CreateContractorRecord> contractorValidatingProcessor, ItemWriter<CreateContractorRecord> contractorItemWriter)
 	{
-		return new StepBuilder("readContractorFromCsv", repository)
-			.<CreateContractorRecord, CreateContractorRecord>chunk(1, transactionManager)
-			.reader(itemReader)
-			.processor(validatingProcessor)
-			.writer(itemWriter)
-			.build();
+		return super.readFromCsv(repository, transactionManager, contractorItemReader, contractorValidatingProcessor, contractorItemWriter);
 	}
 
 	@Bean
-	public Job loadContractorsFromCsv(JobRepository repository, Step readFromCsV)
+	public Job loadContractorsFromCsv(JobRepository repository, Step readContractorFromCsv)
 	{
-		return new JobBuilder("readContractors", repository).start(readFromCsV).build();
+		return super.loadFromCsv(repository, readContractorFromCsv);
+	}
+
+	@Override
+	protected FieldSetMapper<CreateContractorRecord> fieldSetMapper()
+	{
+		return fieldSet -> new CreateContractorRecord(fieldSet.readString("email"), fieldSet.readString("name"));
 	}
 
 }
