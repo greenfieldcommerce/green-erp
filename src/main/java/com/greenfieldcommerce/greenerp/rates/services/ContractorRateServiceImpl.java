@@ -98,7 +98,8 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 		final Client client = clientService.findEntityById(record.clientId());
 
 		validateIfNotOverlapping(contractor, client, record.startDateTime(), record.endDateTime(), null);
-		final ContractorRate rate = ContractorRate.create(contractor, client, record.rate(), record.currency(), record.startDateTime(), record.endDateTime());
+		final ContractorRate rate =
+			ContractorRate.create(contractor, client, record.rate(), record.externalRate(), record.taxDeduction(), record.currency(), record.startDateTime(), record.endDateTime());
 		return contractorRateToRecordMapper.map(contractorRateRepository.save(rate));
 	}
 

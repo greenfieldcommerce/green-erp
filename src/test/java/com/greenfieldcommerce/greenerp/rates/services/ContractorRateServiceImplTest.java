@@ -153,24 +153,23 @@ public class ContractorRateServiceImplTest
 	{
 		final Contractor contractor = mock(Contractor.class);
 		final Client client = mock(Client.class);
-		final CreateContractorRateRecord record = mockRecord();
+		final CreateContractorRateRecord createRateData = validCreateRateRecord();
 		final ContractorRate saved = mock(ContractorRate.class);
 		final ContractorRateRecord savedRecord = mock(ContractorRateRecord.class);
 
-		when(record.clientId()).thenReturn(VALID_RESOURCE_ID);
 		when(contractorService.findEntityById(eq(VALID_RESOURCE_ID))).thenReturn(contractor);
 		when(clientService.findEntityById(eq(VALID_RESOURCE_ID))).thenReturn(client);
-		mockOverlappingLookup(contractor, client, record.startDateTime(), record.endDateTime(),null, new ArrayList<>());
-		when(contractorRateRepository.save(argThat(matchesContractor(contractor, record)))).thenReturn(saved);
+		mockOverlappingLookup(contractor, client, createRateData.startDateTime(), createRateData.endDateTime(),null, new ArrayList<>());
+		when(contractorRateRepository.save(argThat(matchesContractor(contractor, createRateData)))).thenReturn(saved);
 		when(contractorRateToRecordMapper.map(eq(saved))).thenReturn(savedRecord);
 
-		final ContractorRateRecord result = service.create(VALID_RESOURCE_ID, record);
+		final ContractorRateRecord result = service.create(VALID_RESOURCE_ID, createRateData);
 		verify(contractorRateRepository).save(any(ContractorRate.class));
 		verify(contractorRateRepository).findRatesForContractorIdOverlappingWithPeriod(
 			eq(contractor),
 			eq(client),
-			argThat(d -> d.toInstant().equals(record.startDateTime().toInstant())),
-			argThat(d -> d.toInstant().equals(record.endDateTime().toInstant())),
+			argThat(d -> d.toInstant().equals(createRateData.startDateTime().toInstant())),
+			argThat(d -> d.toInstant().equals(createRateData.endDateTime().toInstant())),
 			eq(null));
 
 		assertEquals(savedRecord, result);
@@ -277,14 +276,9 @@ public class ContractorRateServiceImplTest
 		};
 	}
 
-	private CreateContractorRateRecord mockRecord()
+	private CreateContractorRateRecord validCreateRateRecord()
 	{
-		final CreateContractorRateRecord record = mock(CreateContractorRateRecord.class);
-		when(record.rate()).thenReturn(BigDecimal.valueOf(100));
-		when(record.currency()).thenReturn(Currency.getInstance("USD"));
-		when(record.startDateTime()).thenReturn(ZonedDateTime.now());
-		when(record.endDateTime()).thenReturn(ZonedDateTime.now().plusMonths(1));
-		return record;
+		return new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100.0), BigDecimal.valueOf(200.0), BigDecimal.valueOf(10.0), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 	}
 
 	private void mockOverlappingLookup(final Contractor contractor, final Client client, final ZonedDateTime start, final ZonedDateTime end, final Long excludedId, List<ContractorRate> expectedReturn)

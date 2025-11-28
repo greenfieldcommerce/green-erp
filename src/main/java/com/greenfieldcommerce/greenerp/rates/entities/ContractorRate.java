@@ -1,6 +1,7 @@
 package com.greenfieldcommerce.greenerp.rates.entities;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.util.Currency;
 
@@ -35,6 +36,18 @@ public class ContractorRate
 	private BigDecimal rate;
 
 	@Column(nullable = false)
+	private BigDecimal externalRate;
+
+	@Column(nullable = false)
+	private BigDecimal taxDeduction;
+
+	@Column(nullable = false)
+	private BigDecimal margin;
+
+	@Column(nullable = false)
+	private BigDecimal grossRate;
+
+	@Column(nullable = false)
 	private Currency currency;
 
 	@Column(nullable = false)
@@ -48,19 +61,31 @@ public class ContractorRate
 
 	protected ContractorRate(){}
 
-	private ContractorRate(final Contractor contractor, final Client client, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
+	private ContractorRate(final Contractor contractor, final Client client,
+		final BigDecimal rate, final BigDecimal externalRate, final BigDecimal taxDeduction, final BigDecimal margin, final BigDecimal grossRate,
+		final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
 	{
 		this.contractor = contractor;
 		this.client = client;
 		this.rate = rate;
+		this.externalRate = externalRate;
+		this.taxDeduction = taxDeduction;
+		this.margin = margin;
+		this.grossRate = grossRate;
 		this.currency = currency;
 		this.startDateTime = startDateTime;
 		this.endDateTime = endDateTime;
 	}
 
-	public static ContractorRate create(final Contractor contractor, final Client client, final BigDecimal rate, final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
+	public static ContractorRate create(final Contractor contractor, final Client client,
+		final BigDecimal rate, final BigDecimal externalRate, final BigDecimal taxDeduction,
+		final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
 	{
-		return new ContractorRate(contractor, client, rate, currency, startDateTime, endDateTime);
+		final BigDecimal divisor = BigDecimal.ONE.divide(taxDeduction.divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP), RoundingMode.HALF_UP);
+		final BigDecimal grossRate = rate.divide(divisor, RoundingMode.HALF_UP);
+		final BigDecimal margin = BigDecimal.valueOf(100.0).multiply(BigDecimal.ONE.subtract(grossRate.divide(externalRate, RoundingMode.HALF_UP)));
+
+		return new ContractorRate(contractor, client, rate, externalRate, taxDeduction, margin, grossRate, currency, startDateTime, endDateTime);
 	}
 
 	public boolean isActive()

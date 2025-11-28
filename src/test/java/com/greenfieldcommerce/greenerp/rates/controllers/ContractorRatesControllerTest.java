@@ -138,6 +138,8 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 				requestFields(
 					fieldWithPath("clientId").description("Id of the client to which this rate is associated"),
 					fieldWithPath("rate").description("The contractor's daily rate"),
+					fieldWithPath("externalRate").description("The contractor's daily rate charged to clients"),
+					fieldWithPath("taxDeduction").description("Percentage of tax deduction to be deducted from the external rate"),
 					fieldWithPath("currency").description("The rate currency"),
 					fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
 					fieldWithPath("endDateTime").description("Date and time when the rate stops being valid ('valid until')")
@@ -249,12 +251,18 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 	private Stream<CreateContractorRateRecord> invalidCreateContractorRateRecordOptions()
 	{
-		return Stream.of(new CreateContractorRateRecord(null, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
-			new CreateContractorRateRecord(VALID_RESOURCE_ID, null, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
-			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), null, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
-			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), Currency.getInstance("USD"), null, ZonedDateTime.now().plusMonths(1)),
-			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), null),
-			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(-100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)));
+		return Stream.of(
+			new CreateContractorRateRecord(null, BigDecimal.valueOf(100), BigDecimal.valueOf(100), BigDecimal.valueOf(25), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, null, BigDecimal.valueOf(100), BigDecimal.valueOf(25), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.ZERO, BigDecimal.valueOf(100), BigDecimal.valueOf(25), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), null, BigDecimal.valueOf(25), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), BigDecimal.ZERO, BigDecimal.valueOf(25), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), BigDecimal.valueOf(100), null, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), BigDecimal.valueOf(100), BigDecimal.ZERO, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), BigDecimal.valueOf(100), BigDecimal.valueOf(25),null, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), BigDecimal.valueOf(100), BigDecimal.valueOf(25), Currency.getInstance("USD"), null, ZonedDateTime.now().plusMonths(1)),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), BigDecimal.valueOf(100), BigDecimal.valueOf(25), Currency.getInstance("USD"), ZonedDateTime.now(), null),
+			new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(-100), BigDecimal.valueOf(100), BigDecimal.valueOf(25), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1)));
 	}
 
 	private MockHttpServletRequestBuilder getAllContractorRatesRequest(Long contractorId)
@@ -284,7 +292,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 	private CreateContractorRateRecord buildValidContractorRate()
 	{
-		return new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		return new CreateContractorRateRecord(VALID_RESOURCE_ID, BigDecimal.valueOf(100), BigDecimal.valueOf(200), BigDecimal.valueOf(10),Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 	}
 
 	private static ContractorRateRecord buildExpectedSuccessResult(final CreateContractorRateRecord createContractorRateRecord)
