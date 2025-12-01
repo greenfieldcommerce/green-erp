@@ -81,8 +81,9 @@ public class ContractorRate
 		final BigDecimal rate, final BigDecimal externalRate, final BigDecimal taxDeduction,
 		final Currency currency, final ZonedDateTime startDateTime, final ZonedDateTime endDateTime)
 	{
-		final BigDecimal divisor = BigDecimal.ONE.divide(taxDeduction.divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP), RoundingMode.HALF_UP);
+		final BigDecimal divisor = BigDecimal.ONE.subtract(taxDeduction.divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP));
 		final BigDecimal grossRate = rate.divide(divisor, RoundingMode.HALF_UP);
+
 		final BigDecimal margin = BigDecimal.valueOf(100.0).multiply(BigDecimal.ONE.subtract(grossRate.divide(externalRate, RoundingMode.HALF_UP)));
 
 		return new ContractorRate(contractor, client, rate, externalRate, taxDeduction, margin, grossRate, currency, startDateTime, endDateTime);

@@ -14,6 +14,5 @@ public record CreateContractorRateRecord(
 	@DecimalMin(value = "1") @NotNull BigDecimal taxDeduction,
 	@NotNull Currency currency,
 	@NotNull ZonedDateTime startDateTime,
-	@NotNull ZonedDateTime endDateTime)
-{
+	@NotNull ZonedDateTime endDateTime) {
 }

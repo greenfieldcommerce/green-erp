@@ -26,16 +26,18 @@ public class BatchController
 	private final JobLauncher jobLauncher;
 	private final Job loadContractorsFromCsv;
 	private final Job loadClientsFromCsv;
+	private final Job loadContractorRatesFromCsv;
 
 	private final Map<String, Job> jobs;
 
-	public BatchController(final JobLauncher jobLauncher, final Job loadContractorsFromCsv, final Job loadClientsFromCsv)
+	public BatchController(final JobLauncher jobLauncher, final Job loadContractorsFromCsv, final Job loadClientsFromCsv, final Job loadContractorRatesFromCsv)
 	{
 		this.jobLauncher = jobLauncher;
 		this.loadContractorsFromCsv = loadContractorsFromCsv;
 		this.loadClientsFromCsv = loadClientsFromCsv;
+		this.loadContractorRatesFromCsv = loadContractorRatesFromCsv;
 
-		jobs = Map.of("clients", loadClientsFromCsv, "contractors", loadContractorsFromCsv);
+		jobs = Map.of("clients", loadClientsFromCsv, "contractors", loadContractorsFromCsv, "rates", loadContractorRatesFromCsv);
 	}
 
 	@PostMapping("/{jobName}")
