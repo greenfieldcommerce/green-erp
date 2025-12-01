@@ -807,7 +807,7 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "timestamp" : "2025-11-27T00:35:55.509599982Z",
+  "timestamp" : "2025-12-01T00:29:27.439829197Z",
   "status" : 422,
   "error" : "Unprocessable Entity",
   "code" : "VALIDATION_ERROR",
@@ -866,7 +866,7 @@ Content-Length: 761
       "status" : "UP",
       "details" : {
         "total" : 76887154688,
-        "free" : 19867492352,
+        "free" : 19867316224,
         "threshold" : 10485760,
         "path" : "/home/runner/work/green-erp/green-erp/.",
         "exists" : true
@@ -1062,8 +1062,8 @@ Content-Length: 1461
         "clientId" : 1,
         "rate" : 10,
         "currency" : "USD",
-        "startDateTime" : "2025-11-27T00:36:05.141561758Z",
-        "endDateTime" : "2025-12-27T00:36:05.141570013Z"
+        "startDateTime" : "2025-12-01T00:29:37.867487328Z",
+        "endDateTime" : "2026-01-01T00:29:37.867495222Z"
       },
       "_links" : {
         "self" : {
@@ -1451,8 +1451,8 @@ Content-Length: 671
     "clientId" : 1,
     "rate" : 10,
     "currency" : "USD",
-    "startDateTime" : "2025-11-27T00:36:05.121258523Z",
-    "endDateTime" : "2025-12-27T00:36:05.121312524Z"
+    "startDateTime" : "2025-12-01T00:29:37.848805683Z",
+    "endDateTime" : "2026-01-01T00:29:37.848812527Z"
   },
   "_links" : {
     "self" : {
@@ -1756,8 +1756,8 @@ Content-Length: 1038
       "clientId" : 1,
       "rate" : 100,
       "currency" : "USD",
-      "startDateTime" : "2025-11-27T00:36:01.830012744Z",
-      "endDateTime" : "2025-12-27T00:36:01.830029235Z",
+      "startDateTime" : "2025-12-01T00:29:34.016944782Z",
+      "endDateTime" : "2026-01-01T00:29:34.016972036Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1772,8 +1772,8 @@ Content-Length: 1038
       "clientId" : 1,
       "rate" : 100.5,
       "currency" : "USD",
-      "startDateTime" : "2025-12-27T00:36:01.830057537Z",
-      "endDateTime" : "2026-02-27T00:36:01.830065562Z",
+      "startDateTime" : "2026-01-01T00:29:34.017001982Z",
+      "endDateTime" : "2026-03-01T00:29:34.017009155Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/2"
@@ -1805,15 +1805,17 @@ Content-Length: 1038
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /contractors/1/rates HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 164
+Content-Length: 210
 Host: localhost:8080
 
 {
   "clientId" : 1,
   "rate" : 100,
+  "externalRate" : 200,
+  "taxDeduction" : 10,
   "currency" : "USD",
-  "startDateTime" : "2025-11-27T00:36:01.752816228Z",
-  "endDateTime" : "2025-12-27T00:36:01.752831075Z"
+  "startDateTime" : "2025-12-01T00:29:33.93685118Z",
+  "endDateTime" : "2026-01-01T00:29:33.936874948Z"
 }</code></pre>
 </div>
 </div>
@@ -1886,6 +1888,16 @@ Host: localhost:8080
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rate</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s daily rate</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>externalRate</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The contractor&#8217;s daily rate charged to clients</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>taxDeduction</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Percentage of tax deduction to be deducted from the external rate</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>currency</code></p></td>
@@ -1998,7 +2010,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 381
+Content-Length: 380
 
 {
   "id" : 1,
@@ -2006,8 +2018,8 @@ Content-Length: 381
   "clientId" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-27T00:36:01.752816228Z",
-  "endDateTime" : "2025-12-27T00:36:01.752831075Z",
+  "startDateTime" : "2025-12-01T00:29:33.93685118Z",
+  "endDateTime" : "2026-01-01T00:29:33.936874948Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2194,8 +2206,8 @@ Content-Length: 381
   "clientId" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-27T00:36:01.696198701Z",
-  "endDateTime" : "2025-12-27T00:36:01.696216424Z",
+  "startDateTime" : "2025-12-01T00:29:33.874639711Z",
+  "endDateTime" : "2026-01-01T00:29:33.874674271Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2224,7 +2236,7 @@ Content-Length: 57
 Host: localhost:8080
 
 {
-  "newEndDateTime" : "2025-12-27T00:36:01.728315563Z"
+  "newEndDateTime" : "2026-01-01T00:29:33.909370852Z"
 }</code></pre>
 </div>
 </div>
@@ -2379,8 +2391,8 @@ Content-Length: 381
   "clientId" : 1,
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2025-11-27T00:36:01.728350138Z",
-  "endDateTime" : "2025-12-27T00:36:01.728315563Z",
+  "startDateTime" : "2025-12-01T00:29:33.909400364Z",
+  "endDateTime" : "2026-01-01T00:29:33.909370852Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2643,15 +2655,15 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 2434
+Content-Length: 2435
 
 {
   "_embedded" : {
     "invoices" : [ {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-11-27T00:36:06.590185525Z",
-      "endDate" : "2025-12-27T00:36:06.59019361Z",
+      "startDate" : "2025-12-01T00:29:39.279078142Z",
+      "endDate" : "2026-01-01T00:29:39.279084443Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2670,8 +2682,8 @@ Content-Length: 2434
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-10-27T00:36:06.590216753Z",
-      "endDate" : "2025-11-27T00:36:06.590222644Z",
+      "startDate" : "2025-11-01T00:29:39.279103875Z",
+      "endDate" : "2025-12-01T00:29:39.279108657Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2690,8 +2702,8 @@ Content-Length: 2434
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-09-27T00:36:06.590230729Z",
-      "endDate" : "2025-10-27T00:36:06.590234696Z",
+      "startDate" : "2025-10-01T00:29:39.279129282Z",
+      "endDate" : "2025-11-01T00:29:39.279132193Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2934,13 +2946,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 517
+Content-Length: 518
 
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-27T00:36:06.52291114Z",
-  "endDate" : "2025-12-27T00:36:06.522917953Z",
+  "startDate" : "2025-12-01T00:29:39.212479547Z",
+  "endDate" : "2026-01-01T00:29:39.212484584Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3155,8 +3167,8 @@ Content-Length: 518
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-27T00:36:06.635619329Z",
-  "endDate" : "2025-12-27T00:36:06.635623957Z",
+  "startDate" : "2025-12-01T00:29:39.317423664Z",
+  "endDate" : "2026-01-01T00:29:39.317430042Z",
   "numberOfWorkedDays" : 20,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3364,8 +3376,8 @@ Content-Length: 518
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-27T00:36:06.468192544Z",
-  "endDate" : "2025-12-27T00:36:06.468200178Z",
+  "startDate" : "2025-12-01T00:29:39.165666094Z",
+  "endDate" : "2026-01-01T00:29:39.165672655Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3579,8 +3591,8 @@ Content-Length: 593
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-27T00:36:05.923354735Z",
-  "endDate" : "2025-12-27T00:36:05.92336322Z",
+  "startDate" : "2025-12-01T00:29:38.62216837Z",
+  "endDate" : "2026-01-01T00:29:38.622176217Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3797,13 +3809,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 593
+Content-Length: 594
 
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2025-11-27T00:36:06.01018822Z",
-  "endDate" : "2025-12-27T00:36:06.010196526Z",
+  "startDate" : "2025-12-01T00:29:38.707018883Z",
+  "endDate" : "2026-01-01T00:29:38.707026358Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3833,7 +3845,7 @@ Content-Length: 593
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-27 00:35:39 UTC
+Last updated 2025-12-01 00:29:11 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
