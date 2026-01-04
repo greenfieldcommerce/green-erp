@@ -67,7 +67,7 @@ public class ContractorInvoice
 	{
 	}
 
-	private ContractorInvoice(ContractorRate rate, BigDecimal numberOfWorkedDays)
+	private ContractorInvoice(ContractorRate rate, final ZonedDateTime startDate, final ZonedDateTime endDate, BigDecimal numberOfWorkedDays)
 	{
 		this.rate = rate;
 		this.contractor = rate.getContractor();
@@ -76,8 +76,8 @@ public class ContractorInvoice
 
 		this.status = InvoiceStatus.OPEN;
 
-		this.startDate = ZonedDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).with(LocalTime.MIDNIGHT);
-		this.endDate = startDate.plusMonths(1).minusSeconds(1);
+		this.startDate = startDate;
+		this.endDate = endDate;
 
 		this.numberOfWorkedDays = numberOfWorkedDays;
 
@@ -86,7 +86,16 @@ public class ContractorInvoice
 
 	public static ContractorInvoice create(@NotNull ContractorRate rate, @NotNull BigDecimal numberOfWorkedDays)
 	{
-		return new ContractorInvoice(rate, numberOfWorkedDays);
+
+		final ZonedDateTime startDate = ZonedDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).with(LocalTime.MIDNIGHT);
+		final ZonedDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
+
+		return new ContractorInvoice(rate, startDate, endDate, numberOfWorkedDays);
+	}
+
+	public static ContractorInvoice create(@NotNull ContractorRate rate, @NotNull ZonedDateTime startDate, @NotNull ZonedDateTime endDate, @NotNull BigDecimal numberOfWorkedDays)
+	{
+		return new ContractorInvoice(rate, startDate, endDate, numberOfWorkedDays);
 	}
 
 	public BigDecimal calculateTotalInvoiceAmount()

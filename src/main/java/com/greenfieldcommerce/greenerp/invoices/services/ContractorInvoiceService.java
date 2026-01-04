@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
+import com.greenfieldcommerce.greenerp.invoices.records.BatchContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.invoices.records.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.invoices.records.CreateInvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.services.EntityService;
@@ -14,6 +15,7 @@ public interface ContractorInvoiceService extends EntityService<ContractorInvoic
 {
 	Page<ContractorInvoiceRecord> findByContractor(Long contractorId, Pageable pageable);
 	ContractorInvoiceRecord create(Long contractorId, BigDecimal numberOfWorkedDays);
+	ContractorInvoiceRecord create(BatchContractorInvoiceRecord record);
 	ContractorInvoiceRecord findByContractorAndId(Long contractorId, Long invoiceId);
 	ContractorInvoiceRecord addExtraAmountLineToInvoice(Long contractorId, Long invoiceId, CreateInvoiceExtraAmountLineRecord extraAmountLineRecord);
 	ContractorInvoiceRecord patchInvoice(Long contractorId, Long invoiceId, BigDecimal numberOfWorkedDays);

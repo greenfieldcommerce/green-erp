@@ -7,9 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
+import com.greenfieldcommerce.greenerp.clients.services.ClientService;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.invoices.entities.InvoiceExtraAmountLine;
+import com.greenfieldcommerce.greenerp.invoices.records.BatchContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.invoices.records.CreateInvoiceExtraAmountLineRecord;
 import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorInvoiceException;
@@ -44,9 +47,11 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	private final ContractorRateService contractorRateService;
 	private final Mapper<ContractorInvoice, ContractorInvoiceRecord> contractorInvoiceToRecordMapper;
 	private final ContractorService contractorService;
+	private final ClientService clientService;
 	private final ContractorInvoiceMessagingService contractorInvoiceMessagingService;
 
 	public ContractorInvoiceServiceImpl(final ContractorInvoiceRepository contractorInvoiceRepository, final ContractorRateService contractorRateService, final Mapper<ContractorInvoice, ContractorInvoiceRecord> contractorInvoiceToRecordMapper, final ContractorService contractorService,
+		final ClientService clientService,
 		final ContractorInvoiceMessagingService contractorInvoiceMessagingService)
 	{
 		super(contractorInvoiceRepository, ContractorInvoice.class);
@@ -54,6 +59,7 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 		this.contractorRateService = contractorRateService;
 		this.contractorInvoiceToRecordMapper = contractorInvoiceToRecordMapper;
 		this.contractorService = contractorService;
+		this.clientService = clientService;
 		this.contractorInvoiceMessagingService = contractorInvoiceMessagingService;
 	}
 
@@ -89,13 +95,31 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	public ContractorInvoiceRecord create(final Long contractorId, final BigDecimal numberOfWorkedDays)
 	{
 		final Contractor contractor = contractorService.findEntityById(contractorId);
-		final Optional<ContractorInvoice> currentInvoiceOpt = contractorInvoiceRepository.findCurrentContractorInvoice(contractor, TimeService.now());
+		final Optional<ContractorInvoice> currentInvoiceOpt = contractorInvoiceRepository.findContractorInvoiceForADate(contractor, TimeService.now());
 
 		if (currentInvoiceOpt.isPresent())
 			throw new DuplicateContractorInvoiceException("DUPLICATE_INVOICE", String.format("Invoice for %s already exists in the current period", contractor.getName()));
 
 		final ContractorRate currentRateForContractor = contractorRateService.findCurrentRateForContractor(contractor);
 		final ContractorInvoice invoice = ContractorInvoice.create(currentRateForContractor, numberOfWorkedDays);
+
+		final ContractorInvoiceRecord createdInvoiceRecord = contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
+		contractorInvoiceMessagingService.sendContractorInvoiceCreatedMessage(createdInvoiceRecord);
+		return createdInvoiceRecord;
+	}
+
+	@Override
+	public ContractorInvoiceRecord create(final BatchContractorInvoiceRecord record)
+	{
+		final Contractor contractor = contractorService.findEntityById(record.contractorId());
+		final Client client = clientService.findEntityById(record.clientId());
+		final Optional<ContractorInvoice> overlappingInvoice = contractorInvoiceRepository.findContractorInvoiceForADate(contractor, record.startDate());
+
+		if (overlappingInvoice.isPresent())
+			throw new DuplicateContractorInvoiceException("DUPLICATE_INVOICE", String.format("Invoice for %s already exists in the current period", contractor.getName()));
+
+		final ContractorRate rate = contractorRateService.findRateForContractorActiveOnAPeriod(contractor, client, record.startDate(), record.endDate());
+		final ContractorInvoice invoice = ContractorInvoice.create(rate, record.startDate(), record.endDate(), record.numberOfWorkedDays());
 
 		final ContractorInvoiceRecord createdInvoiceRecord = contractorInvoiceToRecordMapper.map(contractorInvoiceRepository.save(invoice));
 		contractorInvoiceMessagingService.sendContractorInvoiceCreatedMessage(createdInvoiceRecord);
@@ -212,7 +236,7 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	private ContractorInvoice internalFindCurrentInvoiceForContractor(final Long contractorId)
 	{
 		final Contractor contractor = contractorService.findEntityById(contractorId);
-		return contractorInvoiceRepository.findCurrentContractorInvoice(contractor, TimeService.now())
+		return contractorInvoiceRepository.findContractorInvoiceForADate(contractor, TimeService.now())
 			.orElseThrow(() -> new EntityNotFoundException("CURRENT_INVOICE_NOT_FOUND", String.format("No current invoice for contractor %s found", contractorId)));
 	}
 

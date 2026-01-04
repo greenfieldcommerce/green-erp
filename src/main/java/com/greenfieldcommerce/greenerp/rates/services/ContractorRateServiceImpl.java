@@ -139,6 +139,12 @@ public class ContractorRateServiceImpl extends BaseEntityService<ContractorRate,
 		return contractor.getCurrentRate().orElseThrow(() -> new NoActiveContractorRateException("NO_ACTIVE_RATE", String.format("No active rate for %s", contractor.getName())));
 	}
 
+	@Override
+	public ContractorRate findRateForContractorActiveOnAPeriod(final Contractor contractor, final Client client, final ZonedDateTime start, final ZonedDateTime end)
+	{
+		return contractorRateRepository.findRatesForContractorIdOverlappingWithPeriod(contractor, client, start, end, null).stream().findFirst().orElseThrow(() -> new NoActiveContractorRateException("NO_ACTIVE_RATE", String.format("No active rate for %s", contractor.getName())));
+	}
+
 	/**
 	 * Deletes a contractor rate by rate ID and contractor ID.
 	 *

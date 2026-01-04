@@ -13,8 +13,8 @@ import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
 
 public interface ContractorInvoiceRepository extends ListCrudRepository<ContractorInvoice, Long>
 {
-	@Query("SELECT i FROM #{#entityName} i WHERE i.contractor = :contractor and i.startDate <= :now AND i.endDate >= :now")
-	Optional<ContractorInvoice> findCurrentContractorInvoice(Contractor contractor, ZonedDateTime now);
+	@Query("SELECT i FROM #{#entityName} i WHERE i.contractor = :contractor and i.startDate <= :date AND i.endDate >= :date")
+	Optional<ContractorInvoice> findContractorInvoiceForADate(Contractor contractor, ZonedDateTime date);
 	Page<ContractorInvoice> findByContractor(Contractor contractor, Pageable pageable);
 	Optional<ContractorInvoice> findByContractorAndId(Contractor contractor, Long id);
 }

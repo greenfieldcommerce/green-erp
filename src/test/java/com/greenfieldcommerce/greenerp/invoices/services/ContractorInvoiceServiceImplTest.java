@@ -103,7 +103,7 @@ public class ContractorInvoiceServiceImplTest
 
 		when(currentRateForContractor.getRate()).thenReturn(new BigDecimal(100));
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.empty());
+		when(contractorInvoiceRepository.findContractorInvoiceForADate(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.empty());
 		when(contractorRateService.findCurrentRateForContractor(contractor)).thenReturn(currentRateForContractor);
 		when(contractorInvoiceRepository.save(
 			argThat(i -> i.getRate().equals(currentRateForContractor) && i.getNumberOfWorkedDays().equals(workedDays)))).thenReturn(saved);
@@ -126,10 +126,10 @@ public class ContractorInvoiceServiceImplTest
 		final BigDecimal workedDays = new BigDecimal(22);
 
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(existing));
+		when(contractorInvoiceRepository.findContractorInvoiceForADate(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(existing));
 
 		assertThrows(DuplicateContractorInvoiceException.class, () -> service.create(VALID_RESOURCE_ID, workedDays));
-		verify(contractorInvoiceRepository).findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now));
+		verify(contractorInvoiceRepository).findContractorInvoiceForADate(eq(contractor), dateIsSameDay(now));
 	}
 
 	@Test
@@ -261,7 +261,7 @@ public class ContractorInvoiceServiceImplTest
 		final Contractor contractor = mock(Contractor.class);
 
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.empty());
+		when(contractorInvoiceRepository.findContractorInvoiceForADate(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.empty());
 
 		assertThrows(EntityNotFoundException.class, () -> service.findCurrentInvoiceForContractor(VALID_RESOURCE_ID));
 	}
@@ -276,7 +276,7 @@ public class ContractorInvoiceServiceImplTest
 		final ContractorInvoiceRecord invoiceRecord = mock(ContractorInvoiceRecord.class);
 
 		when(contractorService.findEntityById(VALID_RESOURCE_ID)).thenReturn(contractor);
-		when(contractorInvoiceRepository.findCurrentContractorInvoice(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(invoice));
+		when(contractorInvoiceRepository.findContractorInvoiceForADate(eq(contractor), dateIsSameDay(now))).thenReturn(Optional.of(invoice));
 		when(contractorInvoiceToRecordMapper.map(eq(invoice))).thenReturn(invoiceRecord);
 
 		final ContractorInvoiceRecord result = service.findCurrentInvoiceForContractor(VALID_RESOURCE_ID);
