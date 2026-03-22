@@ -49,6 +49,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.greenfieldcommerce.greenerp.clients.records.ClientRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.CreateContractorRecord;
 import com.greenfieldcommerce.greenerp.controllers.BaseRestControllerTest;
@@ -264,7 +265,8 @@ public class ContractorsControllerTest extends BaseRestControllerTest
 
 	private static ContractorRecord buildFullContractorExample()
 	{
-		final ContractorRateRecord rate = new ContractorRateRecord(1L, 1L, 1L, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ClientRecord clientRecord = new ClientRecord(1L, "Test Client", "test@client.com");
+		final ContractorRateRecord rate = new ContractorRateRecord(1L, 1L, clientRecord, BigDecimal.TEN, Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 		return new ContractorRecord(1L, "diego@greenfieldcommerce.com", "Diego Reidel", rate);
 	}
 

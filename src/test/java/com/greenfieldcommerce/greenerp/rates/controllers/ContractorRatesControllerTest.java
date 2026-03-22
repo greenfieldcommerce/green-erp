@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.greenfieldcommerce.greenerp.clients.records.ClientRecord;
 import com.greenfieldcommerce.greenerp.controllers.BaseRestControllerTest;
 import com.greenfieldcommerce.greenerp.records.ZonedDateTimeRecord;
 import com.greenfieldcommerce.greenerp.rates.records.ContractorRateRecord;
@@ -75,8 +76,9 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnAllContractorRates_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
-		final ContractorRateRecord a = new ContractorRateRecord(1L, VALID_RESOURCE_ID, 1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
-		final ContractorRateRecord b = new ContractorRateRecord(2L, VALID_RESOURCE_ID, 1L, BigDecimal.valueOf(100.50), Currency.getInstance("USD"), ZonedDateTime.now().plusMonths(1), ZonedDateTime.now().plusMonths(3));
+		final ClientRecord clientRecord = buildClientRecord();
+		final ContractorRateRecord a = new ContractorRateRecord(1L, VALID_RESOURCE_ID, clientRecord, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ContractorRateRecord b = new ContractorRateRecord(2L, VALID_RESOURCE_ID, clientRecord, BigDecimal.valueOf(100.50), Currency.getInstance("USD"), ZonedDateTime.now().plusMonths(1), ZonedDateTime.now().plusMonths(3));
 
 		when(contractorRateService.findRatesForContractor(eq(VALID_RESOURCE_ID))).thenReturn(List.of(a, b));
 
@@ -152,7 +154,8 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnContractorRateById_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor jwt) throws Exception
 	{
-		final ContractorRateRecord rate = new ContractorRateRecord(1L, VALID_RESOURCE_ID,1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
+		final ClientRecord clientRecord = buildClientRecord();
+		final ContractorRateRecord rate = new ContractorRateRecord(1L, VALID_RESOURCE_ID, clientRecord, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1));
 
 		when(contractorRateService.findByIdAndContractorId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID))).thenReturn(rate);
 
@@ -187,7 +190,8 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 	public void shouldUpdateContractorRate_forAdmin() throws Exception
 	{
 		final ZonedDateTimeRecord zonedDateTimeRecord = buildValidEndDateTimeRecord();
-		final ContractorRateRecord result = new ContractorRateRecord(1L, VALID_RESOURCE_ID, 1L, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), zonedDateTimeRecord.newEndDateTime());
+		final ClientRecord clientRecord = buildClientRecord();
+		final ContractorRateRecord result = new ContractorRateRecord(1L, VALID_RESOURCE_ID, clientRecord, BigDecimal.valueOf(100), Currency.getInstance("USD"), ZonedDateTime.now(), zonedDateTimeRecord.newEndDateTime());
 
 		when(contractorRateService.changeEndDateTime(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID), argThat(r -> r.toInstant().equals(zonedDateTimeRecord.newEndDateTime().toInstant())))).thenReturn(result);
 
@@ -297,7 +301,13 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 
 	private static ContractorRateRecord buildExpectedSuccessResult(final CreateContractorRateRecord createContractorRateRecord)
 	{
-		return new ContractorRateRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
+		final ClientRecord clientRecord = buildClientRecord();
+		return new ContractorRateRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, clientRecord, createContractorRateRecord.rate(), createContractorRateRecord.currency(), createContractorRateRecord.startDateTime(), createContractorRateRecord.endDateTime());
+	}
+
+	private static ClientRecord buildClientRecord()
+	{
+		return new ClientRecord(VALID_RESOURCE_ID, "Test Client", "test@client.com");
 	}
 
 	private ZonedDateTimeRecord buildValidEndDateTimeRecord()
@@ -322,7 +332,7 @@ public class ContractorRatesControllerTest extends BaseRestControllerTest
 		return responseFields(
 			fieldWithPath("id").description("The rate ID"),
 			fieldWithPath("contractorId").description("The ID of the contractor this rate belongs to"),
-			fieldWithPath("clientId").description("The ID of the client to which this rate is charged"),
+			subsectionWithPath("client").description("The client to which this rate is charged"),
 			fieldWithPath("rate").description("The contractor's daily rate"),
 			fieldWithPath("currency").description("The currency of the rate"),
 			fieldWithPath("startDateTime").description("Date and time when the rate starts being valid ('valid from')"),
