@@ -7,7 +7,7 @@
           <span class="title">GreenERP</span>
         </div>
         <nav class="nav-links">
-          <router-link to="/contractors">Contractors</router-link>
+          <router-link v-if="isAdmin" to="/contractors">Contractors</router-link>
         </nav>
         <div class="user-info">
           <span class="username">{{ username }}</span>
@@ -29,6 +29,9 @@ export default {
   computed: {
     username() {
       return keycloak.tokenParsed?.preferred_username ?? 'User'
+    },
+    isAdmin() {
+      return keycloak.tokenParsed?.realm_access?.roles?.includes('ROLE_ADMIN') ?? false
     },
   },
   methods: {
