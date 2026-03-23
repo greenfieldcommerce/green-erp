@@ -49,6 +49,8 @@ jobs:
       - name: Upload REST Docs (only on main branch)
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v4
+        permissions:
+          contents: write
         with:
-          github_token: ${{ secrets.DIEGO_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/generated-docs
