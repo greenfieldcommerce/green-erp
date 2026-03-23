@@ -807,7 +807,7 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "timestamp" : "2026-01-04T23:40:44.608163508Z",
+  "timestamp" : "2026-03-23T00:38:14.755257541Z",
   "status" : 422,
   "error" : "Unprocessable Entity",
   "code" : "VALIDATION_ERROR",
@@ -849,7 +849,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 761
+Content-Length: 762
 
 {
   "status" : "UP",
@@ -865,8 +865,8 @@ Content-Length: 761
     "diskSpace" : {
       "status" : "UP",
       "details" : {
-        "total" : 76887154688,
-        "free" : 18615726080,
+        "total" : 154894188544,
+        "free" : 96427278336,
         "threshold" : 10485760,
         "path" : "/home/runner/work/green-erp/green-erp/.",
         "exists" : true
@@ -1048,7 +1048,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 1461
+Content-Length: 1561
 
 {
   "_embedded" : {
@@ -1059,11 +1059,15 @@ Content-Length: 1461
       "currentRate" : {
         "id" : 1,
         "contractorId" : 1,
-        "clientId" : 1,
+        "client" : {
+          "id" : 1,
+          "name" : "Test Client",
+          "email" : "test@client.com"
+        },
         "rate" : 10,
         "currency" : "USD",
-        "startDateTime" : "2026-01-04T23:40:54.358829684Z",
-        "endDateTime" : "2026-02-04T23:40:54.358834553Z"
+        "startDateTime" : "2026-03-23T00:38:06.388932639Z",
+        "endDateTime" : "2026-04-23T00:38:06.388951164Z"
       },
       "_links" : {
         "self" : {
@@ -1439,7 +1443,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 671
+Content-Length: 755
 
 {
   "id" : 1,
@@ -1448,11 +1452,15 @@ Content-Length: 671
   "currentRate" : {
     "id" : 1,
     "contractorId" : 1,
-    "clientId" : 1,
+    "client" : {
+      "id" : 1,
+      "name" : "Test Client",
+      "email" : "test@client.com"
+    },
     "rate" : 10,
     "currency" : "USD",
-    "startDateTime" : "2026-01-04T23:40:54.341018603Z",
-    "endDateTime" : "2026-02-04T23:40:54.341027209Z"
+    "startDateTime" : "2026-03-23T00:38:06.343409587Z",
+    "endDateTime" : "2026-04-23T00:38:06.343432661Z"
   },
   "_links" : {
     "self" : {
@@ -1746,18 +1754,22 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 1038
+Content-Length: 1221
 
 {
   "_embedded" : {
     "rates" : [ {
       "id" : 1,
       "contractorId" : 1,
-      "clientId" : 1,
+      "client" : {
+        "id" : 1,
+        "name" : "Test Client",
+        "email" : "test@client.com"
+      },
       "rate" : 100,
       "currency" : "USD",
-      "startDateTime" : "2026-01-04T23:40:50.912433985Z",
-      "endDateTime" : "2026-02-04T23:40:50.912449543Z",
+      "startDateTime" : "2026-03-23T00:38:16.521562058Z",
+      "endDateTime" : "2026-04-23T00:38:16.52156817Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1769,11 +1781,15 @@ Content-Length: 1038
     }, {
       "id" : 2,
       "contractorId" : 1,
-      "clientId" : 1,
+      "client" : {
+        "id" : 1,
+        "name" : "Test Client",
+        "email" : "test@client.com"
+      },
       "rate" : 100.5,
       "currency" : "USD",
-      "startDateTime" : "2026-02-04T23:40:50.912477456Z",
-      "endDateTime" : "2026-04-04T23:40:50.912485261Z",
+      "startDateTime" : "2026-04-23T00:38:16.521595461Z",
+      "endDateTime" : "2026-06-23T00:38:16.521599939Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/2"
@@ -1814,8 +1830,8 @@ Host: localhost:8080
   "externalRate" : 200,
   "taxDeduction" : 10,
   "currency" : "USD",
-  "startDateTime" : "2026-01-04T23:40:50.836915003Z",
-  "endDateTime" : "2026-02-04T23:40:50.836930943Z"
+  "startDateTime" : "2026-03-23T00:38:16.480023534Z",
+  "endDateTime" : "2026-04-23T00:38:16.480028734Z"
 }</code></pre>
 </div>
 </div>
@@ -1965,9 +1981,9 @@ Host: localhost:8080
 <td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the contractor this rate belongs to</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>clientId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the client to which this rate is charged</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>client</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client to which this rate is charged</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rate</code></p></td>
@@ -2010,16 +2026,20 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 381
+Content-Length: 457
 
 {
   "id" : 1,
   "contractorId" : 1,
-  "clientId" : 1,
+  "client" : {
+    "id" : 1,
+    "name" : "Test Client",
+    "email" : "test@client.com"
+  },
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2026-01-04T23:40:50.836915003Z",
-  "endDateTime" : "2026-02-04T23:40:50.836930943Z",
+  "startDateTime" : "2026-03-23T00:38:16.480023534Z",
+  "endDateTime" : "2026-04-23T00:38:16.480028734Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2154,9 +2174,9 @@ Host: localhost:8080</code></pre>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the contractor this rate belongs to</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>clientId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the client to which this rate is charged</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>client</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client to which this rate is charged</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rate</code></p></td>
@@ -2198,16 +2218,20 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 381
+Content-Length: 457
 
 {
   "id" : 1,
   "contractorId" : 1,
-  "clientId" : 1,
+  "client" : {
+    "id" : 1,
+    "name" : "Test Client",
+    "email" : "test@client.com"
+  },
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2026-01-04T23:40:50.774992338Z",
-  "endDateTime" : "2026-02-04T23:40:50.775016033Z",
+  "startDateTime" : "2026-03-23T00:38:16.442493776Z",
+  "endDateTime" : "2026-04-23T00:38:16.442499958Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2236,7 +2260,7 @@ Content-Length: 57
 Host: localhost:8080
 
 {
-  "newEndDateTime" : "2026-02-04T23:40:50.810508512Z"
+  "newEndDateTime" : "2026-04-23T00:38:16.463633891Z"
 }</code></pre>
 </div>
 </div>
@@ -2339,9 +2363,9 @@ Host: localhost:8080
 <td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the contractor this rate belongs to</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>clientId</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the client to which this rate is charged</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>client</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client to which this rate is charged</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>rate</code></p></td>
@@ -2383,16 +2407,20 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 381
+Content-Length: 457
 
 {
   "id" : 1,
   "contractorId" : 1,
-  "clientId" : 1,
+  "client" : {
+    "id" : 1,
+    "name" : "Test Client",
+    "email" : "test@client.com"
+  },
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2026-01-04T23:40:50.810540482Z",
-  "endDateTime" : "2026-02-04T23:40:50.810508512Z",
+  "startDateTime" : "2026-03-23T00:38:16.463658366Z",
+  "endDateTime" : "2026-04-23T00:38:16.463633891Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2662,8 +2690,8 @@ Content-Length: 2434
     "invoices" : [ {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2026-01-04T23:40:55.872652269Z",
-      "endDate" : "2026-02-04T23:40:55.872658822Z",
+      "startDate" : "2026-03-23T00:38:08.495892239Z",
+      "endDate" : "2026-04-23T00:38:08.49590843Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2682,8 +2710,8 @@ Content-Length: 2434
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-12-04T23:40:55.872682486Z",
-      "endDate" : "2026-01-04T23:40:55.872688347Z",
+      "startDate" : "2026-02-23T00:38:08.495930551Z",
+      "endDate" : "2026-03-23T00:38:08.495939758Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2702,8 +2730,8 @@ Content-Length: 2434
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2025-11-04T23:40:55.87269525Z",
-      "endDate" : "2025-12-04T23:40:55.872699327Z",
+      "startDate" : "2026-01-23T00:38:08.495950388Z",
+      "endDate" : "2026-02-23T00:38:08.495959606Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2951,8 +2979,8 @@ Content-Length: 518
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-01-04T23:40:55.769247115Z",
-  "endDate" : "2026-02-04T23:40:55.769253467Z",
+  "startDate" : "2026-03-23T00:38:08.410500695Z",
+  "endDate" : "2026-04-23T00:38:08.410518288Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3167,8 +3195,8 @@ Content-Length: 518
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-01-04T23:40:55.921960481Z",
-  "endDate" : "2026-02-04T23:40:55.921966242Z",
+  "startDate" : "2026-03-23T00:38:08.549848054Z",
+  "endDate" : "2026-04-23T00:38:08.549862521Z",
   "numberOfWorkedDays" : 20,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3376,8 +3404,8 @@ Content-Length: 518
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-01-04T23:40:55.696722713Z",
-  "endDate" : "2026-02-04T23:40:55.696729906Z",
+  "startDate" : "2026-03-23T00:38:08.341549802Z",
+  "endDate" : "2026-04-23T00:38:08.341572966Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3586,13 +3614,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 594
+Content-Length: 593
 
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-01-04T23:40:55.144818429Z",
-  "endDate" : "2026-02-04T23:40:55.144825342Z",
+  "startDate" : "2026-03-23T00:38:07.623384408Z",
+  "endDate" : "2026-04-23T00:38:07.62340164Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3809,13 +3837,13 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 594
+Content-Length: 593
 
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-01-04T23:40:55.223592816Z",
-  "endDate" : "2026-02-04T23:40:55.223599137Z",
+  "startDate" : "2026-03-23T00:38:07.75825882Z",
+  "endDate" : "2026-04-23T00:38:07.758298935Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3845,7 +3873,7 @@ Content-Length: 594
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-01-04 23:40:27 UTC
+Last updated 2026-03-23 00:37:38 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
