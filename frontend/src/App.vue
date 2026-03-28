@@ -2,10 +2,10 @@
   <div id="app">
     <header class="app-header">
       <div class="header-content">
-        <div class="brand">
+        <router-link to="/" class="brand">
           <span class="logo">🌿</span>
           <span class="title">GreenERP</span>
-        </div>
+        </router-link>
         <nav class="nav-links">
           <router-link v-if="isAdmin" to="/contractors">Contractors</router-link>
         </nav>
@@ -78,6 +78,16 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  text-decoration: none;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.brand:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .brand .logo {

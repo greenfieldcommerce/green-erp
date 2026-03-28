@@ -11,7 +11,7 @@
 
     <div v-if="!loading && !error && contractor" class="contractor-details">
       <div class="card-header">
-        <h2>Your Profile</h2>
+        <h2>Profile</h2>
         <span class="badge">Contractor</span>
       </div>
 
@@ -27,7 +27,7 @@
         </div>
 
         <div class="detail-item">
-          <label>Current Rate</label>
+          <label>Current Daily Rate</label>
           <p class="detail-value">
             <span v-if="contractor.currentRate">
               {{ formatCurrency(contractor.currentRate.rate, contractor.currentRate.currency) }}
@@ -40,7 +40,23 @@
           <label>Currency</label>
           <p class="detail-value">{{ contractor.currentRate.currency }}</p>
         </div>
+
+        <div v-if="contractor.currentRate?.client" class="detail-item">
+          <label>Client</label>
+          <p class="detail-value">{{ contractor.currentRate.client.name }}</p>
+        </div>
       </div>
+
+      <!-- Add the InvoiceGenerator component -->
+      <InvoiceGenerator 
+        v-if="contractor.currentRate" 
+        :contractor-id="contractor.id" 
+        :current-rate="contractor.currentRate" 
+        @invoice-created="refreshInvoiceList"
+      />
+
+      <!-- Add the ContractorInvoices component -->
+      <ContractorInvoices ref="contractorInvoices" :contractor-id="contractor.id" />
     </div>
 
     <div v-if="!loading && !error && !contractor" class="no-data">
@@ -52,9 +68,21 @@
 <script>
 import api from '../api'
 import keycloak from '../keycloak'
+import ContractorInvoices from './ContractorInvoices.vue'
+import InvoiceGenerator from './InvoiceGenerator.vue'
 
 export default {
   name: 'CurrentContractorInfo',
+  components: {
+    ContractorInvoices,
+    InvoiceGenerator,
+  },
+  props: {
+    contractorId: {
+      type: [String, Number],
+      default: null
+    }
+  },
   data() {
     return {
       contractor: null,
@@ -65,23 +93,38 @@ export default {
   mounted() {
     this.fetchContractorInfo()
   },
+  watch: {
+    contractorId: {
+      handler(newId, oldId) {
+        // Only fetch if the ID actually changed and is not null
+        if (newId && newId !== oldId) {
+          this.fetchContractorInfo()
+        }
+      },
+      immediate: false // Don't run on initial mount since mounted() already handles it
+    }
+  },
   methods: {
     async fetchContractorInfo() {
       this.loading = true
       this.error = null
 
       try {
-        // Get contractor ID from Keycloak token
-        const contractorId = keycloak.tokenParsed?.contractorId
+        let targetContractorId = this.contractorId
         
-        if (!contractorId) {
-          this.error = 'Contractor ID not found in your profile.'
+        // If no contractorId prop is provided, use the one from Keycloak token
+        if (!targetContractorId) {
+          targetContractorId = keycloak.tokenParsed?.contractorId
+        }
+        
+        if (!targetContractorId) {
+          this.error = 'Contractor ID not found.'
           this.loading = false
           return
         }
 
         // Fetch contractor details
-        const response = await api.get(`/contractors/${contractorId}`)
+        const response = await api.get(`/contractors/${targetContractorId}`)
         
         // Extract contractor from HAL+JSON response
         this.contractor = response.data
@@ -104,6 +147,13 @@ export default {
         style: 'currency',
         currency: currency,
       }).format(amount)
+    },
+    
+    refreshInvoiceList(createdInvoice) {
+      // Call the refresh method on the ContractorInvoices component
+      if (this.$refs.contractorInvoices) {
+        this.$refs.contractorInvoices.refreshInvoices()
+      }
     },
   },
 }

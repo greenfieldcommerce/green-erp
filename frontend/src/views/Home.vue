@@ -7,32 +7,6 @@
 
     <CurrentContractorInfo />
 
-    <div class="content-section">
-      <div class="card">
-        <div class="card-icon">📊</div>
-        <h2>Dashboard</h2>
-        <p>Get an overview of your business metrics and key performance indicators.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon">👥</div>
-        <h2>Team Management</h2>
-        <p>Manage your team members and collaborate effectively on projects.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon">📈</div>
-        <h2>Analytics</h2>
-        <p>Track performance and gain insights into your business operations.</p>
-      </div>
-
-      <div class="card">
-        <div class="card-icon">⚙️</div>
-        <h2>Settings</h2>
-        <p>Configure your preferences and manage your account settings.</p>
-      </div>
-    </div>
-
     <div class="info-section">
       <h2>About GreenERP</h2>
       <p>

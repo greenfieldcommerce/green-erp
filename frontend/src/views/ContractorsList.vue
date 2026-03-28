@@ -15,17 +15,31 @@
           <th>ID</th>
           <th>Name</th>
           <th>Email</th>
-          <th>Current Rate</th>
+          <th>Current Daily Rate</th>
           <th>Currency</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="contractor in contractors" :key="contractor.id">
+        <tr 
+          v-for="contractor in contractors" 
+          :key="contractor.id"
+          :class="{ 'selected': selectedContractorId === contractor.id }"
+          @click="selectContractor(contractor.id)"
+        >
           <td>{{ contractor.id }}</td>
           <td>{{ contractor.name }}</td>
           <td>{{ contractor.email }}</td>
           <td>{{ contractor.currentRate?.rate ?? '—' }}</td>
           <td>{{ contractor.currentRate?.currency ?? '—' }}</td>
+          <td>
+            <button 
+              class="view-details-btn"
+              @click.stop="selectContractor(contractor.id)"
+            >
+              View Details
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -33,19 +47,39 @@
     <p v-if="!loading && !error && !contractors.length" class="empty">
       No contractors found.
     </p>
+
+    <!-- Contractor Details Section -->
+    <div v-if="selectedContractorId" class="details-section">
+      <div class="details-header">
+        <h2>Contractor Details</h2>
+        <button class="close-details-btn" @click="closeDetails">
+          Close Details
+        </button>
+      </div>
+      
+      <CurrentContractorInfo 
+        :contractor-id="selectedContractorId"
+        @close-details="closeDetails"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import api from '../api'
+import CurrentContractorInfo from '../components/CurrentContractorInfo.vue'
 
 export default {
   name: 'ContractorsList',
+  components: {
+    CurrentContractorInfo,
+  },
   data() {
     return {
       contractors: [],
       loading: false,
       error: null,
+      selectedContractorId: null,
     }
   },
   mounted() {
@@ -69,6 +103,12 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    selectContractor(contractorId) {
+      this.selectedContractorId = contractorId
+    },
+    closeDetails() {
+      this.selectedContractorId = null
     },
   },
 }
@@ -145,5 +185,77 @@ h1 {
   color: #999;
   font-style: italic;
   padding: 2rem 0;
+}
+
+/* Table row selection styling */
+.contractors-table tr.selected {
+  background-color: #e8f5e9;
+  border-left: 4px solid #42b883;
+}
+
+.contractors-table tr.selected:hover {
+  background-color: #e8f5e9;
+}
+
+/* View Details button styling */
+.view-details-btn {
+  background: #42b883;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+}
+
+.view-details-btn:hover {
+  background: #369870;
+}
+
+/* Details section styling */
+.details-section {
+  margin-top: 2rem;
+  border-top: 2px solid #42b883;
+  padding-top: 2rem;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.details-header h2 {
+  color: #2c3e50;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-details-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.close-details-btn:hover {
+  background: #5a6268;
+}
+
+/* Make table rows clickable */
+.contractors-table tbody tr {
+  cursor: pointer;
+}
+
+.contractors-table tbody tr td:not(:last-child) {
+  user-select: none;
 }
 </style>
