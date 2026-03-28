@@ -178,7 +178,12 @@ public class ContractorInvoice
 		return extraAmountLines;
 	}
 
-	private enum InvoiceStatus
+	public InvoiceStatus getStatus()
+	{
+		return status;
+	}
+
+	public enum InvoiceStatus
 	{
 		OPEN, BILLED, CLOSED
 	}

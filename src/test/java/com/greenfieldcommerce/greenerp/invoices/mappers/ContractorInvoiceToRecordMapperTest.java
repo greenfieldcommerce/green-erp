@@ -60,6 +60,7 @@ class ContractorInvoiceToRecordMapperTest {
 		assertEquals(1, result.extraAmountLines().size());
 		assertEquals(extraAmountLineRecord, result.extraAmountLines().iterator().next());
 		assertEquals(TOTAL, result.total());
+		assertEquals(ContractorInvoice.InvoiceStatus.OPEN.toString(), result.status());
 	}
 
 	ContractorInvoice validInvoice()
@@ -74,6 +75,7 @@ class ContractorInvoiceToRecordMapperTest {
 		when(invoice.getEndDate()).thenReturn(END);
 		when(invoice.getNumberOfWorkedDays()).thenReturn(WORKED_DAYS);
 		when(invoice.getTotal()).thenReturn(TOTAL);
+		when(invoice.getStatus()).thenReturn(ContractorInvoice.InvoiceStatus.OPEN);
 
 		return invoice;
 	}

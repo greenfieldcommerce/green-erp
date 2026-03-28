@@ -176,7 +176,7 @@ public class InvoiceExtraLinesControllerTest extends BaseRestControllerTest
 
 	private static ContractorInvoiceRecord buildInvoiceRecord(final InvoiceExtraAmountLineRecord extraLine)
 	{
-		return new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(22), Set.of(extraLine), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		return new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(22), Set.of(extraLine), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
 	}
 
 	private MockHttpServletRequestBuilder postInvoiceExtraLineRequest(Long contractorId, Long invoiceId, CreateInvoiceExtraAmountLineRecord record) throws JsonProcessingException

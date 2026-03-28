@@ -18,6 +18,7 @@ public class ContractorInvoiceTestValidations
 			jsonPath(path + ".numberOfWorkedDays").value(invoice.numberOfWorkedDays()).match(result);
 			jsonPath(path + ".total").value(invoice.total()).match(result);
 			jsonPath(path + ".currency").value(invoice.currency().toString()).match(result);
+			jsonPath(path + ".status").value(invoice.status()).match(result);
 		};
 	}
 }

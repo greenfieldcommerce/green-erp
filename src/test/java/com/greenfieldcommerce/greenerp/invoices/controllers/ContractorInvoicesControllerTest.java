@@ -84,9 +84,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	{
 		final Pageable pageable = buildPageable();
 
-		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
-		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
-		final ContractorInvoiceRecord invoice3 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now().minusMonths(2), ZonedDateTime.now().minusMonths(2).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
+		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "BILLED");
+		final ContractorInvoiceRecord invoice3 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now().minusMonths(2), ZonedDateTime.now().minusMonths(2).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "CLOSED");
 
 		final List<ContractorInvoiceRecord> invoices = List.of(invoice1, invoice2, invoice3);
 		final Page<ContractorInvoiceRecord> page = new PageImpl<>(invoices, pageable, invoices.size());
@@ -142,7 +142,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldCreateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
 
 		when(contractorInvoiceService.create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()))).thenReturn(result);
 
@@ -178,7 +178,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
-		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
 
 		when(contractorInvoiceService.findByContractorAndId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID))).thenReturn(record);
 
@@ -202,7 +202,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldUpdateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"));
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
 
 		when(contractorInvoiceService.patchInvoice(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()))).thenReturn(result);
 
@@ -327,6 +327,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 			fieldWithPath("extraAmountLines[].amount").type(JsonFieldType.NUMBER).description("The amount for the extra amount line").optional(),
 			fieldWithPath("extraAmountLines[].description").type(JsonFieldType.STRING).description("The description for the extra line").optional(),
 			fieldWithPath("currency").description("The invoice currency"),
+			fieldWithPath("status").description("The invoice status (OPEN, BILLED, or CLOSED)"),
 			subsectionWithPath("_links").description("HATEOAS <<resources_invoice_links, invoice links>> to related resources"));
 	}
 
