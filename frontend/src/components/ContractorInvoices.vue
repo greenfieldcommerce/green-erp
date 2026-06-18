@@ -28,7 +28,10 @@
           @click="selectInvoice(invoice.invoiceId)"
         >
           <div class="invoice-header">
-            <span class="invoice-number">Invoice #{{ invoice.invoiceId }}</span>
+            <div class="invoice-header-left">
+              <span class="invoice-number">Invoice #{{ invoice.invoiceId }}</span>
+              <span class="status-badge" :class="getStatusClass(invoice.status)">{{ invoice.status }}</span>
+            </div>
             <span class="invoice-date">{{ formatDateRange(invoice.startDate, invoice.endDate) }}</span>
           </div>
           <div class="invoice-details">
@@ -69,6 +72,11 @@
           <div class="detail-row">
             <span class="label">Invoice ID:</span>
             <span class="value">{{ selectedInvoice.invoiceId }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Status:</span>
+            <span class="status-badge" :class="getStatusClass(selectedInvoice.status)">{{ selectedInvoice.status }}</span>
           </div>
 
           <div class="detail-row">
@@ -264,6 +272,21 @@ export default {
         currency: currency,
       }).format(amount)
     },
+
+    getStatusClass(status) {
+      if (!status) return ''
+      const statusLower = status.toLowerCase()
+      switch (statusLower) {
+        case 'open':
+          return 'status-open'
+        case 'billed':
+          return 'status-billed'
+        case 'closed':
+          return 'status-closed'
+        default:
+          return ''
+      }
+    },
   },
 }
 </script>
@@ -379,6 +402,12 @@ export default {
   margin-bottom: 0.5rem;
 }
 
+.invoice-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .invoice-number {
   font-weight: 600;
   color: #2c3e50;
@@ -388,6 +417,34 @@ export default {
 .invoice-date {
   font-size: 0.85rem;
   color: #666;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-open {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status-billed {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.status-closed {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 .invoice-details {
