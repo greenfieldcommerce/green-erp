@@ -1,19 +1,18 @@
 services:
   # ---------------------
-  # MySQL for both Spring & Keycloak
+  # Postgres for both Spring & Keycloak
   # ---------------------
-  mysql:
-    image: mysql:8.0
-    container_name: greenerp-mysql
+  postgres:
+    image: postgres:18
+    container_name: greenerp-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_GREENERP_DATABASE}
-      MYSQL_USER: ${MYSQL_GREENERP_USERNAME}
-      MYSQL_PASSWORD: ${MYSQL_GREENERP_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_GREENERP_DATABASE}
+      POSTGRES_USER: ${POSTGRES_GREENERP_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_GREENERP_PASSWORD}
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql
     networks:
       - green-erp-net
 
@@ -27,19 +26,19 @@ services:
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
-      KC_DB: mysql
-      KC_DB_URL_HOST: mysql
-      KC_DB_DATABASE: ${MYSQL_KEYCLOAK_DATABASE}
-      KC_DB_USERNAME: ${MYSQL_KEYCLOAK_USERNAME}
-      KC_DB_PASSWORD: ${MYSQL_KEYCLOAK_PASSWORD}
-      KC_DB_PORT: 3306
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres
+      KC_DB_DATABASE: ${POSTGRES_KEYCLOAK_DATABASE}
+      KC_DB_USERNAME: ${POSTGRES_KEYCLOAK_USERNAME}
+      KC_DB_PASSWORD: ${POSTGRES_KEYCLOAK_PASSWORD}
+      KC_DB_PORT: 5432
       KC_HEALTH_ENABLED: true
       KC_METRICS_ENABLED: true
     ports:
       - "8080:8080"
       - "8000:9000"
     depends_on:
-      - mysql
+      - postgres
     networks:
       - green-erp-net
 
@@ -50,11 +49,11 @@ services:
     build: .
     container_name: greenerp
     environment:
-      MYSQL_GREENERP_HOST: mysql
-      MYSQL_GREENERP_PORT: 3306
-      MYSQL_GREENERP_DATABASE: ${MYSQL_GREENERP_DATABASE}
-      MYSQL_GREENERP_USERNAME: ${MYSQL_GREENERP_USERNAME}
-      MYSQL_GREENERP_PASSWORD: ${MYSQL_GREENERP_PASSWORD}
+      POSTGRES_GREENERP_HOST: postgres
+      POSTGRES_GREENERP_PORT: 5432
+      POSTGRES_GREENERP_DATABASE: ${POSTGRES_GREENERP_DATABASE}
+      POSTGRES_GREENERP_USERNAME: ${POSTGRES_GREENERP_USERNAME}
+      POSTGRES_GREENERP_PASSWORD: ${POSTGRES_GREENERP_PASSWORD}
       RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/green-erp
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
@@ -63,7 +62,7 @@ services:
       - "9000:9000"
     depends_on:
       - keycloak
-      - mysql
+      - postgres
       - rabbitmq
     networks:
       - green-erp-net
@@ -84,4 +83,4 @@ networks:
   green-erp-net:
 
 volumes:
-  mysql-data:
+  postgres_data:

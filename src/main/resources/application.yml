@@ -14,9 +14,9 @@ spring:
 
   datasource:
     generate-unique-name: false
-    url: jdbc:mysql://${mysql.greenerp.host:localhost}:${mysql.greenerp.port:3306}/GreenERP
-    username: ${mysql.greenerp.username:GreenERP}
-    password: ${mysql.greenerp.password:GreenERP2025Purple}
+    url: jdbc:postgresql://${postgres.greenerp.host:localhost}:${postgres.greenerp.port:5432}/GreenERP
+    username: ${postgres.greenerp.username:GreenERP}
+    password: ${postgres.greenerp.password:GreenERP2025Purple}
 
   jpa:
     hibernate:
