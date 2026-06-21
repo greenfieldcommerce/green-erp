@@ -641,6 +641,33 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </li>
 </ul>
 </li>
+<li><a href="#resources_clients">Clients</a>
+<ul class="sectlevel2">
+<li><a href="#resources_clients_links">Links</a></li>
+<li><a href="#_listing_clients">Listing clients</a>
+<ul class="sectlevel3">
+<li><a href="#_listing_clients_http_request">HTTP request</a></li>
+<li><a href="#_listing_clients_request_headers">Request headers</a></li>
+<li><a href="#_listing_clients_response_fields">Response fields</a></li>
+<li><a href="#_listing_clients_http_response">Example response</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#resources_client">Client</a>
+<ul class="sectlevel2">
+<li><a href="#resources_client_links">Links</a></li>
+<li><a href="#_detailing_a_client">Detailing a client</a>
+<ul class="sectlevel3">
+<li><a href="#_detailing_a_client_http_request">HTTP request</a></li>
+<li><a href="#_detailing_a_client_request_headers">Request headers</a></li>
+<li><a href="#_detailing_a_client_path_parameters">Path parameters</a></li>
+<li><a href="#_detailing_a_client_response_fields">Response fields</a></li>
+<li><a href="#_detailing_a_client_http_response">Example response</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -807,7 +834,7 @@ X-Frame-Options: DENY
 Content-Length: 304
 
 {
-  "timestamp" : "2026-06-18T21:58:24.188520752Z",
+  "timestamp" : "2026-06-21T14:19:11.650664639Z",
   "status" : 422,
   "error" : "Unprocessable Entity",
   "code" : "VALIDATION_ERROR",
@@ -849,7 +876,7 @@ Cache-Control: no-cache, no-store, max-age=0, must-revalidate
 Pragma: no-cache
 Expires: 0
 X-Frame-Options: DENY
-Content-Length: 761
+Content-Length: 762
 
 {
   "status" : "UP",
@@ -865,8 +892,8 @@ Content-Length: 761
     "diskSpace" : {
       "status" : "UP",
       "details" : {
-        "total" : 76887154688,
-        "free" : 20351660032,
+        "total" : 154894188544,
+        "free" : 95137042432,
         "threshold" : 10485760,
         "path" : "/home/runner/work/green-erp/green-erp/.",
         "exists" : true
@@ -1066,8 +1093,8 @@ Content-Length: 1561
         },
         "rate" : 10,
         "currency" : "USD",
-        "startDateTime" : "2026-06-18T21:58:28.203827412Z",
-        "endDateTime" : "2026-07-18T21:58:28.203838824Z"
+        "startDateTime" : "2026-06-21T14:19:13.453239742Z",
+        "endDateTime" : "2026-07-21T14:19:13.453262537Z"
       },
       "_links" : {
         "self" : {
@@ -1459,8 +1486,8 @@ Content-Length: 755
     },
     "rate" : 10,
     "currency" : "USD",
-    "startDateTime" : "2026-06-18T21:58:28.177282081Z",
-    "endDateTime" : "2026-07-18T21:58:28.177293593Z"
+    "startDateTime" : "2026-06-21T14:19:13.427560102Z",
+    "endDateTime" : "2026-07-21T14:19:13.427582656Z"
   },
   "_links" : {
     "self" : {
@@ -1768,8 +1795,8 @@ Content-Length: 1222
       },
       "rate" : 100,
       "currency" : "USD",
-      "startDateTime" : "2026-06-18T21:58:28.984066621Z",
-      "endDateTime" : "2026-07-18T21:58:28.984073103Z",
+      "startDateTime" : "2026-06-21T14:19:16.009222101Z",
+      "endDateTime" : "2026-07-21T14:19:16.009228711Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -1788,8 +1815,8 @@ Content-Length: 1222
       },
       "rate" : 100.5,
       "currency" : "USD",
-      "startDateTime" : "2026-07-18T21:58:28.984104833Z",
-      "endDateTime" : "2026-09-18T21:58:28.984109972Z",
+      "startDateTime" : "2026-07-21T14:19:16.009260989Z",
+      "endDateTime" : "2026-09-21T14:19:16.009264375Z",
       "_links" : {
         "self" : {
           "href" : "http://localhost:8080/contractors/1/rates/2"
@@ -1830,8 +1857,8 @@ Host: localhost:8080
   "externalRate" : 200,
   "taxDeduction" : 10,
   "currency" : "USD",
-  "startDateTime" : "2026-06-18T21:58:28.939268831Z",
-  "endDateTime" : "2026-07-18T21:58:28.939274502Z"
+  "startDateTime" : "2026-06-21T14:19:15.965429744Z",
+  "endDateTime" : "2026-07-21T14:19:15.965438467Z"
 }</code></pre>
 </div>
 </div>
@@ -2038,8 +2065,8 @@ Content-Length: 457
   },
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2026-06-18T21:58:28.939268831Z",
-  "endDateTime" : "2026-07-18T21:58:28.939274502Z",
+  "startDateTime" : "2026-06-21T14:19:15.965429744Z",
+  "endDateTime" : "2026-07-21T14:19:15.965438467Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2230,8 +2257,8 @@ Content-Length: 457
   },
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2026-06-18T21:58:28.895394046Z",
-  "endDateTime" : "2026-07-18T21:58:28.895400549Z",
+  "startDateTime" : "2026-06-21T14:19:15.923559266Z",
+  "endDateTime" : "2026-07-21T14:19:15.923569301Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2260,7 +2287,7 @@ Content-Length: 57
 Host: localhost:8080
 
 {
-  "newEndDateTime" : "2026-07-18T21:58:28.918055092Z"
+  "newEndDateTime" : "2026-07-21T14:19:15.947024488Z"
 }</code></pre>
 </div>
 </div>
@@ -2419,8 +2446,8 @@ Content-Length: 457
   },
   "rate" : 100,
   "currency" : "USD",
-  "startDateTime" : "2026-06-18T21:58:28.918080059Z",
-  "endDateTime" : "2026-07-18T21:58:28.918055092Z",
+  "startDateTime" : "2026-06-21T14:19:15.947055985Z",
+  "endDateTime" : "2026-07-21T14:19:15.947024488Z",
   "_links" : {
     "self" : {
       "href" : "http://localhost:8080/contractors/1/rates/1"
@@ -2690,8 +2717,8 @@ Content-Length: 2513
     "invoices" : [ {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2026-06-18T21:58:26.19664118Z",
-      "endDate" : "2026-07-18T21:58:26.196658683Z",
+      "startDate" : "2026-06-21T14:19:14.92203876Z",
+      "endDate" : "2026-07-21T14:19:14.922050237Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2711,8 +2738,8 @@ Content-Length: 2513
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2026-05-18T21:58:26.196678069Z",
-      "endDate" : "2026-06-18T21:58:26.196687928Z",
+      "startDate" : "2026-05-21T14:19:14.922074273Z",
+      "endDate" : "2026-06-21T14:19:14.922079321Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2732,8 +2759,8 @@ Content-Length: 2513
     }, {
       "contractorId" : 1,
       "invoiceId" : 1,
-      "startDate" : "2026-04-18T21:58:26.196702345Z",
-      "endDate" : "2026-05-18T21:58:26.196708817Z",
+      "startDate" : "2026-04-21T14:19:14.922085801Z",
+      "endDate" : "2026-05-21T14:19:14.922089106Z",
       "numberOfWorkedDays" : 20,
       "extraAmountLines" : [ ],
       "total" : 3600,
@@ -2987,8 +3014,8 @@ Content-Length: 539
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-06-18T21:58:26.097568631Z",
-  "endDate" : "2026-07-18T21:58:26.097587917Z",
+  "startDate" : "2026-06-21T14:19:14.843936449Z",
+  "endDate" : "2026-07-21T14:19:14.843949909Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3209,8 +3236,8 @@ Content-Length: 539
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-06-18T21:58:26.254535273Z",
-  "endDate" : "2026-07-18T21:58:26.254545362Z",
+  "startDate" : "2026-06-21T14:19:14.966925492Z",
+  "endDate" : "2026-07-21T14:19:14.966934696Z",
   "numberOfWorkedDays" : 20,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3424,8 +3451,8 @@ Content-Length: 539
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-06-18T21:58:26.009640448Z",
-  "endDate" : "2026-07-18T21:58:26.009659313Z",
+  "startDate" : "2026-06-21T14:19:14.774236819Z",
+  "endDate" : "2026-07-21T14:19:14.774252673Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ ],
   "total" : 3600,
@@ -3645,8 +3672,8 @@ Content-Length: 615
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-06-18T21:58:25.266642274Z",
-  "endDate" : "2026-07-18T21:58:25.266676608Z",
+  "startDate" : "2026-06-21T14:19:14.128359409Z",
+  "endDate" : "2026-07-21T14:19:14.128379329Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3874,8 +3901,8 @@ Content-Length: 615
 {
   "contractorId" : 1,
   "invoiceId" : 1,
-  "startDate" : "2026-06-18T21:58:25.401652395Z",
-  "endDate" : "2026-07-18T21:58:25.401672432Z",
+  "startDate" : "2026-06-21T14:19:14.250665805Z",
+  "endDate" : "2026-07-21T14:19:14.250684203Z",
   "numberOfWorkedDays" : 22,
   "extraAmountLines" : [ {
     "id" : 1,
@@ -3903,10 +3930,315 @@ Content-Length: 615
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="resources_clients"><a class="link" href="#resources_clients">Clients</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Clients resource is used to list clients</p>
+</div>
+<div class="sect2">
+<h3 id="resources_clients_links"><a class="link" href="#resources_clients_links">Links</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Relation</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>self</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Self link to this <a href="#resources_clients">resource</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_listing_clients"><a class="link" href="#_listing_clients">Listing clients</a></h3>
+<div class="paragraph">
+<p>A <code>GET</code> request is used to list all clients.</p>
+</div>
+<div class="sect3">
+<h4 id="_listing_clients_http_request"><a class="link" href="#_listing_clients_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /clients HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_listing_clients_request_headers"><a class="link" href="#_listing_clients_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer token used to authenticate the request. Must have 'ADMIN' role.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_listing_clients_response_fields"><a class="link" href="#_listing_clients_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_embedded.clients</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An array of <a href="#resources_client">Client resources</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="#resources_clients_links">Links</a> to other resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_listing_clients_http_response"><a class="link" href="#_listing_clients_http_response">Example response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/hal+json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Length: 709
+
+{
+  "_embedded" : {
+    "clients" : [ {
+      "id" : 1,
+      "name" : "Client Name",
+      "email" : "client@email.com",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/clients/1"
+        },
+        "allClients" : {
+          "href" : "http://localhost:8080/clients"
+        }
+      }
+    }, {
+      "id" : 2,
+      "name" : "Second Client",
+      "email" : "another@email.com",
+      "_links" : {
+        "self" : {
+          "href" : "http://localhost:8080/clients/2"
+        },
+        "allClients" : {
+          "href" : "http://localhost:8080/clients"
+        }
+      }
+    } ]
+  },
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/clients"
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="resources_client"><a class="link" href="#resources_client">Client</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Client resource is used to retrieve details for a client.</p>
+</div>
+<div class="sect2">
+<h3 id="resources_client_links"><a class="link" href="#resources_client_links">Links</a></h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Relation</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>self</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Self link to this <a href="#resources_client">Client</a></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>allClients</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Link to all <a href="#resources_clients">Clients</a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_detailing_a_client"><a class="link" href="#_detailing_a_client">Detailing a client</a></h3>
+<div class="paragraph">
+<p>A <code>GET</code> request will retrieve the details for a client.</p>
+</div>
+<div class="sect3">
+<h4 id="_detailing_a_client_http_request"><a class="link" href="#_detailing_a_client_http_request">HTTP request</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /clients/1 HTTP/1.1
+Host: localhost:8080</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_detailing_a_client_request_headers"><a class="link" href="#_detailing_a_client_request_headers">Request headers</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bearer token used to authenticate the request. Must have 'ADMIN' role.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_detailing_a_client_path_parameters"><a class="link" href="#_detailing_a_client_path_parameters">Path parameters</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. /clients/{clientId}</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>clientId</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Client id</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_detailing_a_client_response_fields"><a class="link" href="#_detailing_a_client_response_fields">Response fields</a></h4>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Path</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>id</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The unique identifier of the client</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client&#8217;s email</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>name</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The client&#8217;s name</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>_links</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Object</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HATEOAS <a href="#resources_client_links">client links</a> to related resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect3">
+<h4 id="_detailing_a_client_http_response"><a class="link" href="#_detailing_a_client_http_response">Example response</a></h4>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/hal+json
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Length: 237
+
+{
+  "id" : 1,
+  "name" : "Client Name",
+  "email" : "client@email.com",
+  "_links" : {
+    "self" : {
+      "href" : "http://localhost:8080/clients/1"
+    },
+    "allClients" : {
+      "href" : "http://localhost:8080/clients"
+    }
+  }
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-06-18 21:57:58 UTC
+Last updated 2026-06-21 14:18:47 UTC
 </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
