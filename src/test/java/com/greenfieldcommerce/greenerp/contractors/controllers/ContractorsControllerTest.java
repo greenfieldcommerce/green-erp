@@ -53,7 +53,7 @@ import com.greenfieldcommerce.greenerp.clients.records.ClientRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.CreateContractorRecord;
 import com.greenfieldcommerce.greenerp.controllers.BaseRestControllerTest;
-import com.greenfieldcommerce.greenerp.rates.records.ContractorRateRecord;
+import com.greenfieldcommerce.greenerp.contractors.rates.records.ContractorRateRecord;
 import com.greenfieldcommerce.greenerp.contractors.services.ContractorService;
 
 @WebMvcTest(controllers = ContractorsController.class)

@@ -236,3 +236,32 @@ operation::creating-an-invoice-extra-line[snippets='http-request,request-headers
 A `PATCH` request will update an extra line in an invoice for a contractor.
 
 operation::updating-an-invoice-extra-line[snippets='http-request,request-headers,path-parameters,request-fields,response-fields,http-response']
+
+[[resources_clients]]
+== Clients
+
+The Clients resource is used to list clients
+
+[[resources_clients_links]]
+=== Links
+
+include::{snippets}/listing-clients/links.adoc[]
+
+=== Listing clients
+A `GET` request is used to list all clients.
+
+operation::listing-clients[snippets='http-request,request-headers,response-fields,http-response']
+
+[[resources_client]]
+== Client
+The Client resource is used to retrieve details for a client.
+
+[[resources_client_links]]
+=== Links
+
+include::{snippets}/detailing-client/links.adoc[]
+
+=== Detailing a client
+A `GET` request will retrieve the details for a client.
+
+operation::detailing-client[snippets='http-request,request-headers,path-parameters,response-fields,http-response']

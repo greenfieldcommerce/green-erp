@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import com.greenfieldcommerce.greenerp.invoices.entities.ContractorInvoice;
-import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
+import com.greenfieldcommerce.greenerp.contractors.invoices.entities.ContractorInvoice;
+import com.greenfieldcommerce.greenerp.contractors.rates.entities.ContractorRate;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

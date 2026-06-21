@@ -10,8 +10,8 @@ import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSuppor
 import org.springframework.stereotype.Component;
 
 import com.greenfieldcommerce.greenerp.contractors.controllers.ContractorsController;
-import com.greenfieldcommerce.greenerp.invoices.controllers.ContractorInvoicesController;
-import com.greenfieldcommerce.greenerp.rates.controllers.ContractorRatesController;
+import com.greenfieldcommerce.greenerp.contractors.invoices.controllers.ContractorInvoicesController;
+import com.greenfieldcommerce.greenerp.contractors.rates.controllers.ContractorRatesController;
 import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
 
 @Component

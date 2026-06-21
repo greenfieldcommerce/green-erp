@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -34,13 +35,50 @@ public class ClientServiceImplTest
 	@Mock
 	private Mapper<Client, ClientRecord> clientToRecordMapper;
 
-
 	@InjectMocks
 	private ClientServiceImpl service;
 
 	@Test
-	@DisplayName("Should find client by id")
-	public void shouldFindClientById()
+	@DisplayName("Should find all clients")
+	void shouldFindAllClients()
+	{
+		Client clientA = mock(Client.class);
+		Client clientB = mock(Client.class);
+
+		ClientRecord clientRecordA = mock(ClientRecord.class);
+		ClientRecord clientRecordB = mock(ClientRecord.class);
+
+		when(clientRepository.findAll()).thenReturn(List.of(clientA, clientB));
+
+		when(clientToRecordMapper.map(clientA)).thenReturn(clientRecordA);
+		when(clientToRecordMapper.map(clientB)).thenReturn(clientRecordB);
+
+		final List<ClientRecord> result = service.findAll();
+
+		assertEquals(2, result.size());
+		assertEquals(clientRecordA, result.getFirst());
+		assertEquals(clientRecordB, result.getLast());
+	}
+
+	@Test
+	@DisplayName("Should find client record by id")
+	public void shouldFindClientRecordById()
+	{
+		final Client client = mock(Client.class);
+		final ClientRecord expected = mock(ClientRecord.class);
+
+		when(clientRepository.findById(VALID_CLIENT_ID)).thenReturn(Optional.of(client));
+		when(clientToRecordMapper.map(client)).thenReturn(expected);
+
+		final ClientRecord result = service.findById(VALID_CLIENT_ID);
+
+		assertEquals(expected, result);
+		verify(clientRepository).findById(VALID_CLIENT_ID);
+	}
+
+	@Test
+	@DisplayName("Should find client entity by id")
+	public void shouldFindClientEntityById()
 	{
 		final Client client = mock(Client.class);
 		when(clientRepository.findById(VALID_CLIENT_ID)).thenReturn(Optional.of(client));
@@ -75,7 +113,7 @@ public class ClientServiceImplTest
 		final Client client = mock(Client.class);
 		final ClientRecord expected = mock(ClientRecord.class);
 
-		when(clientRepository.save(argThat(c-> c.getName().equals(clientRecord.name()) && c.getEmail().equals(clientRecord.email())))).thenReturn(client);
+		when(clientRepository.save(argThat(c -> c.getName().equals(clientRecord.name()) && c.getEmail().equals(clientRecord.email())))).thenReturn(client);
 		when(clientToRecordMapper.map(client)).thenReturn(expected);
 
 		final ClientRecord saved = service.createClient(clientRecord);

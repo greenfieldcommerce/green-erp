@@ -216,6 +216,16 @@ public abstract class BaseRestControllerTest
 	}
 
 	/**
+	 * Creates a REST Docs parameter descriptor for client ID path parameters.
+	 *
+	 * @return a parameter descriptor for clientId
+	 */
+	protected static ParameterDescriptor clientIdParameterDescription()
+	{
+		return parameterWithName("clientId").description("Client id");
+	}
+
+	/**
 	 * Creates a REST Docs parameter descriptor for contractor rate ID path parameters.
 	 *
 	 * @return a parameter descriptor for rateId

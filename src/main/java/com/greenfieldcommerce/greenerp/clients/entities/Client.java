@@ -1,10 +1,19 @@
 package com.greenfieldcommerce.greenerp.clients.entities;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import com.greenfieldcommerce.greenerp.clients.invoices.entities.ClientInvoice;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
 
 @Entity
@@ -20,6 +29,9 @@ public class Client
 
 	@Column(nullable = false, unique = true)
 	private String email;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
+	private final List<ClientInvoice> invoices = new ArrayList<>();
 
 	@Version
 	private Long version;
@@ -75,5 +87,10 @@ public class Client
 	public void setVersion(final Long version)
 	{
 		this.version = version;
+	}
+
+	public List<ClientInvoice> getInvoices()
+	{
+		return invoices;
 	}
 }

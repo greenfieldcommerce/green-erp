@@ -1,5 +1,7 @@
 package com.greenfieldcommerce.greenerp.clients.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.greenfieldcommerce.greenerp.clients.entities.Client;
@@ -23,11 +25,23 @@ public class ClientServiceImpl extends BaseEntityService<Client, Long> implement
 	}
 
 	@Override
+	public List<ClientRecord> findAll()
+	{
+		return repository.findAll().stream().map(clientToRecordMapper::map).toList();
+	}
+
+	@Override
 	public ClientRecord createClient(final CreateClientRecord clientData)
 	{
 		final Client client = Client.create(clientData.name(), clientData.email());
 		final Client created = repository.save(client);
 
 		return clientToRecordMapper.map(created);
+	}
+
+	@Override
+	public ClientRecord findById(final Long id)
+	{
+		return clientToRecordMapper.map(findEntityById(id));
 	}
 }

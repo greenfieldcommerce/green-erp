@@ -3,9 +3,9 @@ package com.greenfieldcommerce.greenerp.contractors.mappers;
 import org.springframework.stereotype.Component;
 
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
-import com.greenfieldcommerce.greenerp.rates.entities.ContractorRate;
+import com.greenfieldcommerce.greenerp.contractors.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.mappers.Mapper;
-import com.greenfieldcommerce.greenerp.rates.records.ContractorRateRecord;
+import com.greenfieldcommerce.greenerp.contractors.rates.records.ContractorRateRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
 
 @Component
