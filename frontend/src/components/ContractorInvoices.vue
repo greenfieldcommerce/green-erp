@@ -94,15 +94,116 @@
             <span class="value">{{ selectedInvoice.currency }}</span>
           </div>
 
-          <div v-if="selectedInvoice.extraAmountLines && selectedInvoice.extraAmountLines.length > 0" class="extra-amounts">
-            <h5>Extra Amounts</h5>
+          <div v-if="selectedInvoice.extraAmountLines && (selectedInvoice.extraAmountLines.length > 0 || isInvoiceOpen())" class="extra-amounts">
+            <div class="extra-amounts-header">
+              <h5>Extra Amounts</h5>
+              <button
+                v-if="isInvoiceOpen()"
+                @click="toggleAddExtraLineForm"
+                :disabled="submittingExtraLine"
+                class="add-line-btn"
+              >
+                {{ isAddingExtraLine ? 'Cancel' : '+ Add Extra Line' }}
+              </button>
+            </div>
+
+            <div v-if="extraLineError" class="extra-line-error">
+              {{ extraLineError }}
+            </div>
+
+            <!-- Existing extra lines -->
             <div
               v-for="line in selectedInvoice.extraAmountLines"
               :key="line.id"
               class="extra-line"
+              :class="{ 'editing': editingExtraLineId === line.id }"
             >
-              <span class="line-description">{{ line.description }}</span>
-              <span class="line-amount">{{ formatCurrency(line.amount, selectedInvoice.currency) }}</span>
+              <div v-if="editingExtraLineId === line.id" class="extra-line-edit-form">
+                <input
+                  v-model="editExtraLineForm.description"
+                  type="text"
+                  placeholder="Description"
+                  class="form-input"
+                  :disabled="submittingExtraLine"
+                />
+                <input
+                  v-model="editExtraLineForm.amount"
+                  type="number"
+                  placeholder="Amount"
+                  step="0.01"
+                  min="0.01"
+                  class="form-input"
+                  :disabled="submittingExtraLine"
+                />
+                <div class="edit-actions">
+                  <button
+                    @click="updateExtraLine"
+                    :disabled="submittingExtraLine"
+                    class="save-btn"
+                  >
+                    {{ submittingExtraLine ? 'Saving...' : 'Save' }}
+                  </button>
+                  <button
+                    @click="toggleEditMode(line)"
+                    :disabled="submittingExtraLine"
+                    class="cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+              <div v-else class="extra-line-view">
+                <span class="line-description">{{ line.description }}</span>
+                <span class="line-amount">{{ formatCurrency(line.amount, selectedInvoice.currency) }}</span>
+                <button
+                  v-if="isInvoiceOpen()"
+                  @click="toggleEditMode(line)"
+                  class="edit-line-btn"
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+
+            <!-- Add new extra line form -->
+            <div v-if="isAddingExtraLine" class="extra-line-add-form">
+              <h6>Add New Extra Amount</h6>
+              <input
+                v-model="newExtraLineForm.description"
+                type="text"
+                placeholder="Description"
+                class="form-input"
+                :disabled="submittingExtraLine"
+              />
+              <input
+                v-model="newExtraLineForm.amount"
+                type="number"
+                placeholder="Amount"
+                step="0.01"
+                min="0.01"
+                class="form-input"
+                :disabled="submittingExtraLine"
+              />
+              <div class="form-actions">
+                <button
+                  @click="addExtraLine"
+                  :disabled="submittingExtraLine"
+                  class="save-btn"
+                >
+                  {{ submittingExtraLine ? 'Adding...' : 'Add' }}
+                </button>
+                <button
+                  @click="toggleAddExtraLineForm"
+                  :disabled="submittingExtraLine"
+                  class="cancel-btn"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <div v-if="selectedInvoice.extraAmountLines.length === 0 && !isAddingExtraLine && isInvoiceOpen()" class="no-extra-lines">
+              <p>No extra amounts yet</p>
             </div>
           </div>
 
@@ -150,6 +251,19 @@ export default {
       totalElements: 0,
       hasNextPage: false,
       loadingMore: false,
+      // Extra lines management
+      isAddingExtraLine: false,
+      editingExtraLineId: null,
+      newExtraLineForm: {
+        description: '',
+        amount: ''
+      },
+      editExtraLineForm: {
+        description: '',
+        amount: ''
+      },
+      submittingExtraLine: false,
+      extraLineError: null,
     }
   },
   computed: {
@@ -285,6 +399,109 @@ export default {
           return 'status-closed'
         default:
           return ''
+      }
+    },
+
+    isInvoiceOpen() {
+      return this.selectedInvoice && this.selectedInvoice.status === 'OPEN'
+    },
+
+    toggleAddExtraLineForm() {
+      this.isAddingExtraLine = !this.isAddingExtraLine
+      if (!this.isAddingExtraLine) {
+        this.newExtraLineForm = { description: '', amount: '' }
+        this.extraLineError = null
+      }
+    },
+
+    toggleEditMode(line) {
+      if (this.editingExtraLineId === line.id) {
+        // Cancel edit mode
+        this.editingExtraLineId = null
+        this.editExtraLineForm = { description: '', amount: '' }
+        this.extraLineError = null
+      } else {
+        // Enter edit mode
+        this.editingExtraLineId = line.id
+        this.editExtraLineForm = {
+          description: line.description,
+          amount: line.amount.toString()
+        }
+        this.extraLineError = null
+      }
+    },
+
+    isFormValid(form) {
+      return form.description && form.description.trim() !== '' && form.amount && parseFloat(form.amount) >= 0.01
+    },
+
+    async addExtraLine() {
+      if (!this.isFormValid(this.newExtraLineForm)) {
+        this.extraLineError = 'Please fill in all fields. Amount must be at least 0.01.'
+        return
+      }
+
+      this.submittingExtraLine = true
+      this.extraLineError = null
+
+      try {
+        const payload = {
+          description: this.newExtraLineForm.description,
+          amount: parseFloat(this.newExtraLineForm.amount)
+        }
+
+        const response = await api.post(
+          `/contractors/${this.contractorId}/invoices/${this.selectedInvoiceId}/extra-lines`,
+          payload
+        )
+
+        this.selectedInvoice = response.data
+        this.newExtraLineForm = { description: '', amount: '' }
+        this.isAddingExtraLine = false
+      } catch (err) {
+        console.error('Failed to add extra line:', err)
+        if (err.response?.data?.message) {
+          this.extraLineError = err.response.data.message
+        } else {
+          this.extraLineError = 'Failed to add extra line. Please try again.'
+        }
+      } finally {
+        this.submittingExtraLine = false
+      }
+    },
+
+    async updateExtraLine() {
+      if (!this.isFormValid(this.editExtraLineForm)) {
+        this.extraLineError = 'Please fill in all fields. Amount must be at least 0.01.'
+        return
+      }
+
+      this.submittingExtraLine = true
+      this.extraLineError = null
+
+      try {
+        const payload = {
+          description: this.editExtraLineForm.description,
+          amount: parseFloat(this.editExtraLineForm.amount)
+        }
+
+        const response = await api.patch(
+          `/contractors/${this.contractorId}/invoices/${this.selectedInvoiceId}/extra-lines/${this.editingExtraLineId}`,
+          payload
+        )
+
+        this.selectedInvoice = response.data
+        this.editingExtraLineId = null
+        this.editExtraLineForm = { description: '', amount: '' }
+      } catch (err) {
+        console.error('Failed to update extra line:', err)
+        if (err.response?.data?.message) {
+          this.extraLineError = err.response.data.message
+        } else {
+          this.extraLineError = 'Failed to update extra line. Please try again.'
+        }
+      } finally {
+        this.submittingExtraLine = false
       }
     },
   },
@@ -534,26 +751,197 @@ export default {
   font-size: 1rem;
 }
 
-.extra-line {
+.extra-amounts-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 1rem;
 }
 
-.extra-line:last-child {
-  border-bottom: none;
+.extra-amounts-header h5 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+.add-line-btn {
+  background: #42b883;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-line-btn:hover:not(:disabled) {
+  background: #369970;
+}
+
+.add-line-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.extra-line-error {
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  padding: 0.75rem;
+  color: #c33;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.extra-line {
+  padding: 0.75rem;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  background: #fff;
+  transition: background-color 0.2s;
+}
+
+.extra-line.editing {
+  background: #f8f9fa;
+  border-color: #42b883;
+}
+
+.extra-line-view {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .line-description {
   color: #666;
   font-size: 0.9rem;
+  flex: 1;
 }
 
 .line-amount {
   font-weight: 600;
   color: #2c3e50;
+  min-width: 100px;
+  text-align: right;
+}
+
+.edit-line-btn {
+  background: #f0f0f0;
+  color: #2c3e50;
+  border: 1px solid #ddd;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.edit-line-btn:hover {
+  background: #e0e0e0;
+  border-color: #ccc;
+}
+
+.extra-line-edit-form {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.extra-line-add-form {
+  background: #f8f9fa;
+  border: 1px solid #42b883;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.extra-line-add-form h6 {
+  margin: 0 0 0.5rem 0;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.form-input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #42b883;
+  box-shadow: 0 0 0 2px rgba(66, 184, 131, 0.1);
+}
+
+.form-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.edit-actions,
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: #42b883;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #369970;
+}
+
+.save-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  color: #2c3e50;
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #e0e0e0;
+  border-color: #ccc;
+}
+
+.cancel-btn:disabled {
+  background: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.no-extra-lines {
+  text-align: center;
+  color: #999;
+  padding: 1rem;
+  font-style: italic;
+  font-size: 0.9rem;
 }
 
 .total-row {
