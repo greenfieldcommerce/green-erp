@@ -8,6 +8,7 @@
         </router-link>
         <nav class="nav-links">
           <router-link v-if="isAdmin" to="/contractors">Contractors</router-link>
+          <router-link v-if="isAdmin" to="/clients">Clients</router-link>
         </nav>
         <div class="user-info">
           <span class="username">{{ username }}</span>

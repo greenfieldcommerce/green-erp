@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from './views/Home.vue'
 import ContractorsList from './views/ContractorsList.vue'
+import ClientsList from './views/ClientsList.vue'
 import keycloak from './keycloak'
 
 const routes = [
@@ -13,6 +14,12 @@ const routes = [
     path: '/contractors',
     name: 'Contractors',
     component: ContractorsList,
+    meta: { requiresAdmin: true },
+  },
+  {
+    path: '/clients',
+    name: 'Clients',
+    component: ClientsList,
     meta: { requiresAdmin: true },
   },
   {
