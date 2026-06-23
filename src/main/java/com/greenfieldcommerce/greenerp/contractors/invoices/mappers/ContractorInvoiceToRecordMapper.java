@@ -28,6 +28,7 @@ public class ContractorInvoiceToRecordMapper implements Mapper<ContractorInvoice
 		return new ContractorInvoiceRecord(
 			contractorInvoice.getContractor().getId(),
 			contractorInvoice.getId(),
+			contractorInvoice.getClient().getId(),
 			contractorInvoice.getStartDate(),
 			contractorInvoice.getEndDate(),
 			contractorInvoice.getNumberOfWorkedDays(),

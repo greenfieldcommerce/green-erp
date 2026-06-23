@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
+import com.greenfieldcommerce.greenerp.clients.assemblers.ClientContractorInvoicesModelAssembler;
 import com.greenfieldcommerce.greenerp.clients.assemblers.ClientModelAssembler;
 import com.greenfieldcommerce.greenerp.contractors.invoices.assemblers.ContractorInvoiceModelAssembler;
 import com.greenfieldcommerce.greenerp.contractors.assemblers.ContractorModelAssembler;
@@ -49,6 +50,12 @@ public class GreenERPTestConfiguration
 	public ClientModelAssembler clientModelAssembler()
 	{
 		return new ClientModelAssembler();
+	}
+
+	@Bean
+	public ClientContractorInvoicesModelAssembler clientContractorInvoicesModelAssembler()
+	{
+		return new ClientContractorInvoicesModelAssembler(contractorInvoiceModelAssembler());
 	}
 
 	@Bean

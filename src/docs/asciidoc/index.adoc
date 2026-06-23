@@ -265,3 +265,15 @@ include::{snippets}/detailing-client/links.adoc[]
 A `GET` request will retrieve the details for a client.
 
 operation::detailing-client[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
+
+== Contractor invoices for a Client
+
+[[resources_client_contractor_invoices]]
+=== Links
+
+include::{snippets}/listing-contractor-invoices-for-client/links.adoc[]
+
+=== Listing open contractor invoices for a client
+A `GET` request will retrieve open contractor invoices with start date before given date, for a client.
+
+operation::listing-contractor-invoices-for-client[snippets='http-request,request-headers,path-parameters,query-parameters,response-fields,http-response']

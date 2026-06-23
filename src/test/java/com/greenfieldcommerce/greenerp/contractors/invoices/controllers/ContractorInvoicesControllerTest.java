@@ -85,9 +85,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	{
 		final Pageable pageable = buildPageable();
 
-		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
-		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "BILLED");
-		final ContractorInvoiceRecord invoice3 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID,ZonedDateTime.now().minusMonths(2), ZonedDateTime.now().minusMonths(2).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "CLOSED");
+		final ContractorInvoiceRecord invoice1 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
+		final ContractorInvoiceRecord invoice2 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(1), ZonedDateTime.now().minusMonths(1).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "BILLED");
+		final ContractorInvoiceRecord invoice3 = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now().minusMonths(2), ZonedDateTime.now().minusMonths(2).plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "CLOSED");
 
 		final List<ContractorInvoiceRecord> invoices = List.of(invoice1, invoice2, invoice3);
 		final Page<ContractorInvoiceRecord> page = new PageImpl<>(invoices, pageable, invoices.size());
@@ -108,7 +108,6 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 			.andDo(MockMvcResultHandlers.print())
 			.andDo(document("listing-latest-invoices",
 				preprocessResponse(prettyPrint()),
-				requestHeaders(describeAdminOrContractorHeader()),
 				requestHeaders(describeAdminOrContractorHeader()),
 				queryParameters(
 					parameterWithName("page").description("The requested response page, defaults to 0").optional(),
@@ -143,7 +142,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldCreateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
 
 		when(contractorInvoiceService.create(eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()))).thenReturn(result);
 
@@ -179,7 +178,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	@MethodSource("withAdminUserAndOwnerContractor")
 	public void shouldReturnInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
-		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
+		final ContractorInvoiceRecord record = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), BigDecimal.valueOf(20), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
 
 		when(contractorInvoiceService.findByContractorAndId(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID))).thenReturn(record);
 
@@ -203,7 +202,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 	public void shouldUpdateInvoice_forAdminAndOwner(SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor user) throws Exception
 	{
 		final CreateContractorInvoiceRecord createContractorInvoiceRecord = buildValidContractorInvoiceRecord();
-		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
+		final ContractorInvoiceRecord result = new ContractorInvoiceRecord(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, ZonedDateTime.now(), ZonedDateTime.now().plusMonths(1), createContractorInvoiceRecord.numberOfWorkedDays(), SetUtils.emptySet(), BigDecimal.valueOf(3600), Currency.getInstance("USD"), "OPEN");
 
 		when(contractorInvoiceService.patchInvoice(eq(VALID_RESOURCE_ID), eq(VALID_RESOURCE_ID), eq(createContractorInvoiceRecord.numberOfWorkedDays()))).thenReturn(result);
 
@@ -306,7 +305,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		return links(
 			linkWithRel("self").description("Self link to this <<resources_invoice, Invoice>>"),
 			linkWithRel("contractor").description("Link to the <<resources_contractor, Contractor>> for whom this invoice is issued"),
-			linkWithRel("latestInvoices").description("Link to the latest <<resources_invoices, invoices>> for the contractor"));
+			linkWithRel("latestInvoices").description("Link to the latest <<resources_invoices, invoices>> for the contractor"),
+			linkWithRel("client").description("Link to the <<resources_client, Client>> for whom this invoice is billed").optional()
+		);
 	}
 
 	protected static ParameterDescriptor invoiceIdParameterDescription()
@@ -319,6 +320,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		return responseFields(
 			fieldWithPath("contractorId").description("ID of the contractor"),
 			fieldWithPath("invoiceId").description("ID of the invoice"),
+			fieldWithPath("clientId").description("ID of the client to whom invoice is billed"),
 			fieldWithPath("startDate").description("The start of the period for which the invoice is valid"),
 			fieldWithPath("endDate").description("The end of the period for which the invoice is valid"),
 			fieldWithPath("numberOfWorkedDays").description("The number of days worked by the contractor"),

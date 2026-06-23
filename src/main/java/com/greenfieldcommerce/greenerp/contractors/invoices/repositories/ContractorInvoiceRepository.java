@@ -1,6 +1,7 @@
 package com.greenfieldcommerce.greenerp.contractors.invoices.repositories;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.contractors.invoices.entities.ContractorInvoice;
 
@@ -17,4 +19,6 @@ public interface ContractorInvoiceRepository extends ListCrudRepository<Contract
 	Optional<ContractorInvoice> findContractorInvoiceForADate(Contractor contractor, ZonedDateTime date);
 	Page<ContractorInvoice> findByContractor(Contractor contractor, Pageable pageable);
 	Optional<ContractorInvoice> findByContractorAndId(Contractor contractor, Long id);
+	List<ContractorInvoice> findByClientAndStartDateBeforeAndStatus(Client client, ZonedDateTime startDate, ContractorInvoice.InvoiceStatus status);
+
 }

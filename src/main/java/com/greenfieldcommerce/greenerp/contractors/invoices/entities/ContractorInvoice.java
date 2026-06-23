@@ -9,6 +9,7 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
 import com.greenfieldcommerce.greenerp.clients.invoices.entities.ClientInvoice;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.contractors.rates.entities.ContractorRate;
@@ -17,6 +18,8 @@ import com.greenfieldcommerce.greenerp.exceptions.IllegalInvoiceModificationExce
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -47,6 +50,10 @@ public class ContractorInvoice
 	@JoinColumn(name = "clientInvoiceId")
 	private ClientInvoice clientInvoice;
 
+	@ManyToOne
+	@JoinColumn(name = "clientId")
+	private Client client;
+
 	@OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, mappedBy = "invoice")
 	private Set<InvoiceExtraAmountLine> extraAmountLines;
 
@@ -75,6 +82,7 @@ public class ContractorInvoice
 	private ContractorInvoice(ContractorRate rate, final ZonedDateTime startDate, final ZonedDateTime endDate, BigDecimal numberOfWorkedDays)
 	{
 		this.rate = rate;
+		this.client = rate.getClient();
 		this.contractor = rate.getContractor();
 		this.currency = rate.getCurrency();
 		this.extraAmountLines = new HashSet<>();
@@ -186,6 +194,11 @@ public class ContractorInvoice
 	public InvoiceStatus getStatus()
 	{
 		return status;
+	}
+
+	public Client getClient()
+	{
+		return client;
 	}
 
 	public enum InvoiceStatus

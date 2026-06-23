@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.contractors.invoices.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.contractors.invoices.entities.InvoiceExtraAmountLine;
@@ -32,6 +33,7 @@ class ContractorInvoiceToRecordMapperTest {
 	private static final BigDecimal WORKED_DAYS = BigDecimal.valueOf(20);
 	private static final BigDecimal TOTAL = BigDecimal.valueOf(5000.0);
 	private static final Long CONTRACTOR_ID = 1L;
+	private static final Long CLIENT_ID = 2L;
 
 	@Mock
 	private Mapper<InvoiceExtraAmountLine, InvoiceExtraAmountLineRecord> invoiceExtraAmountLineRecordMapper;
@@ -69,8 +71,11 @@ class ContractorInvoiceToRecordMapperTest {
 
 		Contractor contractor = mock(Contractor.class);
 		when(contractor.getId()).thenReturn(CONTRACTOR_ID);
-
 		when(invoice.getContractor()).thenReturn(contractor);
+
+		Client client = mock(Client.class);
+		when(client.getId()).thenReturn(CLIENT_ID);
+		when(invoice.getClient()).thenReturn(client);
 		when(invoice.getStartDate()).thenReturn(START);
 		when(invoice.getEndDate()).thenReturn(END);
 		when(invoice.getNumberOfWorkedDays()).thenReturn(WORKED_DAYS);

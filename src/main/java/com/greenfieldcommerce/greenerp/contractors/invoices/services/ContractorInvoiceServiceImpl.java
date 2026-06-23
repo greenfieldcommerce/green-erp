@@ -1,6 +1,8 @@
 package com.greenfieldcommerce.greenerp.contractors.invoices.services;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -80,6 +82,15 @@ public class ContractorInvoiceServiceImpl extends BaseEntityService<ContractorIn
 	{
 		final Contractor contractor = contractorService.findEntityById(contractorId);
 		return contractorInvoiceRepository.findByContractor(contractor, pageable).map(contractorInvoiceToRecordMapper::map);
+	}
+
+	@Override
+	public List<ContractorInvoiceRecord> findOpenForClientBeforeDate(final Long clientId, final ZonedDateTime limiterDate)
+	{
+		final Client client = clientService.findEntityById(clientId);
+		final List<ContractorInvoice> openInvoices = contractorInvoiceRepository.findByClientAndStartDateBeforeAndStatus(client, limiterDate, ContractorInvoice.InvoiceStatus.OPEN);
+
+		return openInvoices.stream().map(contractorInvoiceToRecordMapper::map).toList();
 	}
 
 	/**

@@ -28,12 +28,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import com.greenfieldcommerce.greenerp.clients.entities.Client;
+import com.greenfieldcommerce.greenerp.clients.services.ClientService;
 import com.greenfieldcommerce.greenerp.contractors.entities.Contractor;
 import com.greenfieldcommerce.greenerp.contractors.invoices.entities.ContractorInvoice;
 import com.greenfieldcommerce.greenerp.contractors.invoices.entities.InvoiceExtraAmountLine;
 import com.greenfieldcommerce.greenerp.contractors.invoices.records.CreateInvoiceExtraAmountLineRecord;
-import com.greenfieldcommerce.greenerp.contractors.invoices.services.ContractorInvoiceMessagingService;
-import com.greenfieldcommerce.greenerp.contractors.invoices.services.ContractorInvoiceServiceImpl;
 import com.greenfieldcommerce.greenerp.contractors.rates.entities.ContractorRate;
 import com.greenfieldcommerce.greenerp.exceptions.DuplicateContractorInvoiceException;
 import com.greenfieldcommerce.greenerp.exceptions.EntityNotFoundException;
@@ -58,6 +58,8 @@ public class ContractorInvoiceServiceImplTest
 	private ContractorService contractorService;
 	@Mock
 	private ContractorInvoiceMessagingService contractorInvoiceMessagingService;
+	@Mock
+	private ClientService clientService;
 
 	@InjectMocks
 	private ContractorInvoiceServiceImpl service;
@@ -89,6 +91,33 @@ public class ContractorInvoiceServiceImplTest
 		assertEquals(invoice2Record, result.getContent().get(1));
 		assertEquals(invoices.size(), result.getTotalElements());
 		assertEquals(pageable, result.getPageable());
+	}
+
+	@Test
+	@DisplayName("Should find open contractor invoices for a client with starting before a given date")
+	public void shouldFindOpenContractorInvoicesForAClientWithStartingBeforeDate()
+	{
+		final Client client = mock(Client.class);
+		final ZonedDateTime startDate = ZonedDateTime.now();
+
+		final ContractorInvoice invoice1 = mock(ContractorInvoice.class);
+		final ContractorInvoice invoice2 = mock(ContractorInvoice.class);
+
+		final ContractorInvoiceRecord invoice1Record = mock(ContractorInvoiceRecord.class);
+		final ContractorInvoiceRecord invoice2Record = mock(ContractorInvoiceRecord.class);
+
+		when(clientService.findEntityById(eq(VALID_RESOURCE_ID))).thenReturn(client);
+		when(contractorInvoiceRepository.findByClientAndStartDateBeforeAndStatus(eq(client), eq(startDate), eq(ContractorInvoice.InvoiceStatus.OPEN)))
+			.thenReturn(List.of(invoice1, invoice2));
+
+		when(contractorInvoiceToRecordMapper.map(eq(invoice1))).thenReturn(invoice1Record);
+		when(contractorInvoiceToRecordMapper.map(eq(invoice2))).thenReturn(invoice2Record);
+
+		final List<ContractorInvoiceRecord> result = service.findOpenForClientBeforeDate(VALID_RESOURCE_ID, startDate);
+
+		assertEquals(2, result.size());
+		assertEquals(invoice1Record, result.get(0));
+		assertEquals(invoice2Record, result.get(1));
 	}
 
 	@Test

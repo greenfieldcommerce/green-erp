@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.greenfieldcommerce.greenerp.clients.controllers.ClientsController;
 import com.greenfieldcommerce.greenerp.clients.records.ClientRecord;
+import com.greenfieldcommerce.greenerp.contractors.invoices.records.ContractorInvoiceRecord;
 
 @Component
 public class ClientModelAssembler extends RepresentationModelAssemblerSupport<ClientRecord, EntityModel<ClientRecord>>
@@ -24,6 +25,7 @@ public class ClientModelAssembler extends RepresentationModelAssemblerSupport<Cl
 	{
 		return EntityModel.of(client,
 			linkTo(methodOn(ClientsController.class).getClientDetails(client.id())).withSelfRel(),
+			linkTo(methodOn(ClientsController.class).getContractorInvoicesForClient(client.id(), null)).withRel("openContractorInvoicesForClient"),
 			linkTo(methodOn(ClientsController.class).getAllClients()).withRel("allClients"));
 	}
 
@@ -35,4 +37,5 @@ public class ClientModelAssembler extends RepresentationModelAssemblerSupport<Cl
 
 		return collection;
 	}
+
 }
