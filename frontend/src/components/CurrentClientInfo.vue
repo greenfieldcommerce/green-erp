@@ -31,14 +31,24 @@
     <div v-if="!loading && !error && !client" class="no-data">
       <p>No client information available.</p>
     </div>
+
+    <!-- Contractor Invoices Section -->
+    <ClientContractorInvoices
+      v-if="!loading && !error && client"
+      :client-id="clientId"
+    />
   </div>
 </template>
 
 <script>
 import api from '../api'
+import ClientContractorInvoices from './ClientContractorInvoices.vue'
 
 export default {
   name: 'CurrentClientInfo',
+  components: {
+    ClientContractorInvoices,
+  },
   props: {
     clientId: {
       type: [String, Number],
