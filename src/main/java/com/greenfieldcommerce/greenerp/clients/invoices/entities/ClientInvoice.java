@@ -64,10 +64,13 @@ public class ClientInvoice
 		this.status = ClientInvoiceStatus.OPEN;
 	}
 
-	public static ClientInvoice create(Client client, Currency currency, ZonedDateTime invoiceDate, ZonedDateTime dueDate, List<ContractorInvoice> contractorInvoices)
+	public static ClientInvoice create(Client client, List<ContractorInvoice> contractorInvoices)
 	{
-		ClientInvoice clientInvoice = new ClientInvoice(client, currency, invoiceDate, dueDate);
+		final ZonedDateTime invoiceDate = ZonedDateTime.now();
+		final ZonedDateTime dueDate = invoiceDate.plusDays(client.getInvoiceDueDateGap());
+		final ClientInvoice clientInvoice = new ClientInvoice(client, client.getInvoiceCurrency(), invoiceDate, dueDate);
 		contractorInvoices.forEach(clientInvoice::addContractorInvoice);
+
 		return clientInvoice;
 	}
 

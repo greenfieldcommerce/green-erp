@@ -1,12 +1,11 @@
 package com.greenfieldcommerce.greenerp.clients.entities;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Currency;
 import java.util.List;
 
 import com.greenfieldcommerce.greenerp.clients.invoices.entities.ClientInvoice;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -30,6 +29,10 @@ public class Client
 	@Column(nullable = false, unique = true)
 	private String email;
 
+	private Currency invoiceCurrency;
+
+	private Integer invoiceDueDateGap;
+
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "client")
 	private final List<ClientInvoice> invoices = new ArrayList<>();
 
@@ -38,15 +41,15 @@ public class Client
 
 	protected Client() {}
 
-	private Client(final String name, final String email)
+	private Client(final String name, final String email, final Currency invoiceCurrency, final Integer invoiceDueDateGap)
 	{
 		this.name = name;
 		this.email = email;
 	}
 
-	public static Client create(final String name, final String email)
+	public static Client create(final String name, final String email, final Currency invoiceCurrency, final Integer invoiceDueDateGap)
 	{
-		return new Client(name, email);
+		return new Client(name, email, invoiceCurrency, invoiceDueDateGap);
 	}
 
 	public Long getId()
@@ -77,6 +80,26 @@ public class Client
 	public void setEmail(final String email)
 	{
 		this.email = email;
+	}
+
+	public Currency getInvoiceCurrency()
+	{
+		return invoiceCurrency;
+	}
+
+	public void setInvoiceCurrency(final Currency invoiceCurrency)
+	{
+		this.invoiceCurrency = invoiceCurrency;
+	}
+
+	public Integer getInvoiceDueDateGap()
+	{
+		return invoiceDueDateGap;
+	}
+
+	public void setInvoiceDueDateGap(final Integer invoiceDueDateGap)
+	{
+		this.invoiceDueDateGap = invoiceDueDateGap;
 	}
 
 	public Long getVersion()

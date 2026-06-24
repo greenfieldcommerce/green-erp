@@ -10,7 +10,6 @@ import com.greenfieldcommerce.greenerp.services.EntityService;
 
 public interface ClientService extends EntityService<Client, Long>
 {
-	Client findEntityById(Long id);
 	List<ClientRecord> findAll();
 	ClientRecord createClient(CreateClientRecord clientData);
 	ClientRecord findById(Long id);

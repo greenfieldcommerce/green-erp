@@ -33,7 +33,7 @@ public class ClientServiceImpl extends BaseEntityService<Client, Long> implement
 	@Override
 	public ClientRecord createClient(final CreateClientRecord clientData)
 	{
-		final Client client = Client.create(clientData.name(), clientData.email());
+		final Client client = Client.create(clientData.name(), clientData.email(), clientData.currency(), clientData.dueDateGap());
 		final Client created = repository.save(client);
 
 		return clientToRecordMapper.map(created);

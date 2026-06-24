@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 
@@ -109,7 +110,7 @@ public class ClientServiceImplTest
 	@DisplayName("Should create client")
 	public void shouldCreateClient()
 	{
-		final CreateClientRecord clientRecord = new CreateClientRecord("Client Name", "client@greenfieldcommerce.com");
+		final CreateClientRecord clientRecord = new CreateClientRecord("Client Name", "client@greenfieldcommerce.com", Currency.getInstance("USD"), 15);
 		final Client client = mock(Client.class);
 		final ClientRecord expected = mock(ClientRecord.class);
 
