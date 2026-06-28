@@ -10,10 +10,8 @@ import org.apache.commons.collections4.SetUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,8 +28,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -73,20 +69,15 @@ public class ClientsControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(getClientsRequest().with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("_embedded.clients").isArray())
-			.andExpect(validClient("_embedded.clients[0]", client1))
-			.andExpect(validClient("_embedded.clients[1]", client2))
-			.andExpect(jsonPath("_links").exists())
-			.andExpect(jsonPath("$._links.self").exists())
-			.andExpect(jsonPath("$._links.self.href").value("http://localhost:8080/clients"))
+			.andExpect(jsonPath("clients").isArray())
+			.andExpect(validClient("clients[0]", client1))
+			.andExpect(validClient("clients[1]", client2))
 			.andDo(
 				document("listing-clients",
 					preprocessResponse(prettyPrint()),
 					requestHeaders(describeAdminHeader()),
-					links(linkWithRel("self").description("Self link to this <<resources_clients, resource>>")),
 					responseFields(
-						subsectionWithPath("_embedded.clients").description("An array of <<resources_client, Client resources>>"),
-						subsectionWithPath("_links").description("<<resources_clients_links, Links>> to other resources")
+						subsectionWithPath("clients").description("An array of <<resources_client, Client resources>>")
 					)
 				)
 			);
@@ -102,12 +93,10 @@ public class ClientsControllerTest extends BaseRestControllerTest
 		getMvc().perform(getClientDetailsRequest(VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isOk())
 			.andExpect(validClient("$", client))
-			.andExpectAll(clientLinksMatchers(VALID_RESOURCE_ID))
 			.andDo(print())
 			.andDo(
 				document("detailing-client",
 					preprocessResponse(prettyPrint()),
-					describeClientLinks(),
 					requestHeaders(describeAdminHeader()),
 					pathParameters(clientIdParameterDescription()),
 					describeClientResponse()
@@ -127,11 +116,9 @@ public class ClientsControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(getContractorInvoicesForClientRequest(VALID_RESOURCE_ID).with(getJwtRequestPostProcessors().admin()))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("_embedded.invoices").isArray())
-			.andExpect(validateContractorInvoice("_embedded.invoices[0]", invoice1, getObjectMapper()))
-			.andExpect(validateContractorInvoice("_embedded.invoices[1]", invoice2, getObjectMapper()))
-			.andExpect(jsonPath("_links").exists())
-			.andExpect(jsonPath("_links.self").exists())
+			.andExpect(jsonPath("invoices").isArray())
+			.andExpect(validateContractorInvoice("invoices[0]", invoice1, getObjectMapper()))
+			.andExpect(validateContractorInvoice("invoices[1]", invoice2, getObjectMapper()))
 			.andDo(print())
 			.andDo(
 				document("listing-contractor-invoices-for-client",
@@ -141,10 +128,8 @@ public class ClientsControllerTest extends BaseRestControllerTest
 						parameterWithName("startDateBefore").description("A date limiter for the invoices (formatted ISO 8601 date-time), defaults to current date").optional()
 					),
 					pathParameters(clientIdParameterDescription()),
-					links(linkWithRel("self").description("Self link to this <<resources_client_contractor_invoices, open invoices query>>")),
 					responseFields(
-						subsectionWithPath("_embedded.invoices").description("An array of <<resources_invoice, Invoice resources>>"),
-						subsectionWithPath("_links").description("<<resources_client_contractor_invoices, Links>> to other resources")
+						subsectionWithPath("invoices").description("An array of <<resources_invoice, Invoice resources>>")
 					)
 				)
 			);
@@ -184,27 +169,9 @@ public class ClientsControllerTest extends BaseRestControllerTest
 		return get("/clients/{clientId}/contractor-invoices", clientId);
 	}
 
-	private static ResultMatcher[] clientLinksMatchers(final Long clientId)
-	{
-		return new ResultMatcher[] {
-			jsonPath("$._links").exists(),
-			jsonPath("$._links.self.href").value("http://localhost:8080/clients/" + clientId),
-			jsonPath("$._links.allClients.href").value("http://localhost:8080/clients")
-		};
-	}
-
 	private static ClientRecord buildClient()
 	{
 		return new ClientRecord(1L, "Client Name", "client@email.com");
-	}
-
-	private LinksSnippet describeClientLinks()
-	{
-		return links(
-			linkWithRel("self").description("Self link to this <<resources_client, Client>>"),
-			linkWithRel("allClients").description("Link to all <<resources_clients, Clients>>"),
-			linkWithRel("openContractorInvoicesForClient").description("Link to the open <<resources_invoices, invoices>> for this client")
-		);
 	}
 
 	private static ResponseFieldsSnippet describeClientResponse()
@@ -212,8 +179,7 @@ public class ClientsControllerTest extends BaseRestControllerTest
 		return responseFields(
 			fieldWithPath("id").description("The unique identifier of the client"),
 			fieldWithPath("email").description("The client's email"),
-			fieldWithPath("name").description("The client's name"),
-			subsectionWithPath("_links").description("HATEOAS <<resources_client_links, client links>> to related resources")
+			fieldWithPath("name").description("The client's name")
 		);
 	}
 }

@@ -1,6 +1,8 @@
 package com.greenfieldcommerce.greenerp.controllers;
 
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.headers.HeaderDescriptor;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
@@ -233,6 +236,22 @@ public abstract class BaseRestControllerTest
 	protected static ParameterDescriptor contractorRateIdParameterDescription()
 	{
 		return parameterWithName("rateId").description("Rate id");
+	}
+
+	public static FieldDescriptor[] pageFields(final String contentDescription) {
+		return new FieldDescriptor[] {
+			subsectionWithPath("pageable").description("A Spring pageable object containing pagination metadata"),
+			subsectionWithPath("sort").description("A Spring sort object containing sorting metadata"),
+			subsectionWithPath("content").description(contentDescription),
+			fieldWithPath("last").description("Boolean indicating if this is the last page"),
+			fieldWithPath("totalPages").description("The total number of pages"),
+			fieldWithPath("totalElements").description("The total number of elements"),
+			fieldWithPath("first").description("Boolean indicating if this is the first page"),
+			fieldWithPath("size").description("The size of the page"),
+			fieldWithPath("numberOfElements").description("The number of elements on the current page"),
+			fieldWithPath("number").description("The current page number"),
+			fieldWithPath("empty").description("Boolean indicating if the page is empty")
+		};
 	}
 
 	/**

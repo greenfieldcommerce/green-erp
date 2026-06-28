@@ -1,11 +1,8 @@
 package com.greenfieldcommerce.greenerp.contractors.rates.controllers;
 
+import java.net.URI;
 import java.util.List;
 
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.greenfieldcommerce.greenerp.contractors.rates.assemblers.ContractorRateModelAssembler;
+import com.greenfieldcommerce.greenerp.contractors.rates.records.ContractorRateCollectionRecord;
 import com.greenfieldcommerce.greenerp.records.ZonedDateTimeRecord;
 import com.greenfieldcommerce.greenerp.contractors.rates.records.ContractorRateRecord;
 import com.greenfieldcommerce.greenerp.contractors.rates.records.CreateContractorRateRecord;
@@ -30,50 +28,45 @@ import com.greenfieldcommerce.greenerp.contractors.rates.services.ContractorRate
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/contractors/{contractorId}/rates", produces = MediaTypes.HAL_JSON_VALUE)
+@RequestMapping(value = "/contractors/{contractorId}/rates", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ContractorRatesController
 {
 
 	private final ContractorRateService contractorRateService;
-	private final ContractorRateModelAssembler contractorRateModelAssembler;
 
-	public ContractorRatesController(final ContractorRateService contractorRateService, final ContractorRateModelAssembler contractorRateModelAssembler)
+	public ContractorRatesController(final ContractorRateService contractorRateService)
 	{
 		this.contractorRateService = contractorRateService;
-		this.contractorRateModelAssembler = contractorRateModelAssembler;
 	}
 
 	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public CollectionModel<EntityModel<ContractorRateRecord>> findRatesForContractor(@PathVariable("contractorId") Long contractorId)
+	public ContractorRateCollectionRecord findRatesForContractor(@PathVariable("contractorId") Long contractorId)
 	{
-		final List<ContractorRateRecord> ratesForContractor = contractorRateService.findRatesForContractor(contractorId);
-		return contractorRateModelAssembler.toCollectionModel(contractorId, ratesForContractor);
+		return new ContractorRateCollectionRecord(contractorRateService.findRatesForContractor(contractorId));
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	public ResponseEntity<EntityModel<ContractorRateRecord>> createContractorRate(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
+	public ResponseEntity<ContractorRateRecord> createContractorRate(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRateRecord record)
 	{
 		final ContractorRateRecord createdRate = contractorRateService.create(contractorId, record);
-		EntityModel<ContractorRateRecord> response = contractorRateModelAssembler.toModel(createdRate);
-
-		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{rateId}").buildAndExpand(createdRate.id()).toUri();
+		return ResponseEntity.created(location).body(createdRate);
 	}
 
 	@GetMapping(value = "/{rateId}")
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorRateRecord> getContractorRate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId)
+	public ContractorRateRecord getContractorRate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId)
 	{
-		return contractorRateModelAssembler.toModel(contractorRateService.findByIdAndContractorId(rateId, contractorId));
+		return contractorRateService.findByIdAndContractorId(rateId, contractorId);
 	}
 
 	@PatchMapping(value = "/{rateId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	public EntityModel<ContractorRateRecord> updateRateEndDate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId, @Valid @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
+	public ContractorRateRecord updateRateEndDate(@PathVariable("contractorId") Long contractorId, @PathVariable("rateId") Long rateId, @Valid @RequestBody ZonedDateTimeRecord newEndDateTimeRecord)
 	{
-		final ContractorRateRecord updated = contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
-		return contractorRateModelAssembler.toModel(updated);
+		return contractorRateService.changeEndDateTime(contractorId, rateId, newEndDateTimeRecord.newEndDateTime());
 	}
 
 	@DeleteMapping(value = "/{rateId}")

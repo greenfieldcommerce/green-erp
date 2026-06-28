@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.greenfieldcommerce.greenerp.clients.entities.Client;
 import com.greenfieldcommerce.greenerp.clients.invoices.entities.ClientInvoice;
-import com.greenfieldcommerce.greenerp.clients.invoices.mappers.ClientInvoiceToRecordMapper;
 import com.greenfieldcommerce.greenerp.clients.invoices.records.ClientInvoiceRecord;
 import com.greenfieldcommerce.greenerp.clients.invoices.repository.ClientInvoiceRepository;
 import com.greenfieldcommerce.greenerp.clients.services.ClientService;
@@ -38,16 +37,16 @@ public class ClientInvoiceServiceImpl extends BaseEntityService<ClientInvoice, L
 	}
 
 	@Override
+	public ClientInvoiceRecord findById(final Long id)
+	{
+		return clientInvoiceToRecordMapper.map(findEntityById(id));
+	}
+
+	@Override
 	public Page<ClientInvoiceRecord> findClientInvoicesForClient(final Long clientId, final Pageable pageable)
 	{
 		final Client client = clientService.findEntityById(clientId);
 		return clientInvoiceRepository.findByClient(client, pageable).map(clientInvoiceToRecordMapper::map);
-	}
-
-	@Override
-	public ClientInvoiceRecord findById(final Long id)
-	{
-		return clientInvoiceToRecordMapper.map(findEntityById(id));
 	}
 
 	@Override

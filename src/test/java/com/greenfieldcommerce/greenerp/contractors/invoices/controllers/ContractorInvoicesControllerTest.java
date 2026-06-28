@@ -18,14 +18,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.hypermedia.LinksSnippet;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
@@ -36,8 +34,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.linkWithRel;
-import static org.springframework.restdocs.hypermedia.HypermediaDocumentation.links;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -45,7 +41,6 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
@@ -55,7 +50,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.greenfieldcommerce.greenerp.contractors.invoices.controllers.ContractorInvoicesController;
 import com.greenfieldcommerce.greenerp.controllers.BaseRestControllerTest;
 import com.greenfieldcommerce.greenerp.contractors.invoices.records.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.contractors.invoices.records.CreateContractorInvoiceRecord;
@@ -96,15 +90,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 
 		getMvc().perform(getLatestInvoices(VALID_RESOURCE_ID, pageable).with(user))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("_embedded.invoices").isArray())
-			.andExpect(validateContractorInvoice("_embedded.invoices[0]", invoice1, getObjectMapper()))
-			.andExpect(validateContractorInvoice("_embedded.invoices[1]", invoice2, getObjectMapper()))
-			.andExpect(jsonPath("_links").exists())
-			.andExpect(jsonPath("_links.self").exists())
-			.andExpect(jsonPath("_links.next").exists())
-			.andExpect(jsonPath("_links.first").exists())
-			.andExpect(jsonPath("_links.last").exists())
-			.andExpect(jsonPath("page").exists())
+			.andExpect(jsonPath("$.content").isArray())
+			.andExpect(validateContractorInvoice("$.content[0]", invoice1, getObjectMapper()))
+			.andExpect(validateContractorInvoice("$.content[1]", invoice2, getObjectMapper()))
 			.andDo(MockMvcResultHandlers.print())
 			.andDo(document("listing-latest-invoices",
 				preprocessResponse(prettyPrint()),
@@ -115,15 +103,8 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 					parameterWithName("sort").description("The sorting option, defaults to startDate,desc").optional()
 				),
 				pathParameters(contractorIdParameterDescription()),
-				links(
-					linkWithRel("self").description("Self link to this page of <<resources_invoices, invoices>>"),
-					linkWithRel("next").description("Link to the next page of <<resources_invoices, invoices>>").optional(),
-					linkWithRel("first").description("Link to the first page of <<resources_invoices, invoices>>").optional(),
-					linkWithRel("last").description("Link to the last page of <<resources_invoices, invoices>>").optional()),
 				responseFields(
-					subsectionWithPath("_embedded.invoices").description("An array of <<resources_invoice, Invoice resources>>"),
-					subsectionWithPath("_links").description("<<resources_invoices_links, Links>> to other resources"),
-					subsectionWithPath("page").description("Page metadata")
+					pageFields("An array of <<resources_invoice, Invoice resources>>")
 				)
 			));
 
@@ -150,11 +131,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 			.andExpect(status().isCreated())
 			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
 			.andExpect(header().string("Location", String.format("http://localhost:8080/contractors/%s/invoices/%s", result.contractorId(), result.invoiceId())))
-			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("creating-an-invoice",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
-					describeInvoiceLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
 					responseHeaders(describeResourceLocationHeader()),
 					pathParameters(contractorIdParameterDescription()),
@@ -185,10 +164,8 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		getMvc().perform(getInvoiceRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID).with(user))
 			.andExpect(status().isOk())
 			.andExpect(validateContractorInvoice("$", record, getObjectMapper()))
-			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("detailing-an-invoice",
 				preprocessResponse(prettyPrint()),
-				describeInvoiceLinks(),
 				requestHeaders(describeAdminOrContractorHeader()),
 				pathParameters(contractorIdParameterDescription(), invoiceIdParameterDescription()),
 				describeInvoiceResponse()
@@ -209,11 +186,9 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		getMvc().perform(patchInvoiceRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, createContractorInvoiceRecord).with(user))
 			.andExpect(status().isOk())
 			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
-			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("updating-an-invoice",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
-					describeInvoiceLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
 					describeInvoiceResponse(),
 					pathParameters(contractorIdParameterDescription(), invoiceIdParameterDescription()), describeCreateOrUpdateContractorInvoiceBody()
@@ -290,26 +265,6 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 		return new CreateContractorInvoiceRecord(BigDecimal.valueOf(22));
 	}
 
-	protected static ResultMatcher[] invoiceLinksMatcher()
-	{
-		return new ResultMatcher[] {
-			jsonPath("_links").exists(),
-			jsonPath("_links.self.href").value(String.format("http://localhost:8080/contractors/%s/invoices/%s", VALID_RESOURCE_ID, VALID_RESOURCE_ID)),
-			jsonPath("_links.contractor.href").value(String.format("http://localhost:8080/contractors/%s", VALID_RESOURCE_ID)),
-			jsonPath("_links.latestInvoices.href").value(String.format("http://localhost:8080/contractors/%s/invoices", VALID_RESOURCE_ID)),
-		};
-	}
-
-	protected static LinksSnippet describeInvoiceLinks()
-	{
-		return links(
-			linkWithRel("self").description("Self link to this <<resources_invoice, Invoice>>"),
-			linkWithRel("contractor").description("Link to the <<resources_contractor, Contractor>> for whom this invoice is issued"),
-			linkWithRel("latestInvoices").description("Link to the latest <<resources_invoices, invoices>> for the contractor"),
-			linkWithRel("client").description("Link to the <<resources_client, Client>> for whom this invoice is billed").optional()
-		);
-	}
-
 	protected static ParameterDescriptor invoiceIdParameterDescription()
 	{
 		return parameterWithName("invoiceId").description("Invoice id");
@@ -330,8 +285,7 @@ public class ContractorInvoicesControllerTest extends BaseRestControllerTest
 			fieldWithPath("extraAmountLines[].amount").type(JsonFieldType.NUMBER).description("The amount for the extra amount line").optional(),
 			fieldWithPath("extraAmountLines[].description").type(JsonFieldType.STRING).description("The description for the extra line").optional(),
 			fieldWithPath("currency").description("The invoice currency"),
-			fieldWithPath("status").description("The invoice status (OPEN, BILLED, or CLOSED)"),
-			subsectionWithPath("_links").description("HATEOAS <<resources_invoice_links, invoice links>> to related resources"));
+			fieldWithPath("status").description("The invoice status (OPEN, BILLED, or CLOSED)"));
 	}
 
 	private static RequestFieldsSnippet describeCreateOrUpdateContractorInvoiceBody()

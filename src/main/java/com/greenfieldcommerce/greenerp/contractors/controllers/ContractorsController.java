@@ -1,9 +1,7 @@
 package com.greenfieldcommerce.greenerp.contractors.controllers;
 
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.MediaTypes;
+import java.net.URI;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,8 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.greenfieldcommerce.greenerp.contractors.assemblers.ContractorModelAssembler;
+import com.greenfieldcommerce.greenerp.contractors.records.ContractorCollectionRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.ContractorRecord;
 import com.greenfieldcommerce.greenerp.contractors.records.CreateContractorRecord;
 import com.greenfieldcommerce.greenerp.security.AuthenticationConstraint;
@@ -24,46 +23,44 @@ import com.greenfieldcommerce.greenerp.contractors.services.ContractorService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/contractors", produces = MediaTypes.HAL_JSON_VALUE)
+@RequestMapping(value = "/contractors", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ContractorsController
 {
 	private final ContractorService contractorService;
-	private final ContractorModelAssembler contractorModelAssembler;
 
-	public ContractorsController(final ContractorService contractorService, final ContractorModelAssembler contractorModelAssembler)
+	public ContractorsController(final ContractorService contractorService)
 	{
 		this.contractorService = contractorService;
-		this.contractorModelAssembler = contractorModelAssembler;
 	}
 
 	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	public CollectionModel<EntityModel<ContractorRecord>> getAllContractors()
+	public ContractorCollectionRecord getAllContractors()
 	{
-		return contractorModelAssembler.toCollectionModel(contractorService.findAll());
+		return new ContractorCollectionRecord(contractorService.findAll());
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_ONLY)
-	public ResponseEntity<EntityModel<ContractorRecord>> createContractor(@Valid @RequestBody CreateContractorRecord record)
+	public ResponseEntity<ContractorRecord> createContractor(@Valid @RequestBody CreateContractorRecord record)
 	{
 		final ContractorRecord newContractor = contractorService.create(record);
-		final EntityModel<ContractorRecord> response = contractorModelAssembler.toModel(newContractor);
-
-		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
+		final URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{contractorId}")
+			.buildAndExpand(newContractor.id()).toUri();
+		return ResponseEntity.created(location).body(newContractor);
 	}
 
 	@GetMapping(value = "/{contractorId}")
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorRecord> getContractorDetails(@PathVariable("contractorId") Long contractorId)
+	public ContractorRecord getContractorDetails(@PathVariable("contractorId") Long contractorId)
 	{
-		return contractorModelAssembler.toModel(contractorService.findById(contractorId));
+		return contractorService.findById(contractorId);
 	}
 
 	@PatchMapping(value = "/{contractorId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorRecord> updateContractor(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRecord record)
+	public ContractorRecord updateContractor(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorRecord record)
 	{
-		return contractorModelAssembler.toModel(contractorService.update(contractorId, record));
+		return contractorService.update(contractorId, record);
 	}
 }

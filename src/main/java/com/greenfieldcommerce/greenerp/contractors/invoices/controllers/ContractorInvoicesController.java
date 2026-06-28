@@ -1,14 +1,11 @@
 package com.greenfieldcommerce.greenerp.contractors.invoices.controllers;
 
+import java.net.URI;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.MediaTypes;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,8 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.greenfieldcommerce.greenerp.contractors.invoices.assemblers.ContractorInvoiceModelAssembler;
 import com.greenfieldcommerce.greenerp.contractors.invoices.records.ContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.contractors.invoices.records.CreateContractorInvoiceRecord;
 import com.greenfieldcommerce.greenerp.security.AuthenticationConstraint;
@@ -29,53 +26,45 @@ import com.greenfieldcommerce.greenerp.contractors.invoices.services.ContractorI
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/contractors/{contractorId}/invoices", produces = MediaTypes.HAL_JSON_VALUE)
+@RequestMapping(value = "/contractors/{contractorId}/invoices", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ContractorInvoicesController
 {
 	private final ContractorInvoiceService contractorInvoiceService;
-	private final ContractorInvoiceModelAssembler contractorInvoiceModelAssembler;
-	private final PagedResourcesAssembler<ContractorInvoiceRecord> pagedContractorInvoiceResourcesAssembler;
 
-	public ContractorInvoicesController(final ContractorInvoiceService contractorInvoiceService, final ContractorInvoiceModelAssembler contractorInvoiceModelAssembler,
-		final PagedResourcesAssembler<ContractorInvoiceRecord> pagedContractorInvoiceResourcesAssembler)
+	public ContractorInvoicesController(final ContractorInvoiceService contractorInvoiceService)
 	{
 		this.contractorInvoiceService = contractorInvoiceService;
-		this.contractorInvoiceModelAssembler = contractorInvoiceModelAssembler;
-		this.pagedContractorInvoiceResourcesAssembler = pagedContractorInvoiceResourcesAssembler;
 	}
 
 	@GetMapping
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public PagedModel<EntityModel<ContractorInvoiceRecord>> findInvoices(@PathVariable("contractorId") Long contractorId,
+	public Page<ContractorInvoiceRecord> findInvoices(@PathVariable("contractorId") Long contractorId,
 		@PageableDefault(size = 12, sort = "startDate", direction = Sort.Direction.DESC) Pageable pageable)
 	{
-		final Page<ContractorInvoiceRecord> page = contractorInvoiceService.findByContractor(contractorId, pageable);
-		return pagedContractorInvoiceResourcesAssembler.toModel(page, contractorInvoiceModelAssembler);
+		return contractorInvoiceService.findByContractor(contractorId, pageable);
 	}
 
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public ResponseEntity<EntityModel<ContractorInvoiceRecord>> createInvoice(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
+	public ResponseEntity<ContractorInvoiceRecord> createInvoice(@PathVariable("contractorId") Long contractorId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
 		final ContractorInvoiceRecord createdInvoice = contractorInvoiceService.create(contractorId, record.numberOfWorkedDays());
-		final EntityModel<ContractorInvoiceRecord> response = contractorInvoiceModelAssembler.toModel(createdInvoice);
-
-		return ResponseEntity.created(response.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(response);
+		final URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{invoiceId}")
+			.buildAndExpand(createdInvoice.invoiceId()).toUri();
+		return ResponseEntity.created(location).body(createdInvoice);
 	}
 
 	@GetMapping("/{invoiceId}")
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorInvoiceRecord> getInvoice(@PathVariable("contractorId") Long contractorId, @PathVariable("invoiceId") Long invoiceId)
+	public ContractorInvoiceRecord getInvoice(@PathVariable("contractorId") Long contractorId, @PathVariable("invoiceId") Long invoiceId)
 	{
-		final ContractorInvoiceRecord invoice = contractorInvoiceService.findByContractorAndId(contractorId, invoiceId);
-		return contractorInvoiceModelAssembler.toModel(invoice);
+		return contractorInvoiceService.findByContractorAndId(contractorId, invoiceId);
 	}
 
 	@PatchMapping(value = "/{invoiceId}", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize(AuthenticationConstraint.ALLOW_ADMIN_OR_OWN_CONTRACTOR)
-	public EntityModel<ContractorInvoiceRecord> patchInvoice(@PathVariable("contractorId") Long contractorId, @PathVariable("invoiceId") Long invoiceId, @Valid @RequestBody CreateContractorInvoiceRecord record)
+	public ContractorInvoiceRecord patchInvoice(@PathVariable("contractorId") Long contractorId, @PathVariable("invoiceId") Long invoiceId, @Valid @RequestBody CreateContractorInvoiceRecord record)
 	{
-		final ContractorInvoiceRecord updatedInvoice = contractorInvoiceService.patchInvoice(contractorId, invoiceId, record.numberOfWorkedDays());
-		return contractorInvoiceModelAssembler.toModel(updatedInvoice);
+		return contractorInvoiceService.patchInvoice(contractorId, invoiceId, record.numberOfWorkedDays());
 	}
 }

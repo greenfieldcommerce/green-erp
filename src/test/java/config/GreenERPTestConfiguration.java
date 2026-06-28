@@ -11,11 +11,6 @@ import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.greenfieldcommerce.greenerp.clients.assemblers.ClientContractorInvoicesModelAssembler;
-import com.greenfieldcommerce.greenerp.clients.assemblers.ClientModelAssembler;
-import com.greenfieldcommerce.greenerp.contractors.invoices.assemblers.ContractorInvoiceModelAssembler;
-import com.greenfieldcommerce.greenerp.contractors.assemblers.ContractorModelAssembler;
-import com.greenfieldcommerce.greenerp.contractors.rates.assemblers.ContractorRateModelAssembler;
 import com.greenfieldcommerce.greenerp.helpers.JwtRequestPostProcessors;
 
 @TestConfiguration
@@ -26,36 +21,6 @@ public class GreenERPTestConfiguration
 	public JwtRequestPostProcessors jwtRequestPostProcessors()
 	{
 		return new JwtRequestPostProcessors();
-	}
-
-	@Bean
-	public ContractorModelAssembler contractorModelAssembler()
-	{
-		return new ContractorModelAssembler();
-	}
-
-	@Bean
-	public ContractorInvoiceModelAssembler contractorInvoiceModelAssembler()
-	{
-		return new ContractorInvoiceModelAssembler();
-	}
-
-	@Bean
-	public ContractorRateModelAssembler contractorRateModelAssembler()
-	{
-		return new ContractorRateModelAssembler();
-	}
-
-	@Bean
-	public ClientModelAssembler clientModelAssembler()
-	{
-		return new ClientModelAssembler();
-	}
-
-	@Bean
-	public ClientContractorInvoicesModelAssembler clientContractorInvoicesModelAssembler()
-	{
-		return new ClientContractorInvoicesModelAssembler(contractorInvoiceModelAssembler());
 	}
 
 	@Bean

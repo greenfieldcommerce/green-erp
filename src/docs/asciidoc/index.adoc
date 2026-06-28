@@ -88,16 +88,6 @@ The GreenERP API exposes an endpoint (from Spring Actuator) to check the metrics
 
 operation::metrics[snippets='http-request,http-response']
 
-
-[[overview_hypermedia]]
-== Hypermedia
-
-The GreenERP API uses hypermedia and resources include links to other resources in their
-responses. Responses are in https://github.com/mikekelly/hal_specification[Hypertext
-Application Language (HAL)] format. Links can be found beneath the `_links` key. Users of
-the API should not create URIs themselves, instead they should use the above-described
-links to navigate from resource to resource.
-
 [[resources]]
 = Resources
 
@@ -105,11 +95,6 @@ links to navigate from resource to resource.
 == Contractors
 
 The Contractors resource is used to list and create contractors
-
-[[resources_contractors_links]]
-=== Links
-
-include::{snippets}/listing-contractors/links.adoc[]
 
 === Listing contractors
 
@@ -125,11 +110,6 @@ operation::creating-a-contractor[snippets='http-request,request-headers,request-
 [[resources_contractor]]
 == Contractor
 The Contractor resource is used to retrieve and update a specific contractor.
-
-[[resources_contractor_links]]
-=== Links
-
-include::{snippets}/detailing-contractor/links.adoc[]
 
 === Retrieving a contractor
 A `GET` request will retrieve a specific contractor.
@@ -148,11 +128,6 @@ operation::updating-a-contractor[snippets='http-request,request-headers,path-par
 
 The Rates resource is used to list and create contractor rates
 
-[[resources_rates_links]]
-=== Links
-
-include::{snippets}/listing-contractor-rates/links.adoc[]
-
 === Listing contractor rates
 
 A `GET` request will list all the rates associated with a contractor.
@@ -167,11 +142,6 @@ operation::creating-a-rate[snippets='http-request,request-headers,path-parameter
 [[resources_rate]]
 == Rate
 The Rate resource is used to retrieve, update, and delete a specific contractor's rate.
-
-[[resources_rate_links]]
-=== Links
-
-include::{snippets}/detailing-a-rate/links.adoc[]
 
 === Retrieving a contractor rate
 A `GET` request will retrieve a specific contractor's rate.
@@ -194,10 +164,6 @@ operation::deleting-a-rate[snippets='http-request,request-headers,path-parameter
 
 The Invoices resource is used to list and create invoices
 
-[[resources_invoices_links]]
-=== Links
-include::{snippets}/listing-latest-invoices/links.adoc[]
-
 === Listing the latest invoices
 A `GET` request is used to list the latest contractor invoices.
 
@@ -211,11 +177,6 @@ operation::creating-an-invoice[snippets='http-request,request-headers,path-param
 [[resources_invoice]]
 == Invoice
 The Invoice resource is used to retrieve and update an invoice for a contractor.
-
-[[resources_invoice_links]]
-=== Links
-
-include::{snippets}/detailing-an-invoice/links.adoc[]
 
 === Detailing an invoice
 A `GET` request will retrieve an invoice for a contractor.
@@ -242,11 +203,6 @@ operation::updating-an-invoice-extra-line[snippets='http-request,request-headers
 
 The Clients resource is used to list clients
 
-[[resources_clients_links]]
-=== Links
-
-include::{snippets}/listing-clients/links.adoc[]
-
 === Listing clients
 A `GET` request is used to list all clients.
 
@@ -256,22 +212,12 @@ operation::listing-clients[snippets='http-request,request-headers,response-field
 == Client
 The Client resource is used to retrieve details for a client.
 
-[[resources_client_links]]
-=== Links
-
-include::{snippets}/detailing-client/links.adoc[]
-
 === Detailing a client
 A `GET` request will retrieve the details for a client.
 
 operation::detailing-client[snippets='http-request,request-headers,path-parameters,response-fields,http-response']
 
 == Contractor invoices for a Client
-
-[[resources_client_contractor_invoices]]
-=== Links
-
-include::{snippets}/listing-contractor-invoices-for-client/links.adoc[]
 
 === Listing open contractor invoices for a client
 A `GET` request will retrieve open contractor invoices with start date before given date, for a client.

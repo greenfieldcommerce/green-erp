@@ -1,10 +1,8 @@
 package com.greenfieldcommerce.greenerp.contractors.invoices.controllers;
 
 import static com.greenfieldcommerce.greenerp.helpers.ContractorInvoiceTestValidations.validateContractorInvoice;
-import static com.greenfieldcommerce.greenerp.contractors.invoices.controllers.ContractorInvoicesControllerTest.describeInvoiceLinks;
 import static com.greenfieldcommerce.greenerp.contractors.invoices.controllers.ContractorInvoicesControllerTest.describeInvoiceResponse;
 import static com.greenfieldcommerce.greenerp.contractors.invoices.controllers.ContractorInvoicesControllerTest.invoiceIdParameterDescription;
-import static com.greenfieldcommerce.greenerp.contractors.invoices.controllers.ContractorInvoicesControllerTest.invoiceLinksMatcher;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -78,11 +76,9 @@ public class InvoiceExtraLinesControllerTest extends BaseRestControllerTest
 		getMvc().perform(postInvoiceExtraLineRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, createRecord).with(user))
 			.andExpect(status().isCreated())
 			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
-			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("creating-an-invoice-extra-line",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
-					describeInvoiceLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription(), invoiceIdParameterDescription()),
 					describeCreateOrUpdateInvoiceExtraLineBody(),
@@ -116,11 +112,9 @@ public class InvoiceExtraLinesControllerTest extends BaseRestControllerTest
 		getMvc().perform(patchInvoiceExtraLinesRequest(VALID_RESOURCE_ID, VALID_RESOURCE_ID, VALID_RESOURCE_ID, createRecord).with(user))
 			.andExpect(status().isOk())
 			.andExpect(validateContractorInvoice("$", result, getObjectMapper()))
-			.andExpectAll(invoiceLinksMatcher())
 			.andDo(document("updating-an-invoice-extra-line",
 					preprocessRequest(prettyPrint()),
 					preprocessResponse(prettyPrint()),
-					describeInvoiceLinks(),
 					requestHeaders(describeAdminOrContractorHeader()),
 					pathParameters(contractorIdParameterDescription(), invoiceIdParameterDescription(), extraLineIdParameterDescription()),
 					describeCreateOrUpdateInvoiceExtraLineBody(),
