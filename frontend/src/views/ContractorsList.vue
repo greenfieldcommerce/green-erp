@@ -89,11 +89,11 @@ export default {
     async fetchContractors() {
       this.loading = true
       this.error = null
-      try {
-        const response = await api.get('/contractors')
-        // HAL+JSON response: contractors are in _embedded.contractors
-        this.contractors = response.data._embedded?.contractors ?? []
-      } catch (err) {
+       try {
+         const response = await api.get('/contractors')
+         // API returns wrapped collection: { contractors: [...] }
+         this.contractors = response.data.contractors ?? []
+       } catch (err) {
         console.error('Failed to fetch contractors:', err)
         if (err.response?.status === 403) {
           this.error = 'Access denied. You need ADMIN role to view contractors.'

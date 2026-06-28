@@ -210,12 +210,12 @@ export default {
         const url = `/clients/${this.clientId}/contractor-invoices${params.toString() ? '?' + params.toString() : ''}`
         const response = await api.get(url)
 
-        // Extract invoices from HAL+JSON response
-        if (response.data && response.data._embedded && response.data._embedded.invoices) {
-          this.invoices = response.data._embedded.invoices
-        } else {
-          this.invoices = []
-        }
+         // Extract invoices from API response
+         if (response.data && response.data.invoices) {
+           this.invoices = response.data.invoices
+         } else {
+           this.invoices = []
+         }
       } catch (err) {
         console.error('Failed to fetch contractor invoices:', err)
         if (err.response?.status === 403) {
@@ -243,8 +243,8 @@ export default {
         const response = await api.get(url)
 
         // Find the selected invoice from the response
-        if (response.data && response.data._embedded && response.data._embedded.invoices) {
-          this.selectedInvoice = response.data._embedded.invoices.find(
+        if (response.data && response.data.invoices) {
+          this.selectedInvoice = response.data.invoices.find(
             inv => inv.invoiceId === invoiceId
           ) || null
         }

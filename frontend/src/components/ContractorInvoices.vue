@@ -280,31 +280,31 @@ export default {
       this.error = null
 
       try {
-        const response = await api.get(`/contractors/${this.contractorId}/invoices?page=${page}&size=6`)
+        const response = await api.get(`/contractors/${this.contractorId}/invoices?page=${page}&size=12`)
 
-        // Extract content and pagination metadata from HAL+JSON response
-        if (response.data && response.data._embedded && response.data._embedded.invoices) {
-          if (page === 0) {
-            // Initial load - replace existing invoices
-            this.invoices = response.data._embedded.invoices
-          } else {
-            // Load more - append to existing invoices
-            this.invoices.push(...response.data._embedded.invoices)
-          }
+         // Extract content and pagination metadata from API response
+         if (response.data && response.data.content) {
+           if (page === 0) {
+             // Initial load - replace existing invoices
+             this.invoices = response.data.content
+           } else {
+             // Load more - append to existing invoices
+             this.invoices.push(...response.data.content)
+           }
 
-          // Update pagination metadata
-          this.updatePaginationMetadata(response.data)
+           // Update pagination metadata
+           this.updatePaginationMetadata(response.data)
 
-          // Auto-select first invoice if this is initial load and no invoice is selected
-          if (page === 0 && this.invoices.length > 0 && !this.selectedInvoiceId) {
-            this.selectInvoice(this.invoices[0].invoiceId)
-          }
-        } else {
-          if (page === 0) {
-            this.invoices = []
-          }
-          this.updatePaginationMetadata({ page: { totalElements: 0, totalPages: 0, number: 0 } })
-        }
+           // Auto-select first invoice if this is initial load and no invoice is selected
+           if (page === 0 && this.invoices.length > 0 && !this.selectedInvoiceId) {
+             this.selectInvoice(this.invoices[0].invoiceId)
+           }
+         } else {
+           if (page === 0) {
+             this.invoices = []
+           }
+           this.updatePaginationMetadata({ page: { totalElements: 0, totalPages: 0, number: 0 } })
+         }
       } catch (err) {
         console.error('Failed to fetch invoices:', err)
         if (err.response?.status === 403) {
@@ -322,11 +322,11 @@ export default {
 
     updatePaginationMetadata(responseData) {
       // Extract pagination info from HAL+JSON response
-      if (responseData.page) {
-        this.currentPage = responseData.page.number
-        this.totalPages = responseData.page.totalPages
-        this.totalElements = responseData.page.totalElements
-        this.hasNextPage = responseData.page.number < responseData.page.totalPages - 1
+      if (responseData.pageable) {
+        this.currentPage = responseData.number
+        this.totalPages = responseData.totalPages
+        this.totalElements = responseData.totalElements
+        this.hasNextPage = responseData.number < responseData.totalPages - 1
       } else {
         // Fallback if page metadata is not available
         this.hasNextPage = false

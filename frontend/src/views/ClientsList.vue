@@ -85,11 +85,11 @@ export default {
     async fetchClients() {
       this.loading = true
       this.error = null
-      try {
-        const response = await api.get('/clients')
-        // HAL+JSON response: clients are in _embedded.clients
-        this.clients = response.data._embedded?.clients ?? []
-      } catch (err) {
+       try {
+         const response = await api.get('/clients')
+         // API returns wrapped collection: { clients: [...] }
+         this.clients = response.data.clients ?? []
+       } catch (err) {
         console.error('Failed to fetch clients:', err)
         if (err.response?.status === 403) {
           this.error = 'Access denied. You need ADMIN role to view clients.'

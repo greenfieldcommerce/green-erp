@@ -4,7 +4,7 @@ import keycloak from './keycloak'
 const api = axios.create({
   baseURL: '/api',
   headers: {
-    Accept: 'application/hal+json',
+    Accept: 'application/json',
   },
 })
 
